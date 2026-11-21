@@ -1,3 +1,12 @@
+## 2.4.0 — 20/11/2026
+- Download da appbar abre modal com exportação completa ou por uma/múltiplas unidades.
+- O Excel analítico continua com 7 abas e nome `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
+- Todas as competências selecionadas por padrão ao importar.
+- Rotas hash (`#/dashboard`, `#/base`, `#/empregados`, `#/unidades`, `#/alertas`) com histórico do navegador, sem necessidade de configuração de redirects.
+- Rotas de detalhamento por unidade e matrícula na mesma sessão; seleção atual não persiste após recarregar.
+- Correção do acesso à página Unidades na appbar e preservação do drill-down.
+- Testes de regressão para modal, roteamento e competência.
+
 # Histórico de alterações
 
 ## 2.3.0 — 20/11/2026

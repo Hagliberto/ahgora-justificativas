@@ -1,4 +1,4 @@
-# Dashboard Gerencial — v2.3.0
+# Dashboard Gerencial — v2.4.0
 
 ## Filtros e escopo
 
@@ -26,5 +26,5 @@ O limite do art. 7º, §3º, é relativo a esquecimentos de marcação, que aqui
 O dashboard utiliza **volume absoluto** e não taxas por quadro de empregados, por ausência da população-base. Não extrapolar conclusões sobre produtividade, reincidência relativa ou comportamento.
 
 
-## Fluxo hierárquico 2.3.0
+## Fluxo hierárquico 2.4.0
 Na appbar, abra Unidades e clique na unidade; a lista de empregados aparece filtrada. Clique no empregado para ver ficha analítica mensal, perfil e comparações. A evolução histórica consulta todas as competências do **arquivo atual**, independentemente da competência visual. Não agrega importações diferentes. As médias da unidade usam o recorte de filtros selecionado.

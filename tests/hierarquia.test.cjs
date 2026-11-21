@@ -5,10 +5,10 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 const pkg = require('../package.json');
 
-test('versão 2.3.0 consistente no pacote e interface', () => {
-  assert.equal(pkg.version, '2.3.0');
-  assert.match(html, /Versão 2\.3\.0/);
-  assert.match(html, /v2\.3\.0/);
+test('versão 2.4.0 consistente no pacote e interface', () => {
+  assert.equal(pkg.version, '2.4.0');
+  assert.match(html, /Versão 2\.4\.0/);
+  assert.match(html, /v2\.4\.0/);
 });
 test('appbar contém competência, navegação e nota discreta', () => {
   const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));
@@ -18,7 +18,7 @@ test('appbar contém competência, navegação e nota discreta', () => {
   assert.equal((html.match(/id="competenceSelect"/g)||[]).length,1);
 });
 test('fluxo unidade → empregado → ficha e histórico de todas as competências importadas', () => {
-  assert.match(html,/function openUnitEmployees\(index\)/);
+  assert.match(html,/function openUnitEmployees\(index(?:, updateRoute = true)?\)/);
   assert.match(html,/function openEmployeeAnalysis\(index\)/);
   assert.match(html,/function monthHistoryForEmployee\(matricula\)/);
   assert.match(html,/fullImportedDataset\.forEach\(row =>/);

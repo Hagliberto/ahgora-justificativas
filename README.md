@@ -1,6 +1,6 @@
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.3.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.4.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
 
 ## Como executar
 
@@ -53,12 +53,12 @@ Não há `npm install` obrigatório para executar a aplicação. O arquivo HTML 
 ## Fluxo Git sugerido
 
 ```powershell
-git checkout -b feature/analise-hierarquica-v2.3.0
+git checkout -b feature/analise-hierarquica-v2.4.0
 # copie os arquivos desta entrega sobre o repositório e confira o diff
 git status
 git add .
 git commit -m "chore: documenta e padroniza auditoria de justificativas"
-git push -u origin feature/analise-hierarquica-v2.3.0
+git push -u origin feature/analise-hierarquica-v2.4.0
 ```
 
 A versão original estava na `main` com a árvore limpa; esta entrega **não alterou seu repositório local nem fez push**. Homologue antes de mesclar na `main`.
@@ -67,7 +67,7 @@ A versão original estava na `main` com a árvore limpa; esta entrega **não alt
 
 O sistema **sinaliza** registros para conferência e não decide automaticamente a validade jurídica ou administrativa de uma justificativa. Os parâmetros atuais de 4 inclusões, 5/7 dias e escala 12x36 vêm do código recebido; precisam de confirmação formal na norma aplicável e no período de apuração. Consulte [regras](docs/REGRAS_DE_NEGOCIO.md) e [homologação](docs/HOMOLOGACAO.md).
 
-## Mudanças da versão 2.3.0
+## Mudanças da versão 2.4.0
 - Navegação por botões discretos na appbar e competência em seletor compacto.
 - Aviso normativo recolhido em ícone informativo acessível.
 - Navegação hierárquica: Unidades → Empregados → Ficha individual.
@@ -94,3 +94,9 @@ O sistema **sinaliza** registros para conferência e não decide automaticamente
 - Todas as avaliações são preventivas; exceções, calendário de dias úteis, razão efetiva do ajuste e aprovação normativa demandam validação humana.
 
 **Limitação da origem:** não há campo estruturado que confirme “esqueci de bater ponto”. A heurística textual pode deixar de reconhecer situações. Consulte `docs/CONCILIACAO_NORMATIVA.md`.
+
+## Rotas e exportação (v2.4.0)
+
+A navegação usa rotas hash, compatíveis com GitHub Pages e Cloudflare Pages sem configuração de fallback: `#/dashboard`, `#/base`, `#/empregados`, `#/unidades` e `#/alertas`. A exploração de unidade usa `#/unidades/CODIGO` e a ficha individual `#/empregados/MATRICULA`. **Os dados não são persistidos entre recarregamentos:** importe a planilha novamente ao abrir um link numa nova sessão.
+
+Na appbar, o ícone Excel abre o modal **Completa / Por unidade**. Em *Por unidade*, marque uma ou várias unidades, use a busca ou selecione todas as visíveis. As 7 abas do arquivo analítico são calculadas somente com as linhas das unidades escolhidas, respeitando a competência selecionada (que inicia em **Todas as competências**). O modo Completa ignora filtros visuais do dashboard. O nome permanece `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
