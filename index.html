@@ -187,7 +187,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.0.1 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.3.0 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -214,19 +214,58 @@
 
     <!-- Cabeçalho Institucional CAERN (Formato Wide) -->
     <header class="caern-gradient text-white shadow-lg sticky top-0 z-40 w-full">
-        <div class="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap xl:flex-nowrap items-center justify-between gap-3">
             <div class="flex items-center gap-3.5">
                 <div class="bg-white/15 backdrop-blur-md p-2.5 rounded-xl border border-white/20 flex items-center justify-center shadow-inner">
                     <i class="fa-solid fa-droplet text-2xl text-sky-300"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.3.0</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
                     </div>
                     <p class="text-xs text-sky-100/85 font-normal">Tratamento, Estatística e Análise de Justificativas Ahgora</p>
+                </div>
+            </div>
+
+
+            <!-- Navegação compacta na barra superior -->
+            <div id="appbarTools" class="hidden flex-1 min-w-[280px] items-center justify-end gap-2 flex-wrap order-3 xl:order-none">
+                <label for="competenceSelect" class="sr-only">Competência da auditoria</label>
+                <select id="competenceSelect" aria-label="Competência da auditoria" title="Competência da auditoria" onchange="changeCompetence()" class="max-w-40 bg-white/10 text-white border border-white/20 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-white/40 [&>option]:text-slate-900"><option value="">Todas as competências</option></select>
+                <nav aria-label="Navegação das análises" class="flex items-center gap-1 overflow-x-auto max-w-full" role="tablist">
+                    <button onclick="switchTab('tabOverview')" id="btn-tabOverview" class="tab-btn border border-white/15 active-tab px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer bg-white text-caern-primary shadow">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('tabRecords')" id="btn-tabRecords" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span>Base tratada</span>
+                    </button>
+                    <button onclick="switchTab('tabEmployees')" id="btn-tabEmployees" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Empregados</span>
+                    </button>
+                    <button onclick="openAllUnits()" id="btn-tabUnits" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Unidades</span>
+                    </button>
+                    <button onclick="switchTab('tabAlerts')" id="btn-tabAlerts" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
+                        <i class="fa-solid fa-triangle-exclamation text-current"></i>
+                        <span>Alertas</span>
+                        <span id="tabAlertCounter" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white">0</span>
+                    </button>
+                </nav>
+                <div class="relative group">
+                    <button type="button" aria-label="Informações normativas" aria-describedby="normativeInfo" aria-expanded="false" onclick="toggleNormativeInfo()" class="w-8 h-8 flex items-center justify-center rounded-lg border border-white/20 hover:bg-white/15" title="Informações normativas"><i class="fa-solid fa-circle-info"></i></button>
+                    <div id="normativeInfo" role="note" class="hidden absolute right-0 top-full mt-3 w-[min(92vw,440px)] rounded-xl p-4 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xl text-xs leading-relaxed z-50">
+                        <strong class="block text-sm mb-2"><i class="fa-solid fa-shield-halved text-sky-600 mr-2"></i>Auditoria preventiva</strong>
+                        Alertas dependem de conferência humana. O limite normativo de quatro validações mensais refere-se a <strong>esquecimento de registro</strong> (Norma, art. 7º, §3º), e não a qualquer inclusão de batida.
+                        <p class="mt-2">A Norma prevê análise do gestor em 24h, enquanto o Manual menciona 2 dias úteis. A divergência é registrada na documentação, sem decisão automática de irregularidade.</p>
+                        <button onclick="toggleNormativeInfo(false)" type="button" class="mt-3 text-caern-primary dark:text-sky-300 font-semibold">Fechar</button>
+                    </div>
                 </div>
             </div>
 
@@ -294,19 +333,12 @@
         <!-- Painel Principal Organizado em Abas (Exibido após carga) -->
         <div id="analyticsDashboard" class="hidden space-y-5 w-full">
 
-            <!-- Apuração por competência: recalcula indicadores e limites mensais -->
-            <section class="glass-card rounded-2xl p-3 sm:px-5 flex flex-col md:flex-row md:items-center justify-between gap-3" aria-label="Configuração da competência">
-                <div>
-                    <p class="text-sm font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-calendar-check mr-2 text-caern-secondary"></i>Competência da auditoria</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Limites mensais e indicadores são recalculados ao selecionar o mês. Em “Todas”, os números servem apenas à exploração.</p>
-                </div>
-                <select id="competenceSelect" aria-label="Selecionar competência" onchange="changeCompetence()" class="w-full md:w-64 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-semibold focus:ring-2 focus:ring-caern-secondary">
-                    <option value="">Todas as competências (exploratório)</option>
-                </select>
-            </section>
-            <section class="rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/80 dark:bg-amber-950/20 px-4 py-3 text-xs text-amber-900 dark:text-amber-200" role="note">
-                <strong>Auditoria preventiva:</strong> alertas dependem de conferência humana. O limite normativo de quatro validações mensais se refere a <strong>esquecimento de registro</strong> (Norma, art. 7º, §3º), e não a qualquer inclusão de batida. Há divergência entre a Norma (24 h) e o Manual (2 dias úteis) para análise do gestor; ver documentação.
-            </section>
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 px-1">
+                <i class="fa-solid fa-file-circle-check text-emerald-600"></i>
+                <strong id="loadedFileName" class="text-slate-700 dark:text-slate-200">Base processada</strong>
+                <span id="loadedBadgeCount" class="rounded-full bg-sky-50 dark:bg-sky-950 px-2 py-0.5">0 registros</span>
+                <span id="loadedDateRange">Período: --</span>
+            </div>
             <!-- Filtros globais: afetam dashboard, registros, empregados, unidades e alertas -->
             <section class="glass-card rounded-2xl p-4 sm:p-5 space-y-3" aria-label="Filtros globais da auditoria">
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -330,47 +362,6 @@
                 </div>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400">* Prazo exibido para conferência: Norma art. 12 e Manual apresentam orientações diferentes. Contagem de esquecimentos considera toda a competência, mesmo com filtros ativos.</p>
             </section>
-
-            <!-- Faixa de Contexto da Planilha Carregada + Navegação por Abas -->
-            <div class="glass-card rounded-2xl p-3 sm:px-5 flex flex-col xl:flex-row xl:items-center justify-between gap-3 border-l-4 border-l-caern-secondary">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-base shrink-0">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h2 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base truncate" id="loadedFileName">Base Processada</h2>
-                            <span id="loadedBadgeCount" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-caern-light text-caern-primary dark:bg-sky-900/60 dark:text-sky-300">0 registros</span>
-                        </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400" id="loadedDateRange">Período: --</p>
-                    </div>
-                </div>
-
-                <!-- Botões das Abas -->
-                <nav aria-label="Navegação das análises" class="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0" role="tablist">
-                    <button onclick="switchTab('tabOverview')" id="btn-tabOverview" class="tab-btn active-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer bg-caern-primary text-white shadow">
-                        <i class="fa-solid fa-chart-pie"></i>
-                        <span>Dashboard & Insights</span>
-                    </button>
-                    <button onclick="switchTab('tabRecords')" id="btn-tabRecords" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800">
-                        <i class="fa-solid fa-table-list"></i>
-                        <span>Base Tratada & Filtros</span>
-                    </button>
-                    <button onclick="switchTab('tabEmployees')" id="btn-tabEmployees" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800">
-                        <i class="fa-solid fa-users"></i>
-                        <span>Análise por Empregado</span>
-                    </button>
-                    <button onclick="switchTab('tabUnits')" id="btn-tabUnits" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800">
-                        <i class="fa-solid fa-building"></i>
-                        <span>Análise por Unidade</span>
-                    </button>
-                    <button onclick="switchTab('tabAlerts')" id="btn-tabAlerts" class="tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800">
-                        <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
-                        <span>Alertas de Auditoria</span>
-                        <span id="tabAlertCounter" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white">0</span>
-                    </button>
-                </nav>
-            </div>
 
             <!-- ===================================================================== -->
             <!-- ABA 1: VISÃO GERAL & GRÁFICOS                                         -->
@@ -662,6 +653,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3.5">
                         <div>
                             <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Consolidado & Ranking por Empregado</h3>
+                            <button onclick="document.getElementById('filterDept').value=''; activeEmployeeKey=null; openAllUnits()" class="text-xs text-caern-secondary hover:underline mt-1"><i class="fa-solid fa-arrow-left mr-1"></i>Voltar para unidades</button>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Acompanhamento do volume de inclusões e triagem separada de esquecimentos identificáveis (Norma, art. 7º, §3º)</p>
                         </div>
                         <div class="flex items-center gap-2.5">
@@ -679,6 +671,8 @@
                         </div>
                     </div>
 
+                    <div id="employeeDetail" class="hidden rounded-2xl border border-sky-200 dark:border-sky-900 bg-sky-50/40 dark:bg-sky-950/15 p-4 sm:p-5 space-y-5" aria-live="polite"></div>
+                    <div id="employeeListTitle" class="text-xs font-semibold text-slate-500">Selecione um empregado para detalhar</div>
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 max-h-[600px]">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead class="bg-caern-primary text-white sticky top-0 z-10 font-semibold uppercase tracking-wider">
@@ -782,6 +776,8 @@
         let processedDataset = [];
         let filteredDataset = [];
         let employeeStatsMap = {};
+        let currentUnitRows = [];
+        let activeEmployeeKey = null;
         let currentPage = 1;
         let pageSize = 30;
         let currentSourceName = "Justificativas_Ahgora_CAERN";
@@ -948,14 +944,14 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('bg-caern-primary', 'text-white', 'shadow');
-                b.classList.add('text-slate-600', 'dark:text-slate-300', 'hover:bg-slate-200/70', 'dark:hover:bg-slate-800');
+                b.classList.remove('bg-white', 'text-caern-primary', 'shadow');
+                b.classList.add('text-sky-100', 'hover:bg-white/15');
             });
 
             document.getElementById(tabId).classList.remove('hidden');
             const activeBtn = document.getElementById(`btn-${tabId}`);
-            activeBtn.classList.remove('text-slate-600', 'dark:text-slate-300', 'hover:bg-slate-200/70', 'dark:hover:bg-slate-800');
-            activeBtn.classList.add('bg-caern-primary', 'text-white', 'shadow');
+            activeBtn.classList.remove('text-sky-100', 'hover:bg-white/15');
+            activeBtn.classList.add('bg-white', 'text-caern-primary', 'shadow');
 
             if (tabId === 'tabOverview') { renderCharts(); renderDashboardAdvanced(); }
         }
@@ -1341,6 +1337,8 @@
             // Atualizar Interface
             document.getElementById('uploadSection').classList.add('hidden');
             document.getElementById('btnNewUpload').classList.remove('hidden');
+            document.getElementById('appbarTools').classList.remove('hidden');
+            document.getElementById('appbarTools').classList.add('flex');
             document.getElementById('analyticsDashboard').classList.remove('hidden');
             document.getElementById('btnExportSingle').disabled = false;
 
@@ -1357,6 +1355,7 @@
 
             populateFilterOptions();
             applyFilters();
+            if (!preserveCompetence) switchTab('tabUnits');
             if (!preserveCompetence) showToast(`Planilha processada! ${processedDataset.length} registros na competência selecionada.`, 'success');
         }
 
@@ -1879,9 +1878,127 @@
                 .sort((a, b) => b.totalInclusoesBatida - a.totalInclusoesBatida || b.totalSolicitacoes - a.totalSolicitacoes);
         }
 
+        function toggleNormativeInfo(force) {
+            const panel = document.getElementById('normativeInfo');
+            const opened = force === undefined ? panel.classList.contains('hidden') : force;
+            panel.classList.toggle('hidden', !opened);
+            document.querySelector('[aria-describedby="normativeInfo"]').setAttribute('aria-expanded', String(opened));
+        }
+
+        function openAllUnits() {
+            document.getElementById('filterDept').value = '';
+            activeEmployeeKey = null;
+            applyFilters();
+            switchTab('tabUnits');
+        }
+
+        function openUnitEmployees(index) {
+            const unit = currentUnitRows[index];
+            if (!unit) return;
+            document.getElementById('filterDept').value = unit.nome;
+            document.getElementById('globalEmployee').value = '';
+            document.getElementById('empTabPunchFilter').value = '';
+            activeEmployeeKey = null;
+            applyFilters();
+            switchTab('tabEmployees');
+            document.getElementById('tabEmployees').scrollIntoView({behavior:'smooth',block:'start'});
+        }
+
+        function openEmployeeAnalysis(index) {
+            const emp = getFilteredEmployeesList()[index];
+            if (!emp) return;
+            activeEmployeeKey = emp.matricula;
+            drawEmployeeAnalysis(emp);
+            document.getElementById('employeeDetail').scrollIntoView({behavior:'smooth',block:'start'});
+        }
+
+        function monthHistoryForEmployee(matricula) {
+            // Histórico completo disponível na importação, independentemente da competência visualizada.
+            const results = new Map();
+            fullImportedDataset.forEach(row => {
+                const digits = String(row['Matrícula'] || '').replace(/\D/g,'');
+                const employeeId = digits ? digits.slice(-6).padStart(6,'0') : '';
+                if (!matricula || employeeId !== matricula) return;
+                const month = getCompetence(row['Data da justificativa']);
+                if (!month) return;
+                if (!results.has(month)) results.set(month,{month,total:0,forgot:0,inclusions:0,abonos:0,approvals:[],status:{},types:{}});
+                const v = results.get(month);
+                v.total++;
+                const tipo = String(row['Tipo']||'').trim();
+                const status = String(row['Status']||'').trim() || 'Não informado';
+                const info = `${row['Informação']||''} ${row['Motivo']||''}`;
+                const inclusion = /inclus[aã]o de batida/i.test(tipo);
+                if (inclusion) v.inclusions++;
+                if (inclusion && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(info)) v.forgot++;
+                if (/abono/i.test(tipo)) v.abonos++;
+                v.status[status] = (v.status[status]||0)+1;
+                v.types[tipo||'Não informado'] = (v.types[tipo||'Não informado']||0)+1;
+                const request = parseBrDate(row['Data solicitação']);
+                const approved = parseBrDate(row['Data e hora da aprovação']);
+                if (request && approved && approved >= request) v.approvals.push((approved-request)/3600000);
+            });
+            return Array.from(results.values()).sort((a,b)=>a.month.localeCompare(b.month));
+        }
+
+        function drawEmployeeAnalysis(emp) {
+            const panel = document.getElementById('employeeDetail');
+            const history = monthHistoryForEmployee(emp.matricula);
+            const current = filteredDataset.filter(d=>d.matricula===emp.matricula);
+            const unit = filteredDataset.filter(d=>d.deptNome===emp.deptNome);
+            const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+            const approvalHours = current.map(getDecisionHours).filter(v=>v!==null);
+            const avgCurrent = avg(approvalHours);
+            const unitAvg = avg(unit.map(getDecisionHours).filter(v=>v!==null));
+            const unitEmployees = new Set(unit.map(d=>d.matricula).filter(Boolean)).size;
+            const relative = unitEmployees ? unit.length/unitEmployees : 0;
+            const sortedTypes = Object.entries(current.reduce((m,d)=>{const k=d.motivo||d.tipo||'Não informado';m[k]=(m[k]||0)+1;return m},{})).sort((a,b)=>b[1]-a[1]);
+            const pending = current.filter(d=>/pendente/i.test(d.status)).length;
+            const fmt = x => x===null?'N/D':`${x.toFixed(1)} h`;
+            const cards = [
+              ['Solicitações (recorte)',current.length],
+              ['Possíveis esquecimentos (recorte)',current.filter(d=>d.isEsquecimento).length],
+              ['Pendentes (recorte)',pending],
+              ['Decisão média (recorte)',fmt(avgCurrent)],
+              ['Média por empregado na unidade',relative.toFixed(1)],
+              ['Decisão média da unidade',fmt(unitAvg)]
+            ];
+            const maxCount = Math.max(1,...history.map(h=>h.total));
+            panel.innerHTML = `
+                <div class="flex flex-wrap justify-between gap-3 items-start">
+                    <div><p class="text-xs uppercase tracking-wider text-sky-700 dark:text-sky-300 font-semibold">Ficha analítica individual</p>
+                    <h3 class="text-lg font-extrabold">${escapeHtml(emp.funcionario)}</h3>
+                    <p class="text-xs text-slate-500">Matrícula ${escapeHtml(emp.matricula)} • ${escapeHtml(emp.deptNome)}</p></div>
+                    <button onclick="closeEmployeeAnalysis()" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-xs font-semibold"><i class="fa-solid fa-xmark mr-1"></i>Fechar análise</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">${cards.map(([name,value])=>`<div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3"><p class="text-[11px] text-slate-500">${name}</p><strong class="text-xl">${value}</strong></div>`).join('')}</div>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4">
+                        <h4 class="font-bold text-sm mb-3">Evolução mensal das solicitações</h4>
+                        ${history.length ? history.map(h=>`<div class="flex gap-3 items-center mb-2"><span class="text-xs w-16">${h.month.slice(5)}/${h.month.slice(0,4)}</span><div class="flex-1 rounded-full bg-slate-100 dark:bg-slate-800 h-3 overflow-hidden"><div class="h-full bg-sky-600 rounded-full" style="width:${100*h.total/maxCount}%"></div></div><strong class="text-xs w-6 text-right">${h.total}</strong></div>`).join(''):'<p class="text-xs text-slate-500">Sem histórico válido.</p>'}
+                    </div>
+                    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4">
+                        <h4 class="font-bold text-sm mb-3">Perfil das justificativas no recorte</h4>
+                        ${sortedTypes.length?sortedTypes.slice(0,8).map(([name,num])=>`<div class="flex justify-between gap-4 border-b border-slate-100 dark:border-slate-800 py-2 text-xs"><span>${escapeHtml(name)}</span><strong>${num}</strong></div>`).join(''):'<p class="text-xs text-slate-500">Sem ocorrências no recorte.</p>'}
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                    <table class="w-full text-xs text-left"><thead class="bg-slate-100 dark:bg-slate-800"><tr><th class="p-3">Mês</th><th class="p-3">Solicitações</th><th class="p-3">Inclusões</th><th class="p-3">Esquecimentos*</th><th class="p-3">Abonos</th><th class="p-3">Aprovação média</th></tr></thead>
+                    <tbody>${history.map(h=>`<tr class="border-t border-slate-100 dark:border-slate-800"><td class="p-3">${h.month.slice(5)}/${h.month.slice(0,4)}</td><td class="p-3">${h.total}</td><td class="p-3">${h.inclusions}</td><td class="p-3 font-semibold ${h.forgot>4?'text-amber-600':''}">${h.forgot}</td><td class="p-3">${h.abonos}</td><td class="p-3">${fmt(avg(h.approvals))}</td></tr>`).join('')}</tbody></table>
+                </div>
+                <p class="text-xs text-slate-500">* Esquecimentos identificados por descrição textual. Histórico limitado aos meses contidos no arquivo importado; sem integração externa. Comparações usam a unidade e o mesmo recorte de filtros ativo, não taxas ajustadas pela quantidade de jornadas.</p>`;
+            panel.classList.remove('hidden');
+        }
+
+        function closeEmployeeAnalysis() { activeEmployeeKey=null; document.getElementById('employeeDetail').classList.add('hidden'); }
+
         function renderEmployeeTab() {
             const tbody = document.getElementById('employeeTableBody');
             const list = getFilteredEmployeesList();
+            const selected = activeEmployeeKey && list.find(e => e.matricula === activeEmployeeKey);
+            if (selected) drawEmployeeAnalysis(selected);
+            else { document.getElementById('employeeDetail').classList.add('hidden'); activeEmployeeKey = null; }
+            const unitFilter = document.getElementById('filterDept').value;
+            document.getElementById('employeeListTitle').textContent = unitFilter ? `Unidade: ${unitFilter} • ${list.length} empregado(s)` : `${list.length} empregado(s) • selecione para abrir a análise individual`;
 
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-500">Nenhum empregado encontrado para o filtro selecionado.</td></tr>`;
@@ -1898,7 +2015,7 @@
                 }
 
                 return `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <tr class="hover:bg-sky-50 dark:hover:bg-sky-950/40 cursor-pointer focus:outline focus:outline-2 focus:outline-sky-600" onclick="openEmployeeAnalysis(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEmployeeAnalysis(${idx})}" tabindex="0" role="button" title="Abrir análise detalhada deste empregado">
                         <td class="py-2.5 px-3.5 font-semibold text-slate-400">${idx + 1}</td>
                         <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${escapeHtml(emp.matricula)}</td>
                         <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(emp.funcionario)}</td>
@@ -1935,8 +2052,9 @@
             });
 
             const rows = Object.values(unitMap).sort((a, b) => b.total - a.total);
-            tbody.innerHTML = rows.map(u => `
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+            currentUnitRows = rows;
+            tbody.innerHTML = rows.map((u, idx) => `
+                <tr onclick="openUnitEmployees(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUnitEmployees(${idx})}" tabindex="0" role="button" title="Ver empregados desta unidade" class="hover:bg-sky-50 dark:hover:bg-sky-950/40 cursor-pointer focus:outline focus:outline-2 focus:outline-sky-600">
                     <td class="py-2.5 px-3.5 font-mono text-slate-500">${escapeHtml(u.codigo)}</td>
                     <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(u.nome)}</td>
                     <td class="py-2.5 px-3.5 text-center font-bold">${u.total}</td>
@@ -2688,7 +2806,7 @@
                 });
 
                 const dateStamp = new Date().toISOString().slice(0, 10);
-                const outputFileName = `${currentSourceName}_Analitica_CAERN_${dateStamp}.xlsx`;
+                const outputFileName = `justificativas_Analitica_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/', '.')}.xlsx`;
                 await downloadWorkbook(workbook, outputFileName);
 
                 showToast(`Planilha "${outputFileName}" exportada com 7 abas formatadas!`, 'success');

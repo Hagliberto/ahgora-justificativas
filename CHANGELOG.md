@@ -1,5 +1,13 @@
 # Histórico de alterações
 
+## 2.3.0 — 20/11/2026
+- Versão visível, README e package.json alinhados.
+- Navegação compacta na appbar com competência e aviso normativo no ícone (i).
+- Fluxo hierárquico unidades → empregados → detalhamento individual, incluindo perfil e histórico mensal.
+- Exportação analítica com nome padronizado em data local brasileira.
+- Histórico disponível somente para os períodos contidos no arquivo importado.
+
+
 ## 2.2.0 — 20/11/2026
 - Dashboard com filtros globais cruzados e indicadores de gestão.
 - Novos gráficos e insights descritivos por status, gestor, empregado e dia da semana.

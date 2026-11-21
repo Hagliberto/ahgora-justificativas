@@ -26,3 +26,12 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Datas impossíveis e matrículas ausentes não geram agrupamento fraudulento.
 - [ ] Arquivo sem campos essenciais não substitui base já carregada; arquivo >25MB é recusado.
 - [ ] Conferir funcionamento de todas as cinco abas, gráficos e exportações no navegador (não automatizado nos testes unitários).
+
+## Checklist 2.3.0
+- [ ] Interface e documentação exibem versão 2.3.0.
+- [ ] Appbar exibe cinco abas compactas e seletor de competência.
+- [ ] Ícone (i) abre e fecha aviso normativo, sem card persistente.
+- [ ] Clique na unidade filtra empregados; clique no empregado abre ficha.
+- [ ] Ficha mostra todos os meses disponíveis da importação, inclusive fora da competência atual.
+- [ ] Filtros e ausência de resultados não quebram detalhamento.
+- [ ] Arquivo exportado: justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx.
