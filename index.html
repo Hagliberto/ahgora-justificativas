@@ -188,7 +188,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.7.0 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.7.1 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -245,7 +245,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.7.0</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.7.1</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -2285,7 +2285,7 @@
             referenceRows.forEach(item => {
                 const month = normMonth(item);
                 if (!item.isEsquecimento || !item.matricula || !month) return;
-                const key = `${item.matricula}::${month}`;
+                const key = `${item.deptCodigo || ''}::${item.deptNome || ''}::${item.matricula}::${month}`;
                 if (!monthly.has(key)) monthly.set(key, []);
                 monthly.get(key).push(item);
             });
@@ -3082,9 +3082,55 @@
             } catch(error) { console.error(error); showToast('Falha ao gerar ZIP de unidades.', 'error'); return false; }
         }
 
+        // Fonte única de verdade da exportação: recalcular estatísticas a partir do
+        // conjunto EXATO de registros escolhido no modal (inclusive dentro do ZIP).
+        // A chave inclui o departamento, evitando misturar transferências/lotação.
+        function buildExportScopeData(exportRows) {
+            const stats = new Map();
+            const keyFor = row => `${String(row.deptCodigo || '')}::${String(row.deptNome || 'Não informada')}::${String(row.matricula || `SEM:${row.funcionario || ''}:${row.id}`)}`;
+            exportRows.forEach(row => {
+                const key = keyFor(row);
+                if (!stats.has(key)) stats.set(key, {
+                    matricula: row.matricula,
+                    funcionario: row.funcionario,
+                    filial: row.filial,
+                    deptNome: row.deptNome,
+                    deptCodigo: row.deptCodigo,
+                    grupoRegra: row.grupoRegra,
+                    totalSolicitacoes: 0,
+                    totalInclusoesBatida: 0,
+                    totalEsquecimentos: 0,
+                    totalAbonos: 0,
+                    somaDiasPrazo: 0
+                });
+                const employee = stats.get(key);
+                employee.totalSolicitacoes++;
+                if (row.isInclusao) employee.totalInclusoesBatida++;
+                if (row.isEsquecimento) employee.totalEsquecimentos++;
+                if (row.isAbono) employee.totalAbonos++;
+                employee.somaDiasPrazo += Number(row.diasDiferenca) || 0;
+            });
+            const rows = exportRows.map(row => {
+                const employee = stats.get(keyFor(row));
+                return {
+                    ...row,
+                    totalOcorrenciasColab: employee.totalSolicitacoes,
+                    totalInclusoesColab: employee.totalInclusoesBatida,
+                    totalEsquecimentosColab: employee.totalEsquecimentos,
+                    classificacaoInclusao: getInclusionClassification(employee.totalInclusoesBatida)
+                };
+            });
+            const employees = [...stats.values()].sort((a, b) =>
+                b.totalInclusoesBatida - a.totalInclusoesBatida ||
+                b.totalSolicitacoes - a.totalSolicitacoes ||
+                String(a.funcionario).localeCompare(String(b.funcionario), 'pt-BR'));
+            return { rows, employees };
+        }
+
         // Exportação Completa Multi-Abas (8 abas formatadas)
         async function exportStyledExcel(exportRows = processedDataset, options = {}) {
-            const processedDataset = exportRows; // escopo específico desta exportação
+            const exportScope = buildExportScopeData(exportRows);
+            const processedDataset = exportScope.rows; // base única para TODAS as abas desta exportação
             if (!processedDataset || processedDataset.length === 0) {
                 showToast('Carregue uma planilha antes de exportar.', 'warning');
                 return;
@@ -3233,8 +3279,7 @@
                 });
 
                 // ABA 4: Ranking_Empregados
-                const allEmpSorted = Object.values(employeeStatsMap)
-                    .sort((a, b) => b.totalInclusoesBatida - a.totalInclusoesBatida || b.totalSolicitacoes - a.totalSolicitacoes);
+                const allEmpSorted = exportScope.employees;
                 buildRankingEmpregadosSheet(setupStyledSheet, styles, allEmpSorted, 'Ranking_Empregados');
 
                 // ABA 5: Analise_Motivos_ACT

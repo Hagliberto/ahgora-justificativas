@@ -1,4 +1,4 @@
-# Importação múltipla e ranking — v2.7.0
+# Importação múltipla e ranking — v2.7.1
 
 1. Aceita seleção múltipla via seletor ou drag and drop; as fontes permanecem apenas na memória da aba.
 2. Valida cada arquivo individualmente (extensão, 25 MB por arquivo, primeira aba, colunas essenciais).

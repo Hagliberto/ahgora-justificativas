@@ -1,4 +1,4 @@
-# Dashboard de inclusões e exportação ZIP — v2.7.0
+# Dashboard de inclusões e exportação ZIP — v2.7.1
 
 ## Filtros globais
 
@@ -30,3 +30,9 @@ Norma NN.DD.P.A.06.0008.05, art. 7º, §3º. A classificação é preventiva, nu
 - [ ] Verificar competência `MM/AAAA` na coluna e no XLSX de inconformidades.
 - [ ] Gerar ZIP e abrir dois XLSX de unidades distintas; validar que nenhum contém outra unidade.
 - [ ] Abrir XLSX no Excel Web do SharePoint e conferir cores, bordas, filtros, larguras e formatos.
+
+## Correção de isolamento por unidade (v2.7.1)
+
+A rotina `buildExportScopeData()` recebe exclusivamente as linhas selecionadas no modal. Ela recalcula ranking por empregado (chave departamento + matrícula), totais de inclusões e esquecimentos sem consultar `employeeStatsMap` da importação geral. `exportStyledExcel()` utiliza esse mesmo subconjunto para `Base_Tratada`, `Inconformidades`, `Resumo_Executivo`, `Analise_Por_Unidade`, `Ranking_Empregados`, `Analise_Motivos_ACT`, `Distribuicao_Temporal` e `Alertas_Auditoria`.
+
+No ZIP, cada execução recebe apenas o subconjunto da respectiva unidade. Uma exportação com várias unidades numa única planilha inclui somente aquelas selecionadas. As contagens de `Resumo_Executivo` e das abas agregadas referem-se ao escopo efetivo da exportação.

@@ -12,7 +12,7 @@ test('botão da appbar abre modal e exporta escopo selecionado', () => {
  assert.match(html, /id="btnExportSingle" onclick="openExportModal\(\)"/);
  assert.match(html, /id="exportModal"/);
  assert.match(html, /function getExportRows\(\)/);
- assert.match(html, /const processedDataset = exportRows/);
+ assert.match(html, /const processedDataset = exportScope\.rows/);
  assert.match(html, /async function confirmExportSelection\(\)/);
 });
 test('competência única consolidada sem filtro por mês de ocorrência', () => {

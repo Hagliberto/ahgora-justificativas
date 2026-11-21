@@ -1,3 +1,11 @@
+## [2.7.1] - 2026-11-21
+
+- Corrigido vazamento de empregados de outros departamentos na aba `Ranking_Empregados` das exportações por unidade e do ZIP.
+- Todas as oito abas do arquivo analítico passam a utilizar o mesmo escopo de registros; ranking e contagens de inclusões da `Base_Tratada` são recalculados somente com a seleção exportada.
+- Identificação de empregado na exportação considera departamento + matrícula, evitando mistura de totais caso haja movimentações entre unidades.
+- No relatório de inconformidades, agrupamento de esquecimentos por competência também considera departamento.
+- Testes de regressão para seleção simples, múltipla e ZIP com unidades diferentes, além de verificações de isolamento das abas.
+
 ## [2.7.0] - 2026-11-21
 
 - Importação em lote (seleção múltipla e arrastar/soltar) e acréscimo posterior de planilhas à mesma análise.

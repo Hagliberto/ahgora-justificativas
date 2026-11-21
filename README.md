@@ -1,6 +1,13 @@
-# Ahgora Justificativas — v2.7.0
+# Ahgora Justificativas — v2.7.1
 
-## Novo: importação múltipla e ranking por competência única
+## Correção v2.7.1: exportação por departamento
+
+- `Ranking_Empregados` contém apenas empregados das unidades selecionadas. No ZIP, cada XLSX inclui somente empregados de seu departamento.
+- `Base_Tratada` recalcula a coluna de inclusões por empregado dentro de cada unidade exportada, em vez de reutilizar contagens globais.
+- As demais abas (resumo, unidade, motivos, distribuição temporal, alertas e inconformidades) são geradas usando o mesmo escopo de registros.
+- Uma seleção múltipla mantém apenas as unidades escolhidas. A exportação completa mantém todas.
+
+## Importação múltipla e ranking por competência única
 
 - Selecione várias planilhas `.xlsx`, `.xls` ou `.csv` em um só upload ou clique em **Adicionar planilhas** após processar a primeira. Também suporta soltar vários arquivos.
 - O sistema valida as colunas de cada arquivo e consolida os registros em uma **única competência**, identificada na appbar (padrão: `Consolidada`). Datas de meses diferentes são preservadas, sem separar o ranking por mês.
@@ -14,7 +21,7 @@
 
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.7.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.7.1.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
 
 ## Como executar
 

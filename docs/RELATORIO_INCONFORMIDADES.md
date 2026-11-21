@@ -1,4 +1,4 @@
-# Relatório de Inconformidades para Gestores — versão 2.7.0
+# Relatório de Inconformidades para Gestores — versão 2.7.1
 
 ## Fontes primárias
 
