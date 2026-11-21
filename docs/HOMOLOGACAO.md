@@ -27,11 +27,21 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Arquivo sem campos essenciais não substitui base já carregada; arquivo >25MB é recusado.
 - [ ] Conferir funcionamento de todas as cinco abas, gráficos e exportações no navegador (não automatizado nos testes unitários).
 
-## Checklist 2.4.0
-- [ ] Interface e documentação exibem versão 2.4.0.
+## Checklist 2.4.1
+- [ ] Interface e documentação exibem versão 2.4.1.
 - [ ] Appbar exibe cinco abas compactas e seletor de competência.
 - [ ] Ícone (i) abre e fecha aviso normativo, sem card persistente.
 - [ ] Clique na unidade filtra empregados; clique no empregado abre ficha.
 - [ ] Ficha mostra todos os meses disponíveis da importação, inclusive fora da competência atual.
 - [ ] Filtros e ausência de resultados não quebram detalhamento.
 - [ ] Arquivo exportado: justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx.
+
+
+### Regressão v2.4.1
+- [ ] Importar planilha real: sucesso sem toast falso de arquivo protegido.
+- [ ] Carregar demonstração: Dashboard e indicadores visíveis.
+- [ ] Appbar > Unidades: todas as unidades abrem, sem exceção JS.
+- [ ] Unidade > Empregados > ficha individual: fluxo completo.
+- [ ] Trocar competência e filtros após importar, sem erro `textContent` de null.
+- [ ] Exportar a planilha e validar todas as abas.
+- [ ] Avaliar migração do Tailwind Play CDN para build CSS local.

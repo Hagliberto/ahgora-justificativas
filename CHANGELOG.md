@@ -1,4 +1,7 @@
-## 2.4.0 — 20/11/2026
+## [2.4.1] - 2026-11-20
+- Corrigida renderização de indicadores e tratamento de importação.
+
+## 2.4.1 — 20/11/2026
 - Download da appbar abre modal com exportação completa ou por uma/múltiplas unidades.
 - O Excel analítico continua com 7 abas e nome `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
 - Todas as competências selecionadas por padrão ao importar.

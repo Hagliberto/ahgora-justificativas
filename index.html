@@ -187,7 +187,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.4.0 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.4.1 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -243,7 +243,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.4.0</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.4.1</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -538,6 +538,15 @@
                         </div>
                     </div>
                 </section>
+                 <!-- Indicadores complementares: IDs usados por renderDashboardAdvanced -->
+                 <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3" aria-label="Indicadores complementares de auditoria">
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Taxa de aprovação</p><p id="extraApproval" class="text-xl font-bold text-caern-primary dark:text-sky-300 mt-2" aria-live="polite">—</p></div>
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Tempo médio de decisão</p><p id="extraDecision" class="text-xl font-bold text-caern-primary dark:text-sky-300 mt-2" aria-live="polite">—</p></div>
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Aprovações acima de 24h*</p><p id="extraLate" class="text-xl font-bold text-amber-600 mt-2" aria-live="polite">0</p></div>
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Reprovadas</p><p id="extraRejected" class="text-xl font-bold text-rose-600 mt-2" aria-live="polite">0</p></div>
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Possíveis esquecimentos</p><p id="extraForgotten" class="text-xl font-bold text-teal-600 mt-2" aria-live="polite">0</p></div>
+                    <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Gestores distintos</p><p id="extraManagers" class="text-xl font-bold text-caern-primary dark:text-sky-300 mt-2" aria-live="polite">0</p></div>
+                 </section>
                  <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" aria-label="Análise gerencial complementar">
                     <div class="glass-card rounded-2xl p-5"><h3 class="font-bold text-sm sm:text-base">Status das solicitações</h3><p class="text-xs text-slate-500 mb-3">Situação atual na base importada</p><div class="relative h-64"><canvas id="chartStatus"></canvas></div></div>
                     <div class="glass-card rounded-2xl p-5"><h3 class="font-bold text-sm sm:text-base">Solicitações por gestor</h3><p class="text-xs text-slate-500 mb-3">Volume e pendências por responsável</p><div class="relative h-64"><canvas id="chartManager"></canvas></div></div>
@@ -1085,11 +1094,22 @@
                         return;
                     }
 
-                    processDataset(jsonRows, file.name);
+                    // Leitura concluída. Falhas de processamento ou de interface
+                    // não devem ser relatadas como planilha protegida por senha.
+                    try {
+                        processDataset(jsonRows, file.name);
+                    } catch (processingError) {
+                        console.error('Falha no processamento ou na interface:', processingError);
+                        showToast('A planilha foi lida, mas ocorreu um erro ao processar ou exibir os dados. Consulte o console.', 'error');
+                    }
                 } catch (err) {
-                    console.error(err);
-                    showToast('Falha ao ler a planilha. Verifique se o arquivo não está protegido por senha.', 'error');
+                    console.error('Falha ao interpretar o arquivo:', err);
+                    showToast('Não foi possível interpretar a planilha. Verifique o formato e a integridade do arquivo.', 'error');
                 }
+            };
+            reader.onerror = function() {
+                console.error('Falha de leitura do arquivo:', reader.error);
+                showToast('Não foi possível acessar o arquivo selecionado. Tente novamente.', 'error');
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1418,7 +1438,7 @@
             populateFilterOptions();
             applyFilters();
             if (!preserveCompetence) { if (!location.hash) location.hash = '#/unidades'; applyLocationRoute(); }
-            if (!preserveCompetence) showToast(`Planilha processada! ${processedDataset.length} registros na competência selecionada.`, 'success');
+            if (!preserveCompetence) showToast(`Planilha processada! ${processedDataset.length} registros disponíveis para análise.`, 'success');
         }
 
         // =========================================================================
