@@ -1,42 +1,35 @@
-# Arquitetura atual
+# Arquitetura implementada — v2.7.1
 
-**Modelo:** aplicação single-page sem backend e sem build obrigatório, com CSS e JavaScript embutidos em `index.html`.
+## Visão geral
+Aplicação web estática (SPA) com **um `index.html` monolítico** contendo UI, CSS e JavaScript. Não utiliza servidor de aplicação nem base de dados. Bibliotecas de terceiros são baixadas por CDN em tempo de execução (necessária conexão inicial). Interface WIDE e hash routes; arquivos importados e registros vivem na memória da guia do navegador.
 
 ```text
-Arquivo Ahgora (.xlsx/.xls/.csv)
-    -> FileReader -> SheetJS (primeira aba)
-    -> validação parcial de cabeçalhos
-    -> normalização por registro
-    -> agregação por matrícula / empregado
-    -> aplicação de alertas de auditoria
-    -> estado JS em memória
-    -> filtros / indicadores / gráficos / tabelas
-    -> ExcelJS -> download .xlsx
+arquivos múltiplos XLSX/XLS/CSV
+  -> processUploadedFiles (validação e leitura SheetJS, primeira aba)
+  -> importedFiles + mergeImportedRows (dedup 13 colunas)
+  -> processDataset (normalização, chaves, flags, estatísticas)
+  -> processedDataset / employeeStatsMap
+  -> applyFilters (recorte de visualização)
+  -> renderDashboardAdvanced / render* (DOM + Chart.js)
+  -> modalidade de exportação
+      * Completa -> exportStyledExcel(processedDataset)
+      * Unidades -> getExportRows -> exportStyledExcel(subset)
+      * ZIP -> exportUnitsZip -> exportStyledExcel(subset, returnBuffer:true) por unidade
+           -> buildExportScopeData(subset) -> oito abas estilizadas ExcelJS
+           -> JSZip
 ```
 
-## Componentes lógicos
-- Entrada: `handleFileSelect`, `processUploadedFiles`, `mergeImportedRows`, `EXPECTED_COLUMNS`.
-- Tratamento: `parseBrDate`, `processDataset`, `getInclusionClassification`.
-- Estado: `rawDataset`, `processedDataset`, `filteredDataset`, `employeeStatsMap`.
-- UI: `switchTab`, `applyFilters`, `render*`, `openDetailModal`.
-- Saída: `exportStyledExcel`, `exportFilteredRecordsExcel`, `exportFilteredEmployeesExcel`, `downloadWorkbook`.
+## Fronteiras e diferenças de escopo
+- **Base carregada**: toda a competência consolidada da sessão, independentemente do mês civil das ocorrências.
+- **Recorte de interface**: filtros globais + filtros de tabela, `filteredDataset`; não significa que exportação completa será filtrada.
+- **Escopo da exportação**: `exportRows` escolhido no modal; todas as abas e contadores precisam resultar do **mesmo** subconjunto, independente das variáveis de interface.
+- **Histórico**: fichas individuais usam registros importados na sessão. Não há histórico persistente entre recargas.
 
-## Abas
-Visão Geral & Gráficos; Base Tratada & Filtros; Análise por Empregado; Análise por Unidade; Alertas de Auditoria.
+## Estado principal
+`importedFiles`, `duplicateImportRows`, `fullImportedDataset`, `rawDataset`, `processedDataset`, `filteredDataset`, `employeeStatsMap`, `selectedCompetence`, `currentSourceName` e estado de navegação/seleção. Variáveis são globais dentro do script de `index.html`, portanto mudanças de efeito colateral exigem cautela.
 
-## Dependências
-Tailwind CDN (script de navegador, sem versão travada na URL), SheetJS 0.20.2, ExcelJS 4.4.0, Chart.js 4.4.3, Font Awesome 6.5.2, Google Fonts (Inter). Um navegador com internet é necessário para carregar os recursos externos, salvo se já estiverem disponíveis em cache.
+## Dependências observadas
+Tailwind por CDN (aviso de uso em produção), SheetJS v0.20.2, ExcelJS v4.4.0, Chart.js v4.4.3, JSZip v3.10.1, Font Awesome v6.5.2 e Inter do Google Fonts. Congelar/hospedar os assets localmente é trabalho futuro; **não** declarar operação offline garantida. Processamento de planilhas é local, mas dependências CDN causam requisições a terceiros.
 
-## Débitos técnicos
-- Acoplamento de interface e regras em arquivo único de ~168 KB.
-- Dependências remotas e scripts inline dificultam política CSP.
-- `EXPECTED_COLUMNS` aceita importação mesmo com até 4 colunas faltantes: a validação é permissiva e deve ser revista.
-- `parseBrDate` e os cálculos de dias precisam de casos de teste de fuso, data inválida e planilhas com datas numéricas.
-- Dados embutidos de demonstração devem ser substituídos por fixtures fictícias.
-
-**Evolução proposta**, não implementada: separar `src/core`, `src/import`, `src/export`, `src/ui`, criar testes unitários e automatizados e adotar build leve somente após homologação da versão atual.
-
-
-## Evolução 2.6.0
-
-Relatório de Inconformidades por empregado, competência, unidade e gestor. Rota `#/inconformidades` e geração XLSX com aba de evidências e providências. A lógica permanece no HTML monolítico; futura separação em módulos continua recomendada. Ver `RELATORIO_INCONFORMIDADES.md`.
+## Riscos conhecidos
+Monólito JS; DOM acessado por IDs; acoplamento entre renderização e processamento; exceções de navegador/Excel Web que testes de texto não identificam; dados de demonstração com nomes de aparência real; ausência de persistência; regras de auditoria dependentes de texto e fonte normativa. Evitar mudanças gerais em um único commit.

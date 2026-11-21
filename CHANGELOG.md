@@ -1,3 +1,11 @@
+# Changelog
+
+## Documentação complementar — 21/11/2026 (código mantido em v2.7.1)
+- Revisados README, AGENTS e documentos técnicos para refletir o código da v2.7.1.
+- Adicionados índice técnico, mapa de funções, contratos de dados e contrato de isolamento de XLSX/ZIP por departamento.
+- Formalizados checklist de alterações para IAs, perigos de regressão do DOM, competência única e divergências normativas.
+- Sem alterações funcionais no `index.html`, `package.json` ou testes.
+
 ## [2.7.1] - 2026-11-21
 
 - Corrigido vazamento de empregados de outros departamentos na aba `Ranking_Empregados` das exportações por unidade e do ZIP.

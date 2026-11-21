@@ -1,70 +1,32 @@
-# Homologação / aceite
+# Homologação e regressão — v2.7.1
 
-Usar **exclusivamente dados fictícios** durante testes automatizados e demonstrações públicas.
+Este roteiro separa **testes automatizados estáticos/isolados** de **homologação real no navegador**. `npm test` não substitui testes da geração binária e da interface.
 
-- [ ] Abrir a aplicação e carregar as bibliotecas sem erros no console.
-- [ ] Importar XLSX, XLS e CSV com colunas válidas; testar arquivo vazio e extensão inválida.
-- [ ] Validar matrícula com prefixo alfanumérico e comparação com documento de origem.
-- [ ] Conferir datas no mesmo dia, retroativas, antecipadas, virada de mês/ano, data Excel e fuso.
-- [ ] Conferir inclusão de batida (0, 1, 4, 5, 6, 7) para cada empregado.
-- [ ] Conferir critérios de alerta: >5 e >7 dias, justificativa genérica e indicação de 12x36.
-- [ ] Conferir abono `Dia Todo`, intervalos simples, horários noturnos e ausência de horário.
-- [ ] Aplicar filtros, limpar filtros, alternar abas, paginar e abrir/fechar modais.
-- [ ] Conferir indicadores/gráficos contra totalização independente.
-- [ ] Exportar planilha analítica de 8 abas, registros filtrados e ranking por empregado.
-- [ ] Testar importação contendo texto literal `<img src=x onerror=alert(1)>` e garantir que ele apareça como texto, sem execução.
-- [ ] Testar acessibilidade básica por teclado, mobile e tema claro/escuro.
-- [ ] Confirmar formalmente fundamento/competência das regras com RH/jurídico.
+## Comandos automatizados
+```powershell
+npm run check
+# Opcional, teste direcionado mais crítico:
+node --test tests/isolamento-exportacao.test.cjs
+```
+Use Node >=20. Verifique `git diff --check`. Um editor/agente que altere scripts inline deve executar `node --check` no script JS extraído, não no HTML completo.
 
-**Critério de aceite:** nenhuma mudança não autorizada nos resultados do motor; divergências documentadas em issue e corrigidas antes da publicação.
+## Casos obrigatórios para qualquer release
+- [ ] **Importação múltipla**: XLSX + CSV com sobreposição de linhas; conferir arquivos válidos/ignorados, duplicidades exatas e contagem final; reimportar o mesmo arquivo.
+- [ ] **Competência única**: ocorrências em meses civis diferentes devem permanecer juntas no ranking consolidado. Não sinalizar automaticamente como infração o total 5+ da competência.
+- [ ] **Semântica de esquecimentos**: inclusão simples ≠ texto de esquecimento; testar `esqueci`, `esquecimento` e problemas técnicos diferentes.
+- [ ] **Filtros globais**: alternar unidade, empregado, gestor, períodos e status; checar todos cards/gráficos e reset.
+- [ ] **Rotas**: `#/dashboard`, `#/base`, `#/empregados`, `#/unidades`, `#/alertas`, `#/inconformidades`; fluxo unidade→empregados→ficha; Voltar/Avançar.
+- [ ] **DOM**: nenhuma exceção `Cannot set properties of null`, inclusive depois de importar e trocar abas; mensagens de arquivo não devem mascarar falha de renderização.
+- [ ] **Inconformidades**: achados com evidência, regra, escopo e ressalva humana; testar excesso textual e divergência documental 24h/2 dias úteis.
+- [ ] **Completa**: gerar XLSX, conferir as oito abas, métricas, filtros de cabeçalho, cores, larguras e total de registros.
+- [ ] **Por unidade**: exportar só A, só B e A+B; cruzar totais de TODAS as abas com base original.
+- [ ] **ZIP**: abrir ZIP e dois arquivos XLSX distintos; `Ranking_Empregados` e `Base_Tratada` não podem conter contadores, empregados ou unidades estranhos.
+- [ ] **Mesmo empregado em duas unidades**: separar corretamente contadores por departamento na exportação.
+- [ ] **Privacidade**: não transmitir dados importados, não armazenar PII em logs e não inserir entradas perigosas sem proteção.
+- [ ] **Excel para Web no SharePoint**: testar cores, bordas, filtros, congelamento, números e datas em arquivo real, se necessário.
 
-## Checklist 2.1.0
-- [ ] Importar duas planilhas com datas em meses distintos e confirmar uma única competência consolidada.
-- [ ] Ranking consolidado não afirma excesso mensal de esquecimentos.
-- [ ] Cinco ajustes com motivo textual explícito de esquecimento sinalizam conferência; cinco inclusões sem tal texto NÃO disparam a regra de quatro.
-- [ ] Aprovação após 24h sinaliza alerta **sem decisão de infração**; registrar divergência entre Norma e Manual.
-- [ ] Datas impossíveis e matrículas ausentes não geram agrupamento fraudulento.
-- [ ] Arquivo sem campos essenciais não substitui base já carregada; arquivo >25MB é recusado.
-- [ ] Conferir funcionamento de todas as cinco abas, gráficos e exportações no navegador (não automatizado nos testes unitários).
+## Validação com dados fictícios
+Construir pelo menos 2 departamentos (A e B) com empregados fictícios; inserir mesma matrícula em ambos, duplicidade exata entre duas fontes, uma inclusão sem esquecimento, cinco indícios de esquecimento espalhados por mais de um mês e decisões em mais de 24h. Usar testes de regressão de exportação, não dados funcionais de produção.
 
-## Checklist 2.4.1
-- [ ] Interface e documentação exibem versão 2.4.1.
-- [ ] Appbar exibe cinco abas compactas e seletor de competência.
-- [ ] Ícone (i) abre e fecha aviso normativo, sem card persistente.
-- [ ] Clique na unidade filtra empregados; clique no empregado abre ficha.
-- [ ] Ficha mostra todos os meses disponíveis da importação, inclusive fora da competência atual.
-- [ ] Filtros e ausência de resultados não quebram detalhamento.
-- [ ] Arquivo exportado: justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx.
-
-
-### Regressão v2.4.1
-- [ ] Importar planilha real: sucesso sem toast falso de arquivo protegido.
-- [ ] Carregar demonstração: Dashboard e indicadores visíveis.
-- [ ] Appbar > Unidades: todas as unidades abrem, sem exceção JS.
-- [ ] Unidade > Empregados > ficha individual: fluxo completo.
-- [ ] Trocar competência e filtros após importar, sem erro `textContent` de null.
-- [ ] Exportar a planilha e validar todas as abas.
-- [ ] Avaliar migração do Tailwind Play CDN para build CSS local.
-
-
-## Checklist 2.6.0 — Inconformidades
-
-- [ ] Versão 2.6.0 indicada em appbar, configurações e documentação.
-- [ ] Aba `#/inconformidades` acessível após importação e pelo histórico do navegador.
-- [ ] Filtros de unidade, regra, prioridade, pesquisa, gestor e competência funcionais.
-- [ ] Cinco inclusões em diferentes meses geram ranking consolidado com cinco, sem afirmar excesso mensal.
-- [ ] Não somar ajustes comuns como esquecimentos nem somar meses diferentes.
-- [ ] Aprovação acima de 24h indicada como conferência informativa, diante da divergência Norma/Manual.
-- [ ] Exportação específica contém os indícios filtrados e campo para análise humana.
-- [ ] Excel analítico completa ou por múltiplas unidades tem 8 abas, incluindo Inconformidades.
-- [ ] Testar unidade → empregado → ficha e links dos registros originais.
-
-## Checklist v2.7.0 — múltiplas planilhas e ranking consolidado
-
-- [ ] Selecionar duas ou mais planilhas em um único upload; conferir quantidade de arquivos e registros.
-- [ ] Adicionar outra planilha após a primeira, mantendo os dados anteriores.
-- [ ] Importar linhas iguais presentes em arquivos diferentes e confirmar deduplicação exata.
-- [ ] Importar meses diferentes de um mesmo empregado e confirmar a soma na mesma competência do ranking.
-- [ ] Filtrar unidade no Dashboard e conferir ranking e Excel correspondente.
-- [ ] Confirmar que cinco inclusões em meses distintos não geram conclusão automática de infração mensal.
-- [ ] Usar Limpar base e confirmar novo início sem dados da sessão anterior.
+## Critério de entrega
+Relatório com: versão, arquivos alterados, testes executados e resultados, evidências de navegador e Excel/ZIP (quando realizadas), pendências e aprovação do responsável. Não declarar 'homologado' sem execução comprovada da etapa correspondente.

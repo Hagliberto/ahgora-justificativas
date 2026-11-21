@@ -1,30 +1,21 @@
-# Dashboard Gerencial — v2.4.0
+# Dashboard e ranking de esquecimentos — v2.7.1
 
-## Filtros e escopo
+## Escopo e filtros
+- A competência **inicia `Consolidada`** e abrange todos os registros importados na sessão, ainda que tenham datas de vários meses; não é automaticamente um seletor mensal.
+- Filtros globais incluem unidade, intervalo, empregado, gestor, filial, regime e situação (conforme controles existentes no `index.html`). Os filtros de tabela podem complementar o recorte. Cards/gráficos devem indicar corretamente se usam `filteredDataset` ou estatísticas integrais.
+- A navegação Unidades → Empregados → Ficha individual é complementar, com histórico obtido da base importada na sessão e não de um banco permanente.
 
-A competência MM/AAAA é selecionada pela **data da ocorrência** e determina o universo de auditoria. Os filtros globais (intervalo de ocorrência, empregado, gestor, filial, grupo de regra e sinalização) são cumulativos com os filtros complementares da aba Base Tratada (unidade, tipo, status, prazo, motivo, frequência de inclusões, busca textual e somente sinalizações).
+## Inclusões e esquecimentos
+1. **Inclusões de batida**: registros cujo tipo foi classificado como inclusão; volume operacional, não confirmação de esquecimento.
+2. **Possíveis esquecimentos**: subconjunto com texto indicativo (`isForgottenPunch` pesquisa Informação/Motivo por termos como `esqueci`, `esquecimento`, `esqueceu`). Uma falha biométrica ou defeito de equipamento exige análise diferente.
+3. **Outras inclusões**: inclusões que não apresentam indício textual de esquecimento.
+4. **Ranking consolidado**: soma por empregado de todo o lote identificado por uma única competência, sem dividir por meses. Deve manter acesso à ficha individual e filtros relevantes.
 
-Todos os indicadores e gráficos do dashboard, as tabelas de unidade e de alertas e a lista de empregados visíveis usam o **recorte combinado**. O ranking individual apresenta as **contagens completas da competência** para empregados presentes no recorte, para não distorcer a regra de quatro esquecimentos mensais ao filtrar dias. Assim, os totais individuais podem superar o número de registros filtrados: isto é intencional.
+## Cuidado essencial de interpretação
+A Norma art. 7º §3º limita a quatro **validações mensais por esquecimento**, enquanto o ranking consolida uma competência que pode conter muitos meses e tipos de ajustes. **NUNCA** transformar `5+` no ranking em conclusão automática de infração. Para conclusão seriam necessários motivo oficial, validação efetiva, mês aplicável e conferência humana.
 
-## Indicadores
-
-- Aprovação (%): aprovadas / todas as solicitações filtradas; não é taxa de cumprimento normativo.
-- Tempo de decisão: média de horas entre solicitação e aprovação/reprovação com datas válidas, descartando períodos negativos; pendentes não entram na média.
-- Acima de 24h: decisões identificadas com intervalo de mais de 24 horas; **triagem**, sujeito à divergência Norma art. 12 x Manual.
-- Concentração: participação dos 20% de empregados com maior volume no recorte, arredondados para cima; não leva em conta tamanho da equipe ou dias trabalhados.
-- Gráficos por gestor: registros por situação no recorte; não constituem ranking de desempenho.
-- Dia da semana: dia da **ocorrência**, não da solicitação.
+## Outros indicadores
+Taxa de aprovação, decisão em horas, aprovações acima de 24h, concentração e recortes por gestor/unidade são indicadores descritivos. Não são medidas de produtividade, culpa ou cumprimento normativo. Divergência Norma/Manual quanto ao prazo de aprovação requer ressalva explícita.
 
 ## Exportações
-
-**Dashboard XLSX** contém `Dashboard`, `Gestores` e `Registros_Filtrados` para o recorte combinado. A exportação analítica completa da barra superior usa o escopo de competência carregado; não a considere uma exportação do recorte filtrado.
-
-## Cuidados de auditoria
-
-O limite do art. 7º, §3º, é relativo a esquecimentos de marcação, que aqui são identificados apenas por padrões textuais. O filtro não reinterpreta o motivo e o aplicativo não decide se há irregularidade. A Norma e o Manual têm orientações diferentes quanto ao prazo de aprovação; o produto apenas indica necessidade de verificação.
-
-O dashboard utiliza **volume absoluto** e não taxas por quadro de empregados, por ausência da população-base. Não extrapolar conclusões sobre produtividade, reincidência relativa ou comportamento.
-
-
-## Fluxo hierárquico 2.4.0
-Na appbar, abra Unidades e clique na unidade; a lista de empregados aparece filtrada. Clique no empregado para ver ficha analítica mensal, perfil e comparações. A evolução histórica consulta todas as competências do **arquivo atual**, independentemente da competência visual. Agrega os arquivos enviados à sessão atual. Não conserva dados entre recargas. As médias da unidade usam o recorte de filtros selecionado.
+Exportações específicas do dashboard/ranking podem utilizar recorte visual. A exportação analítica **completa**, escolhida no modal, usa a base da competência consolidada, não necessariamente os filtros da tela; exportações por unidade/ZIP usam o escopo explicitamente selecionado. Ver `EXPORTACOES_E_ISOLAMENTO.md`.
