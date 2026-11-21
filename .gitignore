@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+*.tmp
+*.bak
+*.xlsx
+*.xls
+*.csv
+*.pdf
+.env
+.env.*
+!*.example
+dist/
+coverage/

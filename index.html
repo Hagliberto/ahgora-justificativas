@@ -116,7 +116,7 @@
 <body class="bg-slate-100/80 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 antialiased w-full overflow-x-hidden">
 
     <!-- Notificações Toast -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md pointer-events-none"></div>
+    <div id="toastContainer" role="status" aria-live="polite" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md pointer-events-none"></div>
 
     <!-- Modal de Inspeção do Registro (Fecha ao clicar fora) -->
     <div id="detailModal" onclick="if(event.target === this) closeModal('detailModal')" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/65 backdrop-blur-sm p-4">
@@ -187,7 +187,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.0.0 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.0.1 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -276,7 +276,7 @@
                 <!-- DropZone -->
                 <div class="lg:w-7/12">
                     <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-caern-secondary/45 dark:border-sky-500/40 rounded-2xl p-6 sm:p-8 text-center cursor-pointer hover:border-caern-secondary hover:bg-caern-light/40 dark:hover:bg-slate-800/50 transition-all duration-200 group">
-                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
+                        <input type="file" id="fileInput" aria-label="Selecionar planilha de justificativas Ahgora" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
                         <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-caern-light dark:bg-slate-800 text-caern-primary dark:text-sky-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
@@ -310,7 +310,7 @@
                 </div>
 
                 <!-- Botões das Abas -->
-                <nav class="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0" role="tablist">
+                <nav aria-label="Navegação das análises" class="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0" role="tablist">
                     <button onclick="switchTab('tabOverview')" id="btn-tabOverview" class="tab-btn active-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer bg-caern-primary text-white shadow">
                         <i class="fa-solid fa-chart-pie"></i>
                         <span>Visão Geral & Gráficos</span>
@@ -798,6 +798,13 @@
         // =========================================================================
         // 3. UTILITÁRIOS DE UI, TEMA, MODAIS E ABAS
         // =========================================================================
+        // Escapa texto de planilhas antes de inseri-lo no HTML; nunca altera os dados exportados.
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[char]);
+        }
+
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const colors = {
@@ -815,7 +822,10 @@
 
             const toast = document.createElement('div');
             toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
-            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base"></i><span>${message}</span>`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base" aria-hidden="true"></i>`;
+            const textNode = document.createElement('span');
+            textNode.textContent = message;
+            toast.appendChild(textNode);
             container.appendChild(toast);
 
             requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
@@ -1422,13 +1432,13 @@
                     icon: 'fa-user-clock',
                     color: 'text-caern-primary dark:text-sky-400 bg-caern-light dark:bg-sky-950/60',
                     title: 'Maior Frequência no Recorte',
-                    text: `<strong>${topColab[0]}</strong> lidera o recorte com <strong>${topColab[1]} solicitações</strong> (${((topColab[1] / filteredDataset.length) * 100).toFixed(1)}% do volume).`
+                    text: `<strong>${escapeHtml(topColab[0])}</strong> lidera o recorte com <strong>${topColab[1]} solicitações</strong> (${((topColab[1] / filteredDataset.length) * 100).toFixed(1)}% do volume).`
                 },
                 {
                     icon: 'fa-building-user',
                     color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60',
                     title: 'Unidade Mais Demandante',
-                    text: `<strong>${topDept[0]}</strong> concentra <strong>${topDept[1]} registros (${topDeptPct}%)</strong> das justificativas analisadas.`
+                    text: `<strong>${escapeHtml(topDept[0])}</strong> concentra <strong>${topDept[1]} registros (${topDeptPct}%)</strong> das justificativas analisadas.`
                 },
                 {
                     icon: 'fa-file-contract',
@@ -1660,36 +1670,36 @@
                 return `
                     <tr onclick="openDetailModal(${item.id})" class="hover:bg-caern-light/60 dark:hover:bg-slate-800/70 transition cursor-pointer">
                         <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400 whitespace-nowrap">
-                            ${item.matricula}
+                            ${escapeHtml(item.matricula)}
                         </td>
                         <td class="py-2.5 px-3.5 font-medium text-slate-900 dark:text-slate-100">
-                            <div class="max-w-[200px] truncate" title="${item.funcionario}">${item.funcionario}</div>
+                            <div class="max-w-[200px] truncate" title="${escapeHtml(item.funcionario)}">${escapeHtml(item.funcionario)}</div>
                             <span class="inline-block mt-0.5 px-1.5 py-0.2 rounded text-[10px] font-semibold ${punchBadgeColor}">
                                 ${item.totalInclusoesColab} inclusão(ões) batida
                             </span>
                         </td>
                         <td class="py-2.5 px-3.5">
-                            <div class="max-w-[210px] truncate font-medium text-slate-700 dark:text-slate-300" title="${item.deptNome}">${item.deptNome}</div>
-                            <span class="text-[10px] text-slate-400">Filial: ${item.filial} • ${item.grupoRegra}</span>
+                            <div class="max-w-[210px] truncate font-medium text-slate-700 dark:text-slate-300" title="${escapeHtml(item.deptNome)}">${escapeHtml(item.deptNome)}</div>
+                            <span class="text-[10px] text-slate-400">Filial: ${escapeHtml(item.filial)} • ${escapeHtml(item.grupoRegra)}</span>
                         </td>
                         <td class="py-2.5 px-3.5 whitespace-nowrap font-medium">
-                            ${item.dataJustificativaStr}
-                            <span class="block text-[10px] text-slate-400">${item.diaSemana}</span>
+                            ${escapeHtml(item.dataJustificativaStr)}
+                            <span class="block text-[10px] text-slate-400">${escapeHtml(item.diaSemana)}</span>
                         </td>
                         <td class="py-2.5 px-3.5 whitespace-nowrap">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${slaBadge}">${item.classificacaoTemporal}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${slaBadge}">${escapeHtml(item.classificacaoTemporal)}</span>
                             <span class="block text-[10px] text-slate-400 mt-0.5">${item.diasDiferenca >= 0 ? '+' + item.diasDiferenca : item.diasDiferenca} dia(s)</span>
                         </td>
                         <td class="py-2.5 px-3.5">
-                            <span class="font-semibold text-slate-800 dark:text-slate-200">${item.tipo}</span>
-                            <div class="max-w-[180px] truncate text-[11px] text-slate-500 dark:text-slate-400" title="${item.motivo}">${item.motivo}</div>
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(item.tipo)}</span>
+                            <div class="max-w-[180px] truncate text-[11px] text-slate-500 dark:text-slate-400" title="${escapeHtml(item.motivo)}">${escapeHtml(item.motivo)}</div>
                         </td>
                         <td class="py-2.5 px-3.5 whitespace-nowrap font-mono text-[11px]">
-                            ${item.horarioOuIntervalo}
+                            ${escapeHtml(item.horarioOuIntervalo)}
                             ${duracaoStr}
                         </td>
                         <td class="py-2.5 px-3.5 whitespace-nowrap">
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}">${item.status}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}">${escapeHtml(item.status)}</span>
                         </td>
                         <td class="py-2.5 px-3.5 whitespace-nowrap">${auditHtml}</td>
                     </tr>
@@ -1751,12 +1761,12 @@
                 return `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
                         <td class="py-2.5 px-3.5 font-semibold text-slate-400">${idx + 1}</td>
-                        <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${emp.matricula}</td>
-                        <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${emp.funcionario}</td>
-                        <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[240px] truncate" title="${emp.deptNome}">
-                            <span class="font-semibold text-slate-500 dark:text-slate-400">${emp.filial}</span> • ${emp.deptNome}
+                        <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${escapeHtml(emp.matricula)}</td>
+                        <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(emp.funcionario)}</td>
+                        <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[240px] truncate" title="${escapeHtml(emp.deptNome)}">
+                            <span class="font-semibold text-slate-500 dark:text-slate-400">${escapeHtml(emp.filial)}</span> • ${escapeHtml(emp.deptNome)}
                         </td>
-                        <td class="py-2.5 px-3.5 text-slate-500">${emp.grupoRegra}</td>
+                        <td class="py-2.5 px-3.5 text-slate-500">${escapeHtml(emp.grupoRegra)}</td>
                         <td class="py-2.5 px-3.5 text-center font-bold">${emp.totalSolicitacoes}</td>
                         <td class="py-2.5 px-3.5 text-center font-extrabold text-caern-secondary dark:text-sky-400">${emp.totalInclusoesBatida}</td>
                         <td class="py-2.5 px-3.5 text-center font-semibold text-emerald-600 dark:text-emerald-400">${emp.totalAbonos}</td>
@@ -1788,8 +1798,8 @@
             const rows = Object.values(unitMap).sort((a, b) => b.total - a.total);
             tbody.innerHTML = rows.map(u => `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                    <td class="py-2.5 px-3.5 font-mono text-slate-500">${u.codigo}</td>
-                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${u.nome}</td>
+                    <td class="py-2.5 px-3.5 font-mono text-slate-500">${escapeHtml(u.codigo)}</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(u.nome)}</td>
                     <td class="py-2.5 px-3.5 text-center font-bold">${u.total}</td>
                     <td class="py-2.5 px-3.5 text-center text-caern-secondary dark:text-sky-400 font-semibold">${u.inclusoes}</td>
                     <td class="py-2.5 px-3.5 text-center text-emerald-600 dark:text-emerald-400 font-semibold">${u.abonos}</td>
@@ -1812,13 +1822,13 @@
 
             tbody.innerHTML = alerts.map(item => `
                 <tr onclick="openDetailModal(${item.id})" class="hover:bg-rose-50/60 dark:hover:bg-rose-950/30 cursor-pointer">
-                    <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${item.matricula}</td>
-                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${item.funcionario}</td>
-                    <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">${item.filial} • ${item.deptNome}</td>
-                    <td class="py-2.5 px-3.5 whitespace-nowrap">${item.dataJustificativaStr}</td>
-                    <td class="py-2.5 px-3.5">${item.tipo} • <span class="text-slate-500">${item.motivo}</span></td>
-                    <td class="py-2.5 px-3.5 italic text-slate-600 dark:text-slate-300">"${item.informacao || '-'}"</td>
-                    <td class="py-2.5 px-3.5 font-semibold text-rose-700 dark:text-rose-300">${item.flagAuditoriaStr}</td>
+                    <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${escapeHtml(item.matricula)}</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(item.funcionario)}</td>
+                    <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">${escapeHtml(item.filial)} • ${escapeHtml(item.deptNome)}</td>
+                    <td class="py-2.5 px-3.5 whitespace-nowrap">${escapeHtml(item.dataJustificativaStr)}</td>
+                    <td class="py-2.5 px-3.5">${escapeHtml(item.tipo)} • <span class="text-slate-500">${escapeHtml(item.motivo)}</span></td>
+                    <td class="py-2.5 px-3.5 italic text-slate-600 dark:text-slate-300">"${escapeHtml(item.informacao || '-')}"</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-rose-700 dark:text-rose-300">${escapeHtml(item.flagAuditoriaStr)}</td>
                 </tr>
             `).join('');
         }
@@ -1827,11 +1837,11 @@
             const item = processedDataset.find(d => d.id === id);
             if (!item) return;
 
-            document.getElementById('modalTitle').textContent = `${item.funcionario} (${item.matricula})`;
-            document.getElementById('modalSubtitle').textContent = `${item.departamentoOriginal} • Gestor: ${item.gestor}`;
+            document.getElementById('modalTitle').textContent = `${escapeHtml(item.funcionario)} (${escapeHtml(item.matricula)})`;
+            document.getElementById('modalSubtitle').textContent = `${escapeHtml(item.departamentoOriginal)} • Gestor: ${item.gestor}`;
 
             const flagsHtml = item.flagsAuditoria.length > 0
-                ? item.flagsAuditoria.map(f => `<div class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${f}</div>`).join('')
+                ? item.flagsAuditoria.map(f => `<div class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(f)}</div>`).join('')
                 : `<div class="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Registro regular conforme parâmetros administrativos.</div>`;
 
             document.getElementById('modalBody').innerHTML = `
@@ -1840,17 +1850,17 @@
                     ${flagsHtml}
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-                    <div><span class="text-slate-400 block">Matrícula Original Ahgora:</span><strong class="font-mono">${item.matriculaOriginal}</strong></div>
-                    <div><span class="text-slate-400 block">Matrícula Padronizada:</span><strong class="font-mono">${item.matricula}</strong></div>
-                    <div><span class="text-slate-400 block">Filial / Centro Custo:</span><strong>${item.filial} • CC ${item.centroCusto}</strong></div>
-                    <div><span class="text-slate-400 block">Regime / Grupo Jornada:</span><strong>${item.grupoRegra}</strong></div>
-                    <div><span class="text-slate-400 block">Data da Ocorrência:</span><strong>${item.dataJustificativaStr} (${item.diaSemana})</strong></div>
-                    <div><span class="text-slate-400 block">Data da Solicitação:</span><strong>${item.dataSolicitacaoStr} (${item.classificacaoTemporal}: ${item.diasDiferenca}d)</strong></div>
-                    <div><span class="text-slate-400 block">Tipo & Motivo:</span><strong>${item.tipo} — ${item.motivo}</strong></div>
-                    <div><span class="text-slate-400 block">Horário / Intervalo & Duração:</span><strong>${item.horarioOuIntervalo} ${item.duracaoEstimadaMin > 0 ? `(${item.duracaoEstimadaMin} min)` : ''}</strong></div>
-                    <div><span class="text-slate-400 block">Histórico do Empregado na Base:</span><strong>${item.totalOcorrenciasColab} solicitação(ões) • ${item.totalInclusoesColab} inclusão(ões) batida (${item.classificacaoInclusao})</strong></div>
-                    <div><span class="text-slate-400 block">Status & Aprovação:</span><strong>${item.status} ${item.dataAprovacao ? `(${item.dataAprovacao})` : ''}</strong></div>
-                    <div class="sm:col-span-2"><span class="text-slate-400 block">Texto Informado pelo Empregado:</span><p class="mt-1 p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">${item.informacao || '<em>Sem texto informado</em>'}</p></div>
+                    <div><span class="text-slate-400 block">Matrícula Original Ahgora:</span><strong class="font-mono">${escapeHtml(item.matriculaOriginal)}</strong></div>
+                    <div><span class="text-slate-400 block">Matrícula Padronizada:</span><strong class="font-mono">${escapeHtml(item.matricula)}</strong></div>
+                    <div><span class="text-slate-400 block">Filial / Centro Custo:</span><strong>${escapeHtml(item.filial)} • CC ${escapeHtml(item.centroCusto)}</strong></div>
+                    <div><span class="text-slate-400 block">Regime / Grupo Jornada:</span><strong>${escapeHtml(item.grupoRegra)}</strong></div>
+                    <div><span class="text-slate-400 block">Data da Ocorrência:</span><strong>${escapeHtml(item.dataJustificativaStr)} (${escapeHtml(item.diaSemana)})</strong></div>
+                    <div><span class="text-slate-400 block">Data da Solicitação:</span><strong>${escapeHtml(item.dataSolicitacaoStr)} (${escapeHtml(item.classificacaoTemporal)}: ${item.diasDiferenca}d)</strong></div>
+                    <div><span class="text-slate-400 block">Tipo & Motivo:</span><strong>${escapeHtml(item.tipo)} — ${escapeHtml(item.motivo)}</strong></div>
+                    <div><span class="text-slate-400 block">Horário / Intervalo & Duração:</span><strong>${escapeHtml(item.horarioOuIntervalo)} ${item.duracaoEstimadaMin > 0 ? `(${item.duracaoEstimadaMin} min)` : ''}</strong></div>
+                    <div><span class="text-slate-400 block">Histórico do Empregado na Base:</span><strong>${item.totalOcorrenciasColab} solicitação(ões) • ${item.totalInclusoesColab} inclusão(ões) batida (${escapeHtml(item.classificacaoInclusao)})</strong></div>
+                    <div><span class="text-slate-400 block">Status & Aprovação:</span><strong>${escapeHtml(item.status)} ${item.dataAprovacao ? `(${escapeHtml(item.dataAprovacao)})` : ''}</strong></div>
+                    <div class="sm:col-span-2"><span class="text-slate-400 block">Texto Informado pelo Empregado:</span><p class="mt-1 p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">${item.informacao ? escapeHtml(item.informacao) : '<em>Sem texto informado</em>'}</p></div>
                 </div>
             `;
 
