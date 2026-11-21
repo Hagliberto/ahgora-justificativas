@@ -1,3 +1,11 @@
+## [2.5.0] - 2026-11-20
+
+- Nova aba `Inconformidades` (`#/inconformidades`), com indicadores, filtros e tabela gerencial por empregado, unidade e competência.
+- Triagem rastreável fundamentada em Norma e Manual, sem conclusão disciplinar automática; tratamento mensal de possíveis esquecimentos.
+- XLSX específico para o gestor e nova aba `Inconformidades` na exportação analítica completa/por unidade (total de 8 abas).
+- Navegação para ficha do empregado e registro detalhado a partir do relatório.
+- Testes adicionais de rotas, regras, escopo e documentação.
+
 ## [2.4.1] - 2026-11-20
 - Corrigida renderização de indicadores e tratamento de importação.
 

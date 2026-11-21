@@ -5,10 +5,10 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 const pkg = require('../package.json');
 
-test('versão 2.4.1 consistente no pacote e interface', () => {
-  assert.equal(pkg.version, '2.4.1');
-  assert.match(html, /Versão 2\.4\.1/);
-  assert.match(html, /v2\.4\.1/);
+test('versão 2.5.0 consistente no pacote e interface', () => {
+  assert.equal(pkg.version, '2.5.0');
+  assert.match(html, /Versão 2\.5\.0/);
+  assert.match(html, /v2\.5\.0/);
 });
 test('appbar contém competência, navegação e nota discreta', () => {
   const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));

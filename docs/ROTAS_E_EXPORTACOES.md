@@ -1,4 +1,4 @@
-# Rotas e exportações — v2.4.1
+# Rotas e exportações — v2.5.0
 
 ## Rotas
 
@@ -9,6 +9,7 @@
 | `#/empregados` | Lista de empregados |
 | `#/unidades` | Todas as unidades visíveis no recorte global |
 | `#/alertas` | Alertas para revisão |
+| `#/inconformidades` | Relatório normativo para gestores |
 | `#/unidades/<código>` | Empregados da unidade escolhida |
 | `#/empregados/<matrícula>` | Ficha individual |
 
@@ -18,7 +19,7 @@ A aplicação é SPA estática e usa **hash routing**. Abas têm URL própria e 
 
 - **Completa:** todos os registros da competência ativa; não obedece aos filtros de visualização da interface.
 - **Por unidade:** uma ou diversas unidades selecionadas via checkbox; pode-se pesquisar, marcar todas as visíveis ou limpar as visíveis.
-- A exportação mantém 7 abas, todos os agregados do arquivo usam o mesmo subconjunto de registros.
+- A exportação mantém 8 abas, todos os agregados do arquivo usam o mesmo subconjunto de registros.
 - Competência inicial: **Todas as competências**. Nesse modo, os indicadores mensais de esquecimento não afirmam violação do limite sem delimitação de competência.
 - Nome: `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
 

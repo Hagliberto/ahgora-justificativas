@@ -187,7 +187,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.4.1 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.5.0 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -216,7 +216,7 @@
     <div id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle" onclick="if(event.target===this) closeExportModal()" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
         <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start gap-3">
-                <div><h2 id="exportModalTitle" class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i>Exportar análise CAERN</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Escolha quais unidades integrarão a planilha de 7 abas.</p></div>
+                <div><h2 id="exportModalTitle" class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i>Exportar análise CAERN</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Escolha quais unidades integrarão a planilha de 8 abas.</p></div>
                 <button type="button" onclick="closeExportModal()" aria-label="Fechar opções de exportação" class="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <fieldset class="grid gap-2 text-sm">
@@ -243,7 +243,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.4.1</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.5.0</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -273,6 +273,10 @@
                     <button onclick="openAllUnits()" id="btn-tabUnits" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
                         <i class="fa-solid fa-building"></i>
                         <span>Unidades</span>
+                    </button>
+                    <button onclick="switchTab('tabConformidade')" id="btn-tabConformidade" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15" title="Relatório normativo para gestores">
+                        <i class="fa-solid fa-clipboard-check"></i><span>Inconformidades</span>
+                        <span id="conformityCounter" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">0</span>
                     </button>
                     <button onclick="switchTab('tabAlerts')" id="btn-tabAlerts" class="tab-btn border border-white/15 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer text-sky-100 hover:bg-white/15">
                         <i class="fa-solid fa-triangle-exclamation text-current"></i>
@@ -758,6 +762,51 @@
             </div>
 
             <!-- ===================================================================== -->
+            <!-- RELATÓRIO DE INDÍCIOS NORMATIVOS PARA O GESTOR                         -->
+            <!-- ===================================================================== -->
+            <div id="tabConformidade" class="tab-panel hidden space-y-4">
+                <section class="glass-card rounded-2xl p-5 space-y-4">
+                    <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-caern-secondary"></i> Relatório de Inconformidades • Gestores</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-4xl">Triagem preventiva fundamentada na Norma NN.DD.P.A.06.0008.05 e no Manual de Controle de Jornada. <strong>São indícios a conferir, não infrações comprovadas.</strong> Aplicam-se os filtros globais e da base tratada.</p>
+                        </div>
+                        <button type="button" onclick="exportConformityReport()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm" title="Baixar relatório conforme filtros ativos"><i class="fa-solid fa-file-excel"></i> Exportar relatório XLSX</button>
+                    </div>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Indicadores de conformidade">
+                        <div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700"><p class="text-xs text-slate-500 dark:text-slate-400">Indícios para conferência</p><strong id="confTotal" class="text-2xl font-bold">0</strong></div>
+                        <div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700"><p class="text-xs text-slate-500 dark:text-slate-400">Empregados envolvidos</p><strong id="confEmployees" class="text-2xl font-bold">0</strong></div>
+                        <div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700"><p class="text-xs text-slate-500 dark:text-slate-400">Unidades com indícios</p><strong id="confUnits" class="text-2xl font-bold">0</strong></div>
+                        <div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3 border border-slate-200 dark:border-slate-700"><p class="text-xs text-slate-500 dark:text-slate-400">Casos prioritários</p><strong id="confPriority" class="text-2xl font-bold text-amber-600">0</strong></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Unidade
+                            <select id="confUnit" onchange="renderConformityReport()" class="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm"><option value="">Todas as unidades</option></select>
+                        </label>
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Regra / assunto
+                            <select id="confRule" onchange="renderConformityReport()" class="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm"><option value="">Todas as regras</option></select>
+                        </label>
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Prioridade
+                            <select id="confSeverity" onchange="renderConformityReport()" class="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm"><option value="">Todas</option><option value="Prioritária">Prioritária</option><option value="Atenção">Atenção</option><option value="Informativa">Informativa</option></select>
+                        </label>
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Buscar empregado ou gestor
+                            <input id="confSearch" oninput="renderConformityReport()" placeholder="Nome, matrícula, responsável..." class="mt-1 block w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm"/>
+                        </label>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-between items-center text-xs text-slate-500 dark:text-slate-400"><span id="confCount">0 ocorrências</span><button type="button" onclick="resetConformityFilters()" class="text-caern-primary dark:text-sky-300 hover:underline"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar filtros desta aba</button></div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 max-h-[620px]">
+                        <table class="w-full text-left text-xs border-collapse min-w-[1250px]">
+                            <thead class="bg-caern-primary text-white sticky top-0 z-10 uppercase tracking-wide"><tr>
+                                <th class="p-3">Unidade</th><th class="p-3">Empregado / Matrícula</th><th class="p-3">Competência</th><th class="p-3">Referência normativa</th><th class="p-3">Indício identificado</th><th class="p-3">Evidência / quantidade</th><th class="p-3">Prioridade</th><th class="p-3">Gestor responsável</th><th class="p-3">Providência sugerida</th><th class="p-3">Detalhes</th>
+                            </tr></thead>
+                            <tbody id="conformityTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/70"></tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">A base Ahgora de justificativas não contém necessariamente espelho de ponto, escalas oficiais, autorizações, documentos comprobatórios ou contexto da ocorrência. A avaliação final exige conferência humana. A Norma (art. 12) e o Manual (p. 4) divergem no prazo de análise do gestor: 24 horas versus 2 dias úteis, respectivamente.</p>
+                </section>
+            </div>
+
+            <!-- ===================================================================== -->
             <!-- ABA 5: ALERTAS DE AUDITORIA                                           -->
             <!-- ===================================================================== -->
             <div id="tabAlerts" class="tab-panel hidden space-y-4">
@@ -976,7 +1025,7 @@
         // Roteador hash: páginas com URL própria sem recarga, compatível com Cloudflare Pages estático.
         const PAGE_ROUTES = Object.freeze({
             tabOverview: '/dashboard', tabRecords: '/base', tabEmployees: '/empregados',
-            tabUnits: '/unidades', tabAlerts: '/alertas'
+            tabUnits: '/unidades', tabAlerts: '/alertas', tabConformidade: '/inconformidades'
         });
         const ROUTE_PAGES = Object.fromEntries(Object.entries(PAGE_ROUTES).map(([tab, route]) => [route, tab]));
         let navigatingFromRoute = false;
@@ -1552,6 +1601,7 @@
             renderEmployeeTab();
             renderUnitTab();
             renderAlertsTab();
+            renderConformityReport();
             renderDashboardAdvanced();
         }
 
@@ -2154,6 +2204,175 @@
             `).join('');
         }
 
+        // Relatório de gestão: indícios rastreáveis por competência e empregado.
+        // Nunca classificar automaticamente como infração nem aplicar sanção.
+        function normMonth(item) {
+            return item.dataJustificativaIso ? item.dataJustificativaIso.slice(0, 7) : '';
+        }
+
+        function getConformityFindings(rows, referenceRows = rows) {
+            const findings = [];
+            const monthly = new Map();
+            // A contagem de esquecimentos é por empregado e competência do evento,
+            // nunca a soma de toda a planilha nem de qualquer inclusão de batida.
+            referenceRows.forEach(item => {
+                const month = normMonth(item);
+                if (!item.isEsquecimento || !item.matricula || !month) return;
+                const key = `${item.matricula}::${month}`;
+                if (!monthly.has(key)) monthly.set(key, []);
+                monthly.get(key).push(item);
+            });
+            const selectedIds = new Set(rows.map(item => item.id));
+            function add(item, ruleId, rule, label, evidence, severity, action, quantity = 1) {
+                findings.push({id:item.id, matricula:item.matricula, funcionario:item.funcionario,
+                    unidade:item.deptNome, codigo:item.deptCodigo, filial:item.filial,
+                    competencia:normMonth(item) || 'Não identificada', gestor:item.gestor,
+                    regraId:ruleId, regra:rule, indício:label, evidencia:evidence, quantidade:quantity,
+                    prioridade:severity, providencia:action, situacao:'Pendente de conferência'});
+            }
+            rows.forEach(item => {
+                if (!item.dtJustificativa || !item.dtSolicitacao) {
+                    add(item, 'DADOS', 'Validação da base • Ahgora', 'Data não identificada',
+                        'Data da ocorrência ou solicitação ausente/inválida', 'Atenção',
+                        'Conferir arquivo de origem; não concluir descumprimento');
+                } else if (item.diasDiferenca > 0) {
+                    add(item, 'PRAZO_SOL', 'Norma art. 12, caput e §2º', 'Solicitação posterior ao fato',
+                        `${item.diasDiferenca} dia(s) após ocorrência em ${item.dataJustificativaStr}`, 'Atenção',
+                        'Verificar imprevisibilidade, justificativa, prazos e fechamento mensal');
+                }
+                const approvedAt = parseBrDate(item.dataAprovacao);
+                if (approvedAt && item.dtSolicitacao) {
+                    const hours = (approvedAt.getTime() - item.dtSolicitacao.getTime()) / 3600000;
+                    if (hours > 24) {
+                        add(item, 'APROVACAO', 'Norma art. 12 × Manual p. 4', 'Prazo de análise do gestor a conferir',
+                            `Aprovação após ${hours.toFixed(1)} h corridas (há divergência documental: 24h / 2 dias úteis)`,
+                            'Informativa', 'Verificar prazo aplicável e dias úteis antes de avaliar a atuação do gestor');
+                    } else if (hours < 0) {
+                        add(item, 'DADOS', 'Validação da base • Ahgora', 'Datas cronologicamente inconsistentes',
+                            'Aprovação anterior à solicitação', 'Atenção', 'Conferir datas e sistema de origem');
+                    }
+                }
+                const info = String(item.informacao || '').trim().toLowerCase();
+                if (info.length < 5 || ['act','ok','ponto','batida','ajuste','teste'].includes(info)) {
+                    add(item, 'FUNDAMENTACAO', 'Norma art. 7º, §2º e art. 12', 'Descrição insuficiente para análise',
+                        `Texto informado: ${item.informacao || '(vazio)'}`, 'Atenção',
+                        'Solicitar esclarecimento e documentação; texto curto não prova descumprimento');
+                }
+                const isMotivo12x36 = /12x36/i.test(`${item.motivo} ${item.informacao}`);
+                const isLocRevezamento = /revezamento|12x36/i.test(`${item.grupoRegra} ${item.localizacaoOriginal}`);
+                if (isMotivo12x36 && !isLocRevezamento) {
+                    add(item, 'ESCALA', 'Norma art. 2º, II e art. 7º', 'Possível divergência de escala',
+                        'Texto cita 12x36; localização não indica revezamento', 'Atenção',
+                        'Confirmar escala cadastrada e espelho de ponto antes de concluir');
+                }
+            });
+            for (const items of monthly.values()) {
+                if (items.length <= 4) continue;
+                const item = items.find(x => selectedIds.has(x.id));
+                if (!item) continue;
+                add(item, 'ESQUECIMENTO', 'Norma art. 7º, §§3º e 4º; Manual p. 6',
+                    'Possível excesso mensal de esquecimentos',
+                    `${items.length} solicitações com texto indicativo de esquecimento em ${normMonth(item)}; limite de validações: 4/mês`,
+                    'Prioritária', 'Conferir motivo oficial, quantidade de validações efetivas e eventual comunicação à chefia', items.length);
+            }
+            const rank = {'Prioritária':0, 'Atenção':1, 'Informativa':2};
+            return findings.sort((a,b)=>(rank[a.prioridade]-rank[b.prioridade]) || a.unidade.localeCompare(b.unidade,'pt-BR') || a.funcionario.localeCompare(b.funcionario,'pt-BR'));
+        }
+
+        let currentConformityRows = [];
+        function syncConformitySelect(id, values, emptyLabel) {
+            const select = document.getElementById(id);
+            const prior = select.value;
+            select.replaceChildren(new Option(emptyLabel, ''));
+            values.filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(v=>select.add(new Option(v,v)));
+            select.value = values.includes(prior) ? prior : '';
+        }
+        function getVisibleConformityRows() {
+            const findings = getConformityFindings(filteredDataset, processedDataset);
+            const unit = document.getElementById('confUnit').value;
+            const rule = document.getElementById('confRule').value;
+            const severity = document.getElementById('confSeverity').value;
+            const search = document.getElementById('confSearch').value.toLocaleLowerCase('pt-BR').trim();
+            return findings.filter(f => (!unit || f.unidade === unit) && (!rule || f.regraId === rule) &&
+                (!severity || f.prioridade === severity) &&
+                (!search || `${f.funcionario} ${f.matricula} ${f.gestor} ${f.unidade} ${f.indício}`.toLocaleLowerCase('pt-BR').includes(search)));
+        }
+        function renderConformityReport() {
+            const all = getConformityFindings(filteredDataset, processedDataset);
+            const unitSelect = document.getElementById('confUnit');
+            syncConformitySelect('confUnit', [...new Set(all.map(f=>f.unidade))], 'Todas as unidades');
+            const currentRule = document.getElementById('confRule').value;
+            const ruleOptions = [...new Map(all.map(f=>[f.regraId, f])).values()].sort((a,b)=>a.indício.localeCompare(b.indício,'pt-BR'));
+            const ruleSelect = document.getElementById('confRule');
+            ruleSelect.replaceChildren(new Option('Todas as regras', ''));
+            ruleOptions.forEach(f=>ruleSelect.add(new Option(f.indício, f.regraId)));
+            ruleSelect.value = ruleOptions.some(f=>f.regraId===currentRule) ? currentRule : '';
+            currentConformityRows = getVisibleConformityRows();
+            document.getElementById('conformityCounter').textContent = String(all.length);
+            document.getElementById('confTotal').textContent = currentConformityRows.length.toLocaleString('pt-BR');
+            document.getElementById('confEmployees').textContent = new Set(currentConformityRows.map(f=>f.matricula || `${f.unidade}:${f.funcionario}`)).size;
+            document.getElementById('confUnits').textContent = new Set(currentConformityRows.map(f=>f.unidade)).size;
+            document.getElementById('confPriority').textContent = currentConformityRows.filter(f=>f.prioridade==='Prioritária').length;
+            document.getElementById('confCount').textContent = `${currentConformityRows.length} indício(s) no recorte • ${all.length} antes dos filtros desta aba`;
+            const tbody = document.getElementById('conformityTableBody');
+            tbody.innerHTML = currentConformityRows.length ? currentConformityRows.map(f=>`<tr class="hover:bg-sky-50 dark:hover:bg-slate-800/70">
+                <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.codigo)} • ${escapeHtml(f.unidade)}</td>
+                <td class="p-3"><button type="button" class="font-semibold text-caern-primary dark:text-sky-300 underline decoration-dotted text-left" onclick="openConformityEmployee(${f.id})">${escapeHtml(f.funcionario)}</button><div class="font-mono text-slate-500 mt-1">${escapeHtml(f.matricula)}</div></td>
+                <td class="p-3 whitespace-nowrap">${escapeHtml(f.competencia==='Não identificada'?f.competencia:f.competencia.slice(5)+'/'+f.competencia.slice(0,4))}</td>
+                <td class="p-3">${escapeHtml(f.regra)}</td><td class="p-3 font-semibold">${escapeHtml(f.indício)}</td>
+                <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.evidencia)}</td>
+                <td class="p-3"><span class="rounded-lg px-2 py-1 font-semibold ${f.prioridade==='Prioritária'?'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300':f.prioridade==='Atenção'?'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300':'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">${escapeHtml(f.prioridade)}</span></td>
+                <td class="p-3">${escapeHtml(f.gestor)}</td><td class="p-3">${escapeHtml(f.providencia)}</td>
+                <td class="p-3"><button type="button" class="text-caern-secondary dark:text-sky-300 underline" onclick="openDetailModal(${f.id})">Ver registro</button></td>
+            </tr>`).join('') : '<tr><td colspan="10" class="p-8 text-center text-slate-500">Nenhum indício para os filtros selecionados.</td></tr>';
+        }
+        function resetConformityFilters() {
+            ['confUnit','confRule','confSeverity','confSearch'].forEach(id=>document.getElementById(id).value='');
+            renderConformityReport();
+        }
+        function openConformityEmployee(id) {
+            const record = processedDataset.find(r=>r.id===id);
+            if (!record) return;
+            document.getElementById('filterDept').value = '';
+            document.getElementById('globalEmployee').value = record.matricula;
+            applyFilters();
+            switchTab('tabEmployees');
+            const emp = getFilteredEmployeesList().find(e=>e.matricula===record.matricula);
+            if (emp) { activeEmployeeKey=emp.matricula; drawEmployeeAnalysis(emp); }
+        }
+        function addConformitySheet(workbook, rows, referenceRows=rows) {
+            const ws = workbook.addWorksheet('Inconformidades');
+            ws.columns = [
+                ['Unidade','unidade',38],['Código','codigo',15],['Filial','filial',18],
+                ['Matrícula','matricula',16],['Empregado','funcionario',34],['Competência','competencia',18],
+                ['Gestor','gestor',34],['Referência','regra',38],['Indício','indício',42],
+                ['Evidência','evidencia',78],['Quantidade','quantidade',15],['Prioridade','prioridade',18],
+                ['Situação','situacao',25],['Providência sugerida','providencia',78],
+                ['Análise do gestor (preencher)','analiseGestor',44]
+            ].map(([header,key,width])=>({header,key,width}));
+            ws.views = [{state:'frozen',ySplit:1}];
+            ws.autoFilter = {from:'A1',to:'O1'};
+            ws.getRow(1).height=30;
+            ws.getRow(1).eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF004B93'}};c.font={bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',wrapText:true};});
+            getConformityFindings(rows,referenceRows).forEach(f=>{
+                const record = {...f, analiseGestor:''};
+                const row=ws.addRow(record);
+                row.alignment={vertical:'top',wrapText:true};
+                if (f.prioridade==='Prioritária') {row.getCell('prioridade').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFEDD5'}};row.getCell('prioridade').font={bold:true,color:{argb:'FF9A3412'}};}
+            });
+            return ws;
+        }
+        async function exportConformityReport() {
+            if (!currentConformityRows.length) {showToast('Nenhum indício para exportar.', 'warning');return;}
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const sheet = addConformitySheet(workbook, [], []);
+                currentConformityRows.forEach(f=>sheet.addRow({...f,analiseGestor:''}));
+                await downloadWorkbook(workbook, `justificativas_Inconformidades_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/','.')}.xlsx`);
+                showToast(`Relatório gerado com ${currentConformityRows.length} indício(s).`, 'success');
+            } catch(error) {console.error(error);showToast('Não foi possível exportar o relatório de inconformidades.', 'error');}
+        }
+
         function renderAlertsTab() {
             const tbody = document.getElementById('alertsTableBody');
             const alerts = filteredDataset.filter(d => d.flagsAuditoria.length > 0);
@@ -2688,7 +2907,7 @@
             } finally { button.disabled = false; }
         }
 
-        // Exportação Completa Multi-Abas (7 abas formatadas)
+        // Exportação Completa Multi-Abas (8 abas formatadas)
         async function exportStyledExcel(exportRows = processedDataset) {
             const processedDataset = exportRows; // escopo específico desta exportação
             if (!processedDataset || processedDataset.length === 0) {
@@ -2713,6 +2932,7 @@
 
                 // ABA 1: Base_Tratada
                 buildBaseTratadaSheet(setupStyledSheet, styles, processedDataset, 'Base_Tratada');
+                addConformitySheet(workbook, processedDataset);
 
                 // ABA 2: Resumo_Executivo
                 const wsResumo = workbook.addWorksheet('Resumo_Executivo', {
@@ -2971,7 +3191,7 @@
                 const outputFileName = `justificativas_Analitica_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/', '.')}.xlsx`;
                 await downloadWorkbook(workbook, outputFileName);
 
-                showToast(`Planilha "${outputFileName}" exportada com 7 abas e ${processedDataset.length} registros!`, 'success');
+                showToast(`Planilha "${outputFileName}" exportada com 8 abas e ${processedDataset.length} registros!`, 'success');
                 return true;
             } catch (err) {
                 console.error(err);

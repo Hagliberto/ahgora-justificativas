@@ -11,7 +11,7 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Conferir abono `Dia Todo`, intervalos simples, horários noturnos e ausência de horário.
 - [ ] Aplicar filtros, limpar filtros, alternar abas, paginar e abrir/fechar modais.
 - [ ] Conferir indicadores/gráficos contra totalização independente.
-- [ ] Exportar planilha analítica de 7 abas, registros filtrados e ranking por empregado.
+- [ ] Exportar planilha analítica de 8 abas, registros filtrados e ranking por empregado.
 - [ ] Testar importação contendo texto literal `<img src=x onerror=alert(1)>` e garantir que ele apareça como texto, sem execução.
 - [ ] Testar acessibilidade básica por teclado, mobile e tema claro/escuro.
 - [ ] Confirmar formalmente fundamento/competência das regras com RH/jurídico.
@@ -45,3 +45,16 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Trocar competência e filtros após importar, sem erro `textContent` de null.
 - [ ] Exportar a planilha e validar todas as abas.
 - [ ] Avaliar migração do Tailwind Play CDN para build CSS local.
+
+
+## Checklist 2.5.0 — Inconformidades
+
+- [ ] Versão 2.5.0 indicada em appbar, configurações e documentação.
+- [ ] Aba `#/inconformidades` acessível após importação e pelo histórico do navegador.
+- [ ] Filtros de unidade, regra, prioridade, pesquisa, gestor e competência funcionais.
+- [ ] Quatro esquecimentos no mês não geram alerta de excesso; cinco geram um único caso no mês.
+- [ ] Não somar ajustes comuns como esquecimentos nem somar meses diferentes.
+- [ ] Aprovação acima de 24h indicada como conferência informativa, diante da divergência Norma/Manual.
+- [ ] Exportação específica contém os indícios filtrados e campo para análise humana.
+- [ ] Excel analítico completa ou por múltiplas unidades tem 8 abas, incluindo Inconformidades.
+- [ ] Testar unidade → empregado → ficha e links dos registros originais.

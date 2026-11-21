@@ -1,6 +1,6 @@
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.4.1.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.5.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
 
 ## Como executar
 
@@ -53,12 +53,12 @@ Não há `npm install` obrigatório para executar a aplicação. O arquivo HTML 
 ## Fluxo Git sugerido
 
 ```powershell
-git checkout -b feature/analise-hierarquica-v2.4.1
+git checkout -b feature/analise-hierarquica-v2.5.0
 # copie os arquivos desta entrega sobre o repositório e confira o diff
 git status
 git add .
 git commit -m "chore: documenta e padroniza auditoria de justificativas"
-git push -u origin feature/analise-hierarquica-v2.4.1
+git push -u origin feature/analise-hierarquica-v2.5.0
 ```
 
 A versão original estava na `main` com a árvore limpa; esta entrega **não alterou seu repositório local nem fez push**. Homologue antes de mesclar na `main`.
@@ -67,7 +67,7 @@ A versão original estava na `main` com a árvore limpa; esta entrega **não alt
 
 O sistema **sinaliza** registros para conferência e não decide automaticamente a validade jurídica ou administrativa de uma justificativa. Os parâmetros atuais de 4 inclusões, 5/7 dias e escala 12x36 vêm do código recebido; precisam de confirmação formal na norma aplicável e no período de apuração. Consulte [regras](docs/REGRAS_DE_NEGOCIO.md) e [homologação](docs/HOMOLOGACAO.md).
 
-## Mudanças da versão 2.4.1
+## Mudanças da versão 2.5.0
 - Navegação por botões discretos na appbar e competência em seletor compacto.
 - Aviso normativo recolhido em ícone informativo acessível.
 - Navegação hierárquica: Unidades → Empregados → Ficha individual.
@@ -95,12 +95,21 @@ O sistema **sinaliza** registros para conferência e não decide automaticamente
 
 **Limitação da origem:** não há campo estruturado que confirme “esqueci de bater ponto”. A heurística textual pode deixar de reconhecer situações. Consulte `docs/CONCILIACAO_NORMATIVA.md`.
 
-## Rotas e exportação (v2.4.1)
+## Rotas e exportação (v2.5.0)
 
-A navegação usa rotas hash, compatíveis com GitHub Pages e Cloudflare Pages sem configuração de fallback: `#/dashboard`, `#/base`, `#/empregados`, `#/unidades` e `#/alertas`. A exploração de unidade usa `#/unidades/CODIGO` e a ficha individual `#/empregados/MATRICULA`. **Os dados não são persistidos entre recarregamentos:** importe a planilha novamente ao abrir um link numa nova sessão.
+A navegação usa rotas hash, compatíveis com GitHub Pages e Cloudflare Pages sem configuração de fallback: `#/dashboard`, `#/base`, `#/empregados`, `#/unidades`, `#/alertas` e `#/inconformidades`. A exploração de unidade usa `#/unidades/CODIGO` e a ficha individual `#/empregados/MATRICULA`. **Os dados não são persistidos entre recarregamentos:** importe a planilha novamente ao abrir um link numa nova sessão.
 
-Na appbar, o ícone Excel abre o modal **Completa / Por unidade**. Em *Por unidade*, marque uma ou várias unidades, use a busca ou selecione todas as visíveis. As 7 abas do arquivo analítico são calculadas somente com as linhas das unidades escolhidas, respeitando a competência selecionada (que inicia em **Todas as competências**). O modo Completa ignora filtros visuais do dashboard. O nome permanece `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
+Na appbar, o ícone Excel abre o modal **Completa / Por unidade**. Em *Por unidade*, marque uma ou várias unidades, use a busca ou selecione todas as visíveis. As 8 abas do arquivo analítico são calculadas somente com as linhas das unidades escolhidas, respeitando a competência selecionada (que inicia em **Todas as competências**). O modo Completa ignora filtros visuais do dashboard. O nome permanece `justificativas_Analitica_CAERN_DD.MM.AAAA.xlsx`.
 
 
-### Nota da versão 2.4.1
-A v2.4.1 corrige um erro de renderização no dashboard que impedia o acesso às abas após a importação. O aviso `cdn.tailwindcss.com should not be used in production` é independente desse erro. A migração para CSS Tailwind compilado é recomendada antes da publicação definitiva (não incluída neste hotfix, pois requer dependências de build).
+### Histórico do hotfix 2.4.1
+A v2.4.1 corrigiu um erro de renderização no dashboard que impedia o acesso às abas após a importação. O aviso `cdn.tailwindcss.com should not be used in production` é independente desse erro. A migração para CSS Tailwind compilado é recomendada antes da publicação definitiva (não incluída neste hotfix, pois requer dependências de build).
+
+
+## Relatório de Inconformidades (v2.5.0)
+
+A rota `#/inconformidades` apresenta indícios por empregado, competência, unidade e gestor. É uma **triagem preventiva**, não declaração de infração. Os filtros do Dashboard/Base influenciam o relatório; filtros internos permitem escolher unidade, assunto, prioridade e buscar empregado/gestor. Há exportação XLSX específica e uma oitava aba `Inconformidades` na planilha analítica geral (inclusive seleção de várias unidades).
+
+Classificações: (1) possível excesso de **esquecimentos** identificados textualmente, computado por matrícula e competência com referência ao art. 7º, §§ 3º-4º (a contagem não prova validações efetivas); (2) solicitação posterior a ocorrência, com exceções do art. 12; (3) aprovação acima de 24h, **apenas informativa** devido à divergência documental com o Manual p. 4 (dois dias úteis); (4) descrição insuficiente, como triagem da fundamentação; (5) eventual incompatibilidade textual 12x36, a confirmar com escala oficial; (6) datas inconsistentes.
+
+Dados ausentes no XLSX, como justificativa contextual, documento comprobatório, validação efetiva, batidas originais, escala oficial e decisão final do gestor, **não podem ser inferidos**. O arquivo exportado oferece coluna vazia `Análise do gestor (preencher)`; não há armazenamento de decisões na aplicação. Consulte `docs/RELATORIO_INCONFORMIDADES.md`.

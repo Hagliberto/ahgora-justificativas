@@ -1,0 +1,2350 @@
+        // =========================================================================
+        // 1. ESTADO GLOBAL & CONFIGURAÇÕES
+        // =========================================================================
+        let rawDataset = [];
+        let processedDataset = [];
+        let filteredDataset = [];
+        let employeeStatsMap = {};
+        let currentUnitRows = [];
+        let activeEmployeeKey = null;
+        let currentPage = 1;
+        let pageSize = 30;
+        let currentSourceName = "Justificativas_Ahgora_CAERN";
+
+        let chartMotivosInstance = null;
+        let chartDeptInstance = null;
+        let chartTemporalInstance = null;
+        let chartSlaInstance = null;
+        const dashboardCharts = {};
+
+        let fullImportedDataset = [];
+        let currentDatasetLabel = '';
+        let selectedCompetence = '';
+        const ESSENTIAL_COLUMNS = ['Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário', 'Tipo', 'Status'];
+        const EXPECTED_COLUMNS = [
+            'Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário',
+            'Localização', 'Departamento', 'Tipo', 'Status', 'Gestor Responsável',
+            'Informação', 'Motivo', 'Data e hora da aprovação', 'Detalhes'
+        ];
+
+        // =========================================================================
+        // 2. DADOS DE DEMONSTRAÇÃO (37 REGISTROS REAIS NUPNN / CAERN)
+        // =========================================================================
+        const DEMO_DATA = [
+            {"Data solicitação":"03/11/2026 08:15","Data da justificativa":"02/11/2026","Matrícula":"01CAENTL0208005337","Funcionário":"ANTONIO CARLOS DE SOUZA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Esquecimento no início do turno","Motivo":"","Data e hora da aprovação":"03/11/2026 10:22","Detalhes":"07:30"},
+            {"Data solicitação":"03/11/2026 09:40","Data da justificativa":"02/11/2026","Matrícula":"01CAENTL0208005337","Funcionário":"ANTONIO CARLOS DE SOUZA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Esquecimento saída","Motivo":"","Data e hora da aprovação":"03/11/2026 10:23","Detalhes":"19:30"},
+            {"Data solicitação":"04/11/2026 14:10","Data da justificativa":"01/11/2026","Matrícula":"01CAENTL0208005337","Funcionário":"ANTONIO CARLOS DE SOUZA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Troca de plantão autorizada","Motivo":"Empregado 12x36h","Data e hora da aprovação":"","Detalhes":"Dia Todo"},
+            {"Data solicitação":"05/11/2026 07:50","Data da justificativa":"05/11/2026","Matrícula":"01CAENTL0201004812","Funcionário":"MARIA DO SOCORRO MEDEIROS","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Consulta odontológica periódica","Motivo":"Atestado / Declaração Médica","Data e hora da aprovação":"05/11/2026 11:05","Detalhes":"08:00 até 11:30"},
+            {"Data solicitação":"01/11/2026 16:20","Data da justificativa":"06/11/2026","Matrícula":"01CAENTL0201004812","Funcionário":"MARIA DO SOCORRO MEDEIROS","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Folga compensatória justiça eleitoral","Motivo":"Abono TRE / Justiça Eleitoral","Data e hora da aprovação":"02/11/2026 09:12","Detalhes":"Dia Todo"},
+            {"Data solicitação":"06/11/2026 10:05","Data da justificativa":"27/10/2026","Matrícula":"01CAENTL0204006129","Funcionário":"JOSE ROBERTO DO NASCIMENTO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Relógio de ponto sem comunicação","Motivo":"","Data e hora da aprovação":"","Detalhes":"12:00"},
+            {"Data solicitação":"06/11/2026 10:07","Data da justificativa":"27/10/2026","Matrícula":"01CAENTL0204006129","Funcionário":"JOSE ROBERTO DO NASCIMENTO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Retorno almoço","Motivo":"","Data e hora da aprovação":"","Detalhes":"13:00"},
+            {"Data solicitação":"07/11/2026 08:30","Data da justificativa":"07/11/2026","Matrícula":"01CAENTL0204006129","Funcionário":"JOSE ROBERTO DO NASCIMENTO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"act","Motivo":"Ausência Interesse Pessoal ACT","Data e hora da aprovação":"07/11/2026 14:15","Detalhes":"14:00 até 18:00"},
+            {"Data solicitação":"02/11/2026 11:00","Data da justificativa":"08/11/2026","Matrícula":"01CAENTL0205007044","Funcionário":"ANA PAULA BEZERRA DE OLIVEIRA","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"Realização de prova ENEM 2026","Motivo":"Vestibular / ENEM","Data e hora da aprovação":"03/11/2026 08:40","Detalhes":"Dia Todo"},
+            {"Data solicitação":"08/11/2026 15:45","Data da justificativa":"08/11/2026","Matrícula":"01CAENTL0208003910","Funcionário":"FRANCISCO DE ASSIS PEREIRA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Plantão ETA Extremoz","Motivo":"","Data e hora da aprovação":"09/11/2026 08:10","Detalhes":"19:00"},
+            {"Data solicitação":"09/11/2026 07:12","Data da justificativa":"09/11/2026","Matrícula":"01CAENTL0208003910","Funcionário":"FRANCISCO DE ASSIS PEREIRA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Saída plantão noturno","Motivo":"","Data e hora da aprovação":"09/11/2026 08:11","Detalhes":"07:00"},
+            {"Data solicitação":"09/11/2026 11:20","Data da justificativa":"05/11/2026","Matrícula":"01CAENTL0204005891","Funcionário":"LUIZ GONZAGA DA SILVA FILHO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Serviço externo emergencial adutora","Motivo":"Serviço Externo / Viagem","Data e hora da aprovação":"","Detalhes":"07:30 até 17:30"},
+            {"Data solicitação":"10/11/2026 08:05","Data da justificativa":"09/11/2026","Matrícula":"01CAENTL0201006420","Funcionário":"PATRICIA REGINA COSTA","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Problema leitura biométrica","Motivo":"","Data e hora da aprovação":"10/11/2026 09:30","Detalhes":"08:02"},
+            {"Data solicitação":"10/11/2026 09:18","Data da justificativa":"10/11/2026","Matrícula":"01CAENTL0205005118","Funcionário":"SEVERINO RAMOS DOS SANTOS","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"Atestado médico 1 dia","Motivo":"Atestado / Declaração Médica","Data e hora da aprovação":"10/11/2026 13:50","Detalhes":"Dia Todo"},
+            {"Data solicitação":"10/11/2026 14:40","Data da justificativa":"01/11/2026","Matrícula":"01CAENTL0208004502","Funcionário":"JOAO BATISTA DE ARAUJO","Localização":"CAENTL0208 620204000","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Ajuste escala 12x36","Motivo":"Empregado 12x36h","Data e hora da aprovação":"","Detalhes":"Dia Todo"},
+            {"Data solicitação":"11/11/2026 08:55","Data da justificativa":"10/11/2026","Matrícula":"01CAENTL0204006780","Funcionário":"RAIMUNDO NONATO FERREIRA","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Esquecimento registro","Motivo":"","Data e hora da aprovação":"11/11/2026 11:12","Detalhes":"17:32"},
+            {"Data solicitação":"11/11/2026 10:30","Data da justificativa":"15/11/2026","Matrícula":"01CAENTL0201005993","Funcionário":"CAMILA VITÓRIA MENDES","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Folga TRE 2º turno","Motivo":"Abono TRE / Justiça Eleitoral","Data e hora da aprovação":"11/11/2026 15:00","Detalhes":"Dia Todo"},
+            {"Data solicitação":"11/11/2026 16:10","Data da justificativa":"11/11/2026","Matrícula":"01CAENTL0205006301","Funcionário":"EDSON ARANTES NOGUEIRA","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"Falha aplicativo mobile","Motivo":"","Data e hora da aprovação":"12/11/2026 08:05","Detalhes":"07:58"},
+            {"Data solicitação":"12/11/2026 07:45","Data da justificativa":"11/11/2026","Matrícula":"01CAENTL0208005337","Funcionário":"ANTONIO CARLOS DE SOUZA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Esquecimento entrada","Motivo":"","Data e hora da aprovação":"","Detalhes":"07:30"},
+            {"Data solicitação":"12/11/2026 09:20","Data da justificativa":"12/11/2026","Matrícula":"01CAENTL0204006129","Funcionário":"JOSE ROBERTO DO NASCIMENTO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"ok","Motivo":"Ausência Interesse Pessoal ACT","Data e hora da aprovação":"","Detalhes":"08:00 até 12:00"},
+            {"Data solicitação":"12/11/2026 11:40","Data da justificativa":"03/11/2026","Matrícula":"01CAENTL0206004988","Funcionário":"MARCELO AUGUSTO CAVALCANTI","Localização":"CAENTL0206 620206000","Departamento":"20206000 - SETOR DE CONTROLE DE PERDAS E MACROMEDICAO","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"RODRIGO TAVARES PINHEIRO","Informação":"Inspeção reservatório R-12","Motivo":"","Data e hora da aprovação":"12/11/2026 16:20","Detalhes":"13:15"},
+            {"Data solicitação":"12/11/2026 14:05","Data da justificativa":"12/11/2026","Matrícula":"01CAENTL0206004988","Funcionário":"MARCELO AUGUSTO CAVALCANTI","Localização":"CAENTL0206 620206000","Departamento":"20206000 - SETOR DE CONTROLE DE PERDAS E MACROMEDICAO","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"RODRIGO TAVARES PINHEIRO","Informação":"Doação voluntária de sangue Hemonorte","Motivo":"Doação de Sangue","Data e hora da aprovação":"12/11/2026 16:22","Detalhes":"Dia Todo"},
+            {"Data solicitação":"13/11/2026 08:10","Data da justificativa":"12/11/2026","Matrícula":"01CAENTL0208005714","Funcionário":"SEBASTIAO SALGADO DE LIMA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Batida não registrada no coletor","Motivo":"","Data e hora da aprovação":"13/11/2026 10:00","Detalhes":"18:55"},
+            {"Data solicitação":"13/11/2026 10:15","Data da justificativa":"18/11/2026","Matrícula":"01CAENTL0205007044","Funcionário":"ANA PAULA BEZERRA DE OLIVEIRA","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"Ausência programada ACT","Motivo":"Ausência Interesse Pessoal ACT","Data e hora da aprovação":"","Detalhes":"13:30 até 17:30"},
+            {"Data solicitação":"13/11/2026 13:50","Data da justificativa":"13/11/2026","Matrícula":"01CAENTL0204005440","Funcionário":"GERALDO MAGELA DE QUEIROZ","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Esquecimento intervalo","Motivo":"","Data e hora da aprovação":"13/11/2026 17:02","Detalhes":"11:45"},
+            {"Data solicitação":"14/11/2026 07:35","Data da justificativa":"13/11/2026","Matrícula":"01CAENTL0208006215","Funcionário":"VALDIRENE MARIA DA CONCEICAO","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Entrada turno diurno","Motivo":"","Data e hora da aprovação":"14/11/2026 09:45","Detalhes":"07:00"},
+            {"Data solicitação":"14/11/2026 09:00","Data da justificativa":"14/11/2026","Matrícula":"01CAENTL0201004812","Funcionário":"MARIA DO SOCORRO MEDEIROS","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Reunião externa Sede","Motivo":"","Data e hora da aprovação":"14/11/2026 11:30","Detalhes":"08:15"},
+            {"Data solicitação":"14/11/2026 11:25","Data da justificativa":"04/11/2026","Matrícula":"01CAENTL0204006892","Funcionário":"CICERO ROMAO BATISTA","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Abono","Status":"Reprovada","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Sem documento anexo","Motivo":"Atestado / Declaração Médica","Data e hora da aprovação":"14/11/2026 15:40","Detalhes":"Dia Todo"},
+            {"Data solicitação":"14/11/2026 15:10","Data da justificativa":"14/11/2026","Matrícula":"01CAENTL0206005531","Funcionário":"DANIELA CRISTINA BARBOSA","Localização":"CAENTL0206 620206000","Departamento":"20206000 - SETOR DE CONTROLE DE PERDAS E MACROMEDICAO","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"RODRIGO TAVARES PINHEIRO","Informação":"Exame laboratorial periódico","Motivo":"Atestado / Declaração Médica","Data e hora da aprovação":"14/11/2026 16:55","Detalhes":"07:30 até 10:30"},
+            {"Data solicitação":"15/11/2026 08:20","Data da justificativa":"14/11/2026","Matrícula":"01CAENTL0208005337","Funcionário":"ANTONIO CARLOS DE SOUZA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Saída plantão","Motivo":"","Data e hora da aprovação":"","Detalhes":"19:30"},
+            {"Data solicitação":"15/11/2026 10:45","Data da justificativa":"20/11/2026","Matrícula":"01CAENTL0201006420","Funcionário":"PATRICIA REGINA COSTA","Localização":"CAENTL0201 620201000","Departamento":"20201000 - NUCLEO DE PESSOAL NATAL NORTE - NUPNN","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"FERNANDA CRISTINA ALVES","Informação":"Folga TRE solicitada","Motivo":"Abono TRE / Justiça Eleitoral","Data e hora da aprovação":"","Detalhes":"Dia Todo"},
+            {"Data solicitação":"15/11/2026 14:30","Data da justificativa":"15/11/2026","Matrícula":"01CAENTL0205005118","Funcionário":"SEVERINO RAMOS DOS SANTOS","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"Esquecimento saída","Motivo":"","Data e hora da aprovação":"16/11/2026 08:15","Detalhes":"17:05"},
+            {"Data solicitação":"16/11/2026 08:00","Data da justificativa":"06/11/2026","Matrícula":"01CAENTL0204005891","Funcionário":"LUIZ GONZAGA DA SILVA FILHO","Localização":"CAENTL0204 620204100","Departamento":"20204100 - SETOR DE MANUTENCAO DE REDES NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"CARLOS EDUARDO DANTAS","Informação":"Esquecimento","Motivo":"","Data e hora da aprovação":"","Detalhes":"07:30"},
+            {"Data solicitação":"16/11/2026 09:15","Data da justificativa":"16/11/2026","Matrícula":"01CAENTL0208003910","Funcionário":"FRANCISCO DE ASSIS PEREIRA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Abono","Status":"Aprovada","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Compensação escala 12x36","Motivo":"Empregado 12x36h","Data e hora da aprovação":"16/11/2026 11:40","Detalhes":"Dia Todo"},
+            {"Data solicitação":"16/11/2026 11:50","Data da justificativa":"16/11/2026","Matrícula":"01CAENTL0206005531","Funcionário":"DANIELA CRISTINA BARBOSA","Localização":"CAENTL0206 620206000","Departamento":"20206000 - SETOR DE CONTROLE DE PERDAS E MACROMEDICAO","Tipo":"Inclusão de batida","Status":"Aprovada","Gestor Responsável":"RODRIGO TAVARES PINHEIRO","Informação":"Esquecimento batida almoço","Motivo":"","Data e hora da aprovação":"16/11/2026 14:20","Detalhes":"12:05"},
+            {"Data solicitação":"16/11/2026 15:30","Data da justificativa":"16/11/2026","Matrícula":"01CAENTL0205006301","Funcionário":"EDSON ARANTES NOGUEIRA","Localização":"CAENTL0205 620205000","Departamento":"20205000 - SETOR COMERCIAL E ATENDIMENTO NORTE","Tipo":"Abono","Status":"Pendente","Gestor Responsável":"RICARDO HENRIQUE GOMES","Informação":"act","Motivo":"Ausência Interesse Pessoal ACT","Data e hora da aprovação":"","Detalhes":"08:00 até 12:00"},
+            {"Data solicitação":"17/11/2026 07:05","Data da justificativa":"16/11/2026","Matrícula":"01CAENTL0208005714","Funcionário":"SEBASTIAO SALGADO DE LIMA","Localização":"CAENTL0208 620204000 Escalas de Revezamento","Departamento":"20204000 - UNIDADE DE OPERACAO E MANUTENCAO NATAL NORTE","Tipo":"Inclusão de batida","Status":"Pendente","Gestor Responsável":"MARCOS VINICIUS LIMA","Informação":"Saída plantão noturno","Motivo":"","Data e hora da aprovação":"","Detalhes":"07:00"}
+        ];
+
+        const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
+        // =========================================================================
+        // 3. UTILITÁRIOS DE UI, TEMA, MODAIS E ABAS
+        // =========================================================================
+        // Escapa texto de planilhas antes de inseri-lo no HTML; nunca altera os dados exportados.
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[char]);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: 'bg-emerald-600 text-white border-emerald-400',
+                error: 'bg-rose-600 text-white border-rose-400',
+                warning: 'bg-amber-500 text-slate-950 border-amber-300',
+                info: 'bg-caern-primary text-white border-sky-400'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-circle-info'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base" aria-hidden="true"></i>`;
+            const textNode = document.createElement('span');
+            textNode.textContent = message;
+            toast.appendChild(textNode);
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4200);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDarkNow = !html.classList.contains('dark');
+            if (isDarkNow) {
+                html.classList.add('dark');
+                localStorage.setItem('caern_theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                localStorage.setItem('caern_theme', 'light');
+            }
+            updateThemeLabels();
+            if (processedDataset.length > 0) { renderCharts(); renderDashboardAdvanced(); }
+        }
+
+        function updateThemeLabels() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('settingsThemeIcon');
+            const label = document.getElementById('themeLabelText');
+            if (icon) {
+                icon.className = isDark ? 'fa-solid fa-sun text-base' : 'fa-solid fa-moon text-base';
+            }
+            if (label) {
+                label.textContent = isDark ? 'Tema Escuro Ativo' : 'Tema Claro Ativo';
+            }
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('caern_theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+            updateThemeLabels();
+        })();
+
+        function openSettingsModal() {
+            updateThemeLabels();
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Fechar qualquer modal aberto com a tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal('detailModal');
+                closeModal('settingsModal');
+                closeExportModal();
+            }
+        });
+
+        // Roteador hash: páginas com URL própria sem recarga, compatível com Cloudflare Pages estático.
+        const PAGE_ROUTES = Object.freeze({
+            tabOverview: '/dashboard', tabRecords: '/base', tabEmployees: '/empregados',
+            tabUnits: '/unidades', tabAlerts: '/alertas', tabConformidade: '/inconformidades'
+        });
+        const ROUTE_PAGES = Object.fromEntries(Object.entries(PAGE_ROUTES).map(([tab, route]) => [route, tab]));
+        let navigatingFromRoute = false;
+        function switchTab(tabId, updateRoute = true) {
+            const panel = document.getElementById(tabId);
+            if (!panel || !PAGE_ROUTES[tabId]) return;
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-white', 'text-caern-primary', 'shadow');
+                b.classList.add('text-sky-100', 'hover:bg-white/15');
+                b.setAttribute('aria-current', 'false');
+            });
+            panel.classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-sky-100', 'hover:bg-white/15');
+                activeBtn.classList.add('bg-white', 'text-caern-primary', 'shadow');
+                activeBtn.setAttribute('aria-current', 'page');
+            }
+            if (updateRoute && !navigatingFromRoute) {
+                const target = `#${PAGE_ROUTES[tabId]}`;
+                if (location.hash !== target) location.hash = target;
+            }
+            if (tabId === 'tabOverview') { renderCharts(); renderDashboardAdvanced(); }
+        }
+        function applyLocationRoute() {
+            if (document.getElementById('analyticsDashboard').classList.contains('hidden')) return;
+            const route = decodeURIComponent((location.hash || '#/unidades').replace(/^#/, '')).split('?')[0];
+            navigatingFromRoute = true;
+            try {
+                if (route === '/unidades') {
+                    openAllUnits(false);
+                } else if (route.startsWith('/unidades/')) {
+                    const unitCode = route.slice('/unidades/'.length);
+                    const unit = currentUnitRows.find(u => String(u.codigo) === unitCode);
+                    if (unit) openUnitEmployees(currentUnitRows.indexOf(unit), false);
+                    else openAllUnits(false);
+                } else if (route.startsWith('/empregados/')) {
+                    const employeeId = route.slice('/empregados/'.length);
+                    switchTab('tabEmployees', false);
+                    const emp = getFilteredEmployeesList().find(e => e.matricula === employeeId);
+                    if (emp) { activeEmployeeKey = emp.matricula; drawEmployeeAnalysis(emp); }
+                    else closeEmployeeAnalysis(false);
+                } else {
+                    switchTab(ROUTE_PAGES[route] || 'tabUnits', false);
+                }
+            } finally { navigatingFromRoute = false; }
+        }
+        window.addEventListener('hashchange', applyLocationRoute);
+
+        // Configurar Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+        ['dragenter', 'dragover'].forEach(evtName => {
+            dropZone.addEventListener(evtName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('drop-zone-active');
+            });
+        });
+        ['dragleave', 'drop'].forEach(evtName => {
+            dropZone.addEventListener(evtName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drop-zone-active');
+            });
+        });
+        dropZone.addEventListener('drop', (e) => {
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processUploadedFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                processUploadedFile(e.target.files[0]);
+            }
+        }
+
+        // =========================================================================
+        // 4. LEITURA E VALIDAÇÃO DE ARQUIVOS (.XLSX, .XLS, .CSV)
+        // =========================================================================
+        function processUploadedFile(file) {
+            const validExts = ['.xlsx', '.xls', '.csv'];
+            const fileNameLower = file.name.toLowerCase();
+            if (!validExts.some(ext => fileNameLower.endsWith(ext))) {
+                showToast('Formato inválido! Envie arquivos .xlsx, .xls ou .csv exportados do Ahgora.', 'error');
+                return;
+            }
+
+            if (file.size > 25 * 1024 * 1024) {
+                showToast('Arquivo maior que 25 MB. Divida a exportação por período.', 'error');
+                return;
+            }
+            currentSourceName = file.name.replace(/\.[^/.]+$/, "");
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: false });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                    if (!jsonRows || jsonRows.length === 0) {
+                        showToast('A planilha enviada está vazia.', 'error');
+                        return;
+                    }
+
+                    const fileCols = Object.keys(jsonRows[0]).map(c => c.trim());
+                    
+
+                    const missingEssential = ESSENTIAL_COLUMNS.filter(col => !fileCols.includes(col));
+                    if (missingEssential.length) {
+                        showToast(`Importação bloqueada. Campos obrigatórios ausentes: ${missingEssential.join(', ')}`, 'error');
+                        return;
+                    }
+
+                    // Leitura concluída. Falhas de processamento ou de interface
+                    // não devem ser relatadas como planilha protegida por senha.
+                    try {
+                        processDataset(jsonRows, file.name);
+                    } catch (processingError) {
+                        console.error('Falha no processamento ou na interface:', processingError);
+                        showToast('A planilha foi lida, mas ocorreu um erro ao processar ou exibir os dados. Consulte o console.', 'error');
+                    }
+                } catch (err) {
+                    console.error('Falha ao interpretar o arquivo:', err);
+                    showToast('Não foi possível interpretar a planilha. Verifique o formato e a integridade do arquivo.', 'error');
+                }
+            };
+            reader.onerror = function() {
+                console.error('Falha de leitura do arquivo:', reader.error);
+                showToast('Não foi possível acessar o arquivo selecionado. Tente novamente.', 'error');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function loadDemoData() {
+            currentSourceName = "Demonstracao_Ahgora_NUPNN_CAERN";
+            processDataset(DEMO_DATA, "Base de Demonstração NUPNN (37 registros)");
+        }
+
+        // =========================================================================
+        // 5. MOTOR DE TRATAMENTO, PADRONIZAÇÃO E AUDITORIA
+        // =========================================================================
+        function parseBrDate(dateStr) {
+            if (!dateStr) return null;
+            if (typeof dateStr === 'number') {
+                const utcDays = Math.floor(dateStr - 25569);
+                return new Date(utcDays * 86400 * 1000);
+            }
+            const clean = String(dateStr).trim();
+            const match = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+            if (match) {
+                const dt = new Date(+match[3], +match[2] - 1, +match[1], +(match[4] || 0), +(match[5] || 0), +(match[6] || 0));
+                return dt.getFullYear() === +match[3] && dt.getMonth() === +match[2] - 1 && dt.getDate() === +match[1] ? dt : null;
+            }
+            const isoMatch = clean.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+            if (isoMatch) {
+                const dt = new Date(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3], +(isoMatch[4] || 0), +(isoMatch[5] || 0), +(isoMatch[6] || 0));
+                return dt.getFullYear() === +isoMatch[1] && dt.getMonth() === +isoMatch[2] - 1 && dt.getDate() === +isoMatch[3] ? dt : null;
+            }
+            return null; // Não interpretar formatos ambíguos dependentes do navegador
+        }
+
+        function formatDateOnly(dateObj) {
+            if (!dateObj || isNaN(dateObj.getTime())) return '';
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            return `${d}/${m}/${dateObj.getFullYear()}`;
+        }
+
+        function getInclusionClassification(count) {
+            if (count === 0) return 'Regular (0)';
+            if (count <= 4) return 'Dentro do Limite (1 a 4)';
+            if (count <= 6) return 'Reincidente (5 a 6)';
+            return 'Crítico (7+)';
+        }
+
+        function getCompetence(dateValue) {
+            const date = parseBrDate(dateValue);
+            return date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}` : '';
+        }
+
+        function isForgottenPunch(item) {
+            // A norma limita validações por ESQUECIMENTO; inclusão genérica não comprova esquecimento.
+            return item.isInclusao && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(`${item.informacao} ${item.motivo}`);
+        }
+
+        function changeCompetence() {
+            selectedCompetence = document.getElementById('competenceSelect').value;
+            processDataset(fullImportedDataset, currentDatasetLabel, true);
+        }
+
+        function processDataset(rows, sourceLabel, preserveCompetence = false) {
+            fullImportedDataset = rows;
+            currentDatasetLabel = sourceLabel;
+            const available = [...new Set(rows.map(r => getCompetence(r['Data da justificativa'])).filter(Boolean))].sort().reverse();
+            if (!preserveCompetence) selectedCompetence = ''; // padrão: todas as competências
+            if (selectedCompetence && !available.includes(selectedCompetence)) selectedCompetence = '';
+            const competenceSelect = document.getElementById('competenceSelect');
+            competenceSelect.replaceChildren();
+            const allOption = new Option('Todas as competências', '');
+            competenceSelect.add(allOption);
+            available.forEach(value => competenceSelect.add(new Option(`${value.slice(5)}/${value.slice(0, 4)}`, value)));
+            competenceSelect.value = selectedCompetence;
+            const scopedRows = selectedCompetence ? rows.filter(r => getCompetence(r['Data da justificativa']) === selectedCompetence) : rows;
+            rawDataset = scopedRows;
+
+            // Primeira passagem: normalização linha a linha
+            const tempProcessed = scopedRows.map((row, idx) => {
+                const cleanRow = {};
+                Object.keys(row).forEach(k => {
+                    cleanRow[k.trim()] = row[k] !== null && row[k] !== undefined ? String(row[k]).trim() : '';
+                });
+
+                const rawMat = cleanRow['Matrícula'] || '';
+                const digitsOnly = rawMat.replace(/\D/g, '');
+                const mat6D = digitsOnly.length >= 6 ? digitsOnly.slice(-6) : (digitsOnly ? digitsOnly.padStart(6, '0') : '');
+
+                const rawLoc = cleanRow['Localização'] || '';
+                const locParts = rawLoc.split(/\s+/);
+                const filial = locParts[0] || 'N/I';
+                const centroCusto = (locParts[1] && /^\d+$/.test(locParts[1])) ? locParts[1] : 'N/I';
+                let grupoRegra = 'Padrão';
+                if (locParts.length > 2) {
+                    grupoRegra = locParts.slice(2).join(' ');
+                } else if (locParts.length === 2 && !/^\d+$/.test(locParts[1])) {
+                    grupoRegra = locParts[1];
+                }
+
+                const rawDept = cleanRow['Departamento'] || 'Não Informado';
+                let deptCodigo = '-';
+                let deptNome = rawDept;
+                const deptMatch = rawDept.match(/^(\d+)\s*-\s*(.+)$/);
+                if (deptMatch) {
+                    deptCodigo = deptMatch[1].trim();
+                    deptNome = deptMatch[2].trim();
+                }
+
+                const tipo = cleanRow['Tipo'] || 'Outros';
+                const status = cleanRow['Status'] || 'Não informado';
+                const funcionario = (cleanRow['Funcionário'] || 'NÃO IDENTIFICADO').toUpperCase();
+                const gestor = cleanRow['Gestor Responsável'] || 'Não atribuído';
+                const informacao = cleanRow['Informação'] || '';
+                let motivo = cleanRow['Motivo'] || '';
+                const detalhes = cleanRow['Detalhes'] || '';
+                const dataAprovacao = cleanRow['Data e hora da aprovação'] || '';
+
+                let horarioOuIntervalo = detalhes || 'N/I';
+                let periodoBatida = '-';
+                let duracaoEstimadaMin = 0;
+
+                const isInclusao = tipo.toLowerCase().includes('inclusão') || tipo.toLowerCase().includes('inclusao');
+                const isAbono = tipo.toLowerCase().includes('abono');
+
+                if (isInclusao) {
+                    if (!motivo) motivo = 'Inclusão de Batida / Motivo não informado';
+                    const timeMatch = detalhes.match(/(\d{1,2}):(\d{2})/);
+                    if (timeMatch) {
+                        const hh = parseInt(timeMatch[1], 10);
+                        const mm = timeMatch[2];
+                        horarioOuIntervalo = `${String(hh).padStart(2, '0')}:${mm}`;
+                        if (hh >= 5 && hh < 12) periodoBatida = 'Manhã';
+                        else if (hh >= 12 && hh < 18) periodoBatida = 'Tarde';
+                        else periodoBatida = 'Noite/Madrugada';
+                    }
+                } else if (isAbono) {
+                    if (!motivo) motivo = 'Abono Não Especificado';
+                    if (detalhes.toLowerCase().includes('dia todo')) {
+                        horarioOuIntervalo = 'Dia Todo';
+                        duracaoEstimadaMin = 480;
+                    } else {
+                        const rangeMatch = detalhes.match(/(\d{1,2}):(\d{2})\s*(?:até|a|-)\s*(\d{1,2}):(\d{2})/i);
+                        if (rangeMatch) {
+                            const h1 = parseInt(rangeMatch[1], 10);
+                            const m1 = parseInt(rangeMatch[2], 10);
+                            const h2 = parseInt(rangeMatch[3], 10);
+                            const m2 = parseInt(rangeMatch[4], 10);
+                            const startMin = h1 * 60 + m1;
+                            let endMin = h2 * 60 + m2;
+                            if (endMin < startMin) endMin += 24 * 60;
+                            duracaoEstimadaMin = endMin - startMin;
+                            horarioOuIntervalo = `${String(h1).padStart(2, '0')}:${String(m1).padStart(2, '0')} até ${String(h2).padStart(2, '0')}:${String(m2).padStart(2, '0')}`;
+                        }
+                    }
+                } else {
+                    if (!motivo) motivo = tipo;
+                }
+
+                const dtSolicitacao = parseBrDate(cleanRow['Data solicitação']);
+                const dtJustificativa = parseBrDate(cleanRow['Data da justificativa']);
+                const dataJustificativaFormatada = dtJustificativa
+                    ? formatDateOnly(dtJustificativa)
+                    : (cleanRow['Data da justificativa'] || '').split(' ')[0];
+
+                let diasDiferenca = 0;
+                let classificacaoTemporal = 'Não informado';
+                let diaSemana = '-';
+
+                if (dtJustificativa) {
+                    diaSemana = DIAS_SEMANA[dtJustificativa.getDay()];
+                }
+
+                if (dtSolicitacao && dtJustificativa) {
+                    const solDayOnly = new Date(dtSolicitacao.getFullYear(), dtSolicitacao.getMonth(), dtSolicitacao.getDate());
+                    const justDayOnly = new Date(dtJustificativa.getFullYear(), dtJustificativa.getMonth(), dtJustificativa.getDate());
+                    diasDiferenca = Math.round((solDayOnly.getTime() - justDayOnly.getTime()) / (1000 * 60 * 60 * 24));
+
+                    if (diasDiferenca > 0) classificacaoTemporal = 'Retroativa';
+                    else if (diasDiferenca < 0) classificacaoTemporal = 'Antecipada / Programada';
+                    else classificacaoTemporal = 'No Mesmo Dia';
+                }
+
+                return {
+                    id: idx + 1,
+                    dataSolicitacaoStr: cleanRow['Data solicitação'] || '',
+                    dataJustificativaStr: dataJustificativaFormatada,
+                    dtSolicitacao,
+                    dtJustificativa,
+                    diaSemana,
+                    dataJustificativaIso: dtJustificativa ? `${dtJustificativa.getFullYear()}-${String(dtJustificativa.getMonth()+1).padStart(2,'0')}-${String(dtJustificativa.getDate()).padStart(2,'0')}` : '',
+                    dataSolicitacaoIso: dtSolicitacao ? `${dtSolicitacao.getFullYear()}-${String(dtSolicitacao.getMonth()+1).padStart(2,'0')}-${String(dtSolicitacao.getDate()).padStart(2,'0')}` : '',
+                    matriculaOriginal: rawMat,
+                    matricula: mat6D,
+                    funcionario,
+                    localizacaoOriginal: rawLoc,
+                    filial,
+                    centroCusto,
+                    grupoRegra,
+                    departamentoOriginal: rawDept,
+                    deptCodigo,
+                    deptNome,
+                    tipo,
+                    isInclusao,
+                    isAbono,
+                    status,
+                    gestor,
+                    informacao,
+                    motivo,
+                    dataAprovacao,
+                    detalhesOriginal: detalhes,
+                    horarioOuIntervalo,
+                    periodoBatida,
+                    duracaoEstimadaMin,
+                    diasDiferenca,
+                    classificacaoTemporal,
+                    isEsquecimento: isInclusao && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(`${informacao} ${cleanRow['Motivo'] || ''}`),
+                    flagsAuditoria: [],
+                    flagAuditoriaStr: 'Regular',
+                    severidade: 'OK'
+                };
+            });
+
+            // Segunda passagem: consolidar totais por empregado
+            employeeStatsMap = {};
+            tempProcessed.forEach(item => {
+                const key = item.matricula || `SEM-MATRICULA:${item.funcionario}:${item.id}`;
+                if (!employeeStatsMap[key]) {
+                    employeeStatsMap[key] = {
+                        matricula: item.matricula,
+                        funcionario: item.funcionario,
+                        filial: item.filial,
+                        deptNome: item.deptNome,
+                        grupoRegra: item.grupoRegra,
+                        totalSolicitacoes: 0,
+                        totalInclusoesBatida: 0,
+                        totalEsquecimentos: 0,
+                        totalAbonos: 0,
+                        somaDiasPrazo: 0
+                    };
+                }
+                employeeStatsMap[key].totalSolicitacoes++;
+                if (item.isInclusao) employeeStatsMap[key].totalInclusoesBatida++;
+                if (item.isEsquecimento) employeeStatsMap[key].totalEsquecimentos++;
+                if (item.isAbono) employeeStatsMap[key].totalAbonos++;
+                employeeStatsMap[key].somaDiasPrazo += item.diasDiferenca;
+            });
+
+            // Terceira passagem: aplicar regras de auditoria administrativa (Tolerância até 4 inclusões)
+            processedDataset = tempProcessed.map(item => {
+                const flags = [];
+                let sev = 'OK';
+                const key = item.matricula || `SEM-MATRICULA:${item.funcionario}:${item.id}`;
+                const empStat = employeeStatsMap[key];
+
+                if (!item.dtJustificativa || !item.dtSolicitacao) {
+                    flags.push('Data de ocorrência ou solicitação inválida/ausente: conferir origem');
+                    sev = 'ATENCAO';
+                } else if (item.diasDiferenca < 0) {
+                    // Solicitação prévia pode ser exigida pelo art. 12; não constitui infração isoladamente.
+                    item.classificacaoTemporal = 'Antecipada / Programada';
+                } else if (item.diasDiferenca > 0) {
+                    // Art. 12: há exceções, distinção entre ocorrência previsível/imprevisível e fechamento.
+                    flags.push(`Solicitação posterior à ocorrência (${item.diasDiferenca}d): verificar hipóteses do art. 12`);
+                    sev = 'ATENCAO';
+                }
+                const approvedAt = parseBrDate(item.dataAprovacao);
+                if (approvedAt && item.dtSolicitacao) {
+                    const diffHours = (approvedAt.getTime() - item.dtSolicitacao.getTime()) / 3600000;
+                    if (diffHours > 24) {
+                        flags.push(`Aprovação em ${diffHours.toFixed(1)}h: conferir prazo (Norma art. 12 x Manual p. 4)`);
+                        sev = 'ATENCAO';
+                    } else if (diffHours < 0) {
+                        flags.push('Aprovação anterior à solicitação: conferir datas');
+                        sev = 'ATENCAO';
+                    }
+                }
+
+                const infoClean = item.informacao.trim().toLowerCase();
+                if (infoClean.length < 5 || ['act', 'ok', 'ponto', 'batida', 'ajuste', 'teste'].includes(infoClean)) {
+                    flags.push(`Justificativa Curta/Genérica ("${item.informacao || 'vazio'}")`);
+                    if (sev !== 'CRITICO') sev = 'ATENCAO';
+                }
+
+                // Apenas os registros textualmente identificados como esquecimento
+                // integram esta triagem; não há inferência de motivo para os demais ajustes.
+                if (selectedCompetence && item.isEsquecimento && empStat.totalEsquecimentos > 4) {
+                    flags.push(`Possível excesso de esquecimentos identificados (${empStat.totalEsquecimentos}/mês; Norma art. 7º, §3º)`);
+                    if (sev !== 'CRITICO') sev = 'ATENCAO';
+                }
+
+                const isMotivo12x36 = item.motivo.toLowerCase().includes('12x36') || item.informacao.toLowerCase().includes('12x36');
+                const isLocRevezamento = item.grupoRegra.toLowerCase().includes('revezamento') || item.localizacaoOriginal.toLowerCase().includes('12x36');
+                if (isMotivo12x36 && !isLocRevezamento) {
+                    flags.push('Possível divergência textual 12x36 vs localização: confirmar escala cadastrada');
+                    if (sev !== 'CRITICO') sev = 'ATENCAO';
+                }
+
+                item.totalOcorrenciasColab = empStat.totalSolicitacoes;
+                item.totalInclusoesColab = empStat.totalInclusoesBatida;
+                item.totalEsquecimentosColab = empStat.totalEsquecimentos;
+                item.classificacaoInclusao = getInclusionClassification(empStat.totalInclusoesBatida);
+                item.flagsAuditoria = flags;
+                item.flagAuditoriaStr = flags.length > 0 ? flags.join(' | ') : 'Regular';
+                item.severidade = sev;
+                return item;
+            });
+
+            // Atualizar Interface
+            document.getElementById('uploadSection').classList.add('hidden');
+            document.getElementById('btnNewUpload').classList.remove('hidden');
+            document.getElementById('appbarTools').classList.remove('hidden');
+            document.getElementById('appbarTools').classList.add('flex');
+            document.getElementById('analyticsDashboard').classList.remove('hidden');
+            document.getElementById('btnExportSingle').disabled = false;
+
+            document.getElementById('loadedFileName').textContent = sourceLabel;
+            document.getElementById('loadedBadgeCount').textContent = `${processedDataset.length} registros`;
+
+            const alertsTotal = processedDataset.filter(d => d.flagsAuditoria.length > 0).length;
+            document.getElementById('tabAlertCounter').textContent = alertsTotal;
+
+            const validDates = processedDataset.map(d => d.dtJustificativa).filter(Boolean).sort((a, b) => a - b);
+            document.getElementById('loadedDateRange').textContent = validDates.length > 0
+                ? `Período das ocorrências: ${formatDateOnly(validDates[0])} a ${formatDateOnly(validDates[validDates.length - 1])}`
+                : 'Período não identificável na base';
+
+            populateFilterOptions();
+            applyFilters();
+            if (!preserveCompetence) { if (!location.hash) location.hash = '#/unidades'; applyLocationRoute(); }
+            if (!preserveCompetence) showToast(`Planilha processada! ${processedDataset.length} registros disponíveis para análise.`, 'success');
+        }
+
+        // =========================================================================
+        // 6. FILTROS DINÂMICOS (LIMITE DE ATÉ 4 INCLUSÕES DE BATIDA)
+        // =========================================================================
+        function populateFilterOptions() {
+            const depts = [...new Set(processedDataset.map(d => d.deptNome))].sort();
+            const tipos = [...new Set(processedDataset.map(d => d.tipo))].sort();
+            const statuses = [...new Set(processedDataset.map(d => d.status))].sort();
+            const motivos = [...new Set(processedDataset.map(d => d.motivo))].sort();
+
+            fillSelect('filterDept', depts, 'Todas as Unidades');
+            fillSelect('filterTipo', tipos, 'Todos os Tipos');
+            fillSelect('filterStatus', statuses, 'Todos os Status');
+            fillSelect('filterMotivo', motivos, 'Todos os Motivos');
+            fillSelect('globalEmployee', [...new Set(processedDataset.map(d => d.matricula).filter(Boolean))].sort().map(id => ({value:id, label: `${id} • ${processedDataset.find(d => d.matricula === id).funcionario}`})), 'Todos');
+            fillSelect('globalManager', [...new Set(processedDataset.map(d => d.gestor))].sort(), 'Todos');
+            fillSelect('globalBranch', [...new Set(processedDataset.map(d => d.filial))].sort(), 'Todas');
+            fillSelect('globalRegime', [...new Set(processedDataset.map(d => d.grupoRegra))].sort(), 'Todos');
+        }
+
+        function fillSelect(selectId, items, defaultText) {
+            const sel = document.getElementById(selectId);
+            sel.innerHTML = `<option value="">${defaultText}</option>`;
+            items.forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = typeof val === 'string' ? val : val.value;
+                opt.textContent = typeof val === 'string' ? val : val.label;
+                sel.appendChild(opt);
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterDept').value = '';
+            document.getElementById('filterTipo').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterTemporal').value = '';
+            document.getElementById('filterPunchCount').value = '';
+            document.getElementById('filterMotivo').value = '';
+            document.getElementById('filterOnlyAlerts').checked = false;
+            applyFilters();
+        }
+
+        function resetGlobalFilters() {
+            ['globalDateStart','globalDateEnd','globalEmployee','globalManager','globalBranch','globalRegime','globalRisk'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            applyFilters();
+        }
+
+        function matchPunchCountRule(count, rule) {
+            if (!rule) return true;
+            if (rule === '0') return count === 0;
+            if (rule === '1-4') return count >= 1 && count <= 4;
+            if (rule === '5+') return count >= 5;
+            if (rule === '5-6') return count >= 5 && count <= 6;
+            if (rule === '7+') return count >= 7;
+            return true;
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            const dept = document.getElementById('filterDept').value;
+            const tipo = document.getElementById('filterTipo').value;
+            const status = document.getElementById('filterStatus').value;
+            const temporal = document.getElementById('filterTemporal').value;
+            const punchRule = document.getElementById('filterPunchCount').value;
+            const motivo = document.getElementById('filterMotivo').value;
+            const onlyAlerts = document.getElementById('filterOnlyAlerts').checked;
+            const globalStart = document.getElementById('globalDateStart').value;
+            const globalEnd = document.getElementById('globalDateEnd').value;
+            const globalEmployee = document.getElementById('globalEmployee').value;
+            const globalManager = document.getElementById('globalManager').value;
+            const globalBranch = document.getElementById('globalBranch').value;
+            const globalRegime = document.getElementById('globalRegime').value;
+            const globalRisk = document.getElementById('globalRisk').value;
+
+            filteredDataset = processedDataset.filter(item => {
+                if (globalStart && (!item.dataJustificativaIso || item.dataJustificativaIso < globalStart)) return false;
+                if (globalEnd && (!item.dataJustificativaIso || item.dataJustificativaIso > globalEnd)) return false;
+                if (globalEmployee && item.matricula !== globalEmployee) return false;
+                if (globalManager && item.gestor !== globalManager) return false;
+                if (globalBranch && item.filial !== globalBranch) return false;
+                if (globalRegime && item.grupoRegra !== globalRegime) return false;
+                if (globalRisk === 'alerts' && !item.flagsAuditoria.length) return false;
+                if (globalRisk === 'ok' && item.flagsAuditoria.length) return false;
+                if (globalRisk === 'late' && !isLateApproval(item)) return false;
+                if (globalRisk === 'forgotten' && !item.isEsquecimento) return false;
+                if (dept && item.deptNome !== dept) return false;
+                if (tipo && item.tipo !== tipo) return false;
+                if (status && item.status !== status) return false;
+                if (temporal && item.classificacaoTemporal !== temporal) return false;
+                if (motivo && item.motivo !== motivo) return false;
+                if (!matchPunchCountRule(item.totalInclusoesColab, punchRule)) return false;
+                if (onlyAlerts && item.flagsAuditoria.length === 0) return false;
+                if (search) {
+                    const hay = `${item.funcionario} ${item.matricula} ${item.matriculaOriginal} ${item.filial} ${item.informacao} ${item.motivo} ${item.deptNome}`.toLowerCase();
+                    if (!hay.includes(search)) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('globalFilterCount').textContent = `${filteredDataset.length.toLocaleString('pt-BR')} de ${processedDataset.length.toLocaleString('pt-BR')} registros`;
+            document.getElementById('tabAlertCounter').textContent = filteredDataset.filter(d => d.flagsAuditoria.length).length;
+            currentPage = 1;
+            updateKpis();
+            generateInsights();
+            renderCharts();
+            renderTable();
+            renderEmployeeTab();
+            renderUnitTab();
+            renderAlertsTab();
+            renderConformityReport();
+            renderDashboardAdvanced();
+        }
+
+        // =========================================================================
+        // 7. KPIS E DIAGNÓSTICO AUTOMÁTICO
+        // =========================================================================
+        function updateKpis() {
+            const total = filteredDataset.length;
+            const uniqueColabs = new Set(filteredDataset.map(d => d.matricula || `SEM-MATRICULA:${d.funcionario}:${d.id}`)).size;
+            const pendentes = filteredDataset.filter(d => d.status.toLowerCase().includes('pendente')).length;
+            const aprovadas = filteredDataset.filter(d => d.status.toLowerCase().includes('aprovad')).length;
+            const abonos = filteredDataset.filter(d => d.isAbono).length;
+            const inclusoes = filteredDataset.filter(d => d.isInclusao).length;
+            const alertsCount = filteredDataset.filter(d => d.flagsAuditoria.length > 0).length;
+
+            const avgLead = total > 0
+                ? (filteredDataset.reduce((acc, d) => acc + d.diasDiferenca, 0) / total)
+                : 0;
+
+            document.getElementById('kpiTotal').textContent = total;
+            document.getElementById('kpiTotalSub').textContent = total === processedDataset.length
+                ? '100% da planilha carregada'
+                : `${((total / (processedDataset.length || 1)) * 100).toFixed(1)}% da seleção filtrada`;
+
+            document.getElementById('kpiColabs').textContent = uniqueColabs;
+            document.getElementById('kpiColabsSub').textContent = `Média de ${(total / (uniqueColabs || 1)).toFixed(1)} por empregado`;
+
+            const pendPct = total > 0 ? ((pendentes / total) * 100).toFixed(1) : '0.0';
+            document.getElementById('kpiPendentesPct').textContent = `${pendPct}%`;
+            document.getElementById('kpiStatusSub').textContent = `${pendentes} pendentes • ${aprovadas} aprovadas`;
+
+            document.getElementById('kpiSplitRatio').textContent = `${abonos} / ${inclusoes}`;
+            const abonoPct = total > 0 ? Math.round((abonos / total) * 100) : 0;
+            const inclusaoPct = total > 0 ? Math.round((inclusoes / total) * 100) : 0;
+            document.getElementById('kpiSplitSub').textContent = `${abonoPct}% Abonos • ${inclusaoPct}% Inclusões`;
+
+            document.getElementById('kpiLeadTime').textContent = `${avgLead >= 0 ? '+' : ''}${avgLead.toFixed(1)}d`;
+            document.getElementById('kpiLeadTimeSub').textContent = avgLead > 0 ? 'Predomínio retroativo' : (avgLead < 0 ? 'Predomínio programado' : 'No mesmo dia');
+
+            document.getElementById('kpiAlerts').textContent = alertsCount;
+            document.getElementById('kpiAlertsSub').textContent = `${total > 0 ? ((alertsCount / total) * 100).toFixed(1) : 0}% com sinalização`;
+        }
+
+        function generateInsights() {
+            const container = document.getElementById('insightsContainer');
+            if (filteredDataset.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-xs text-slate-500">Nenhum registro encontrado no filtro atual.</div>`;
+                return;
+            }
+
+            const colabMap = {};
+            filteredDataset.forEach(d => {
+                const k = `${d.funcionario} (${d.matricula})`;
+                colabMap[k] = (colabMap[k] || 0) + 1;
+            });
+            const topColab = Object.entries(colabMap).sort((a, b) => b[1] - a[1])[0];
+
+            const deptMap = {};
+            filteredDataset.forEach(d => {
+                deptMap[d.deptNome] = (deptMap[d.deptNome] || 0) + 1;
+            });
+            const topDept = Object.entries(deptMap).sort((a, b) => b[1] - a[1])[0];
+            const topDeptPct = ((topDept[1] / filteredDataset.length) * 100).toFixed(1);
+
+            const actCount = filteredDataset.filter(d => d.motivo.toLowerCase().includes('act')).length;
+            const treCount = filteredDataset.filter(d => d.motivo.toLowerCase().includes('tre')).length;
+            const esc12Count = filteredDataset.filter(d => d.motivo.toLowerCase().includes('12x36')).length;
+
+            const visibleKeys = new Set(filteredDataset.map(d => d.matricula));
+            const acimaLimite4 = selectedCompetence ? Object.values(employeeStatsMap).filter(e => visibleKeys.has(e.matricula) && e.totalEsquecimentos >= 5).length : 0;
+            const atrasosCriticos = filteredDataset.filter(d => d.flagsAuditoria.some(f => f.startsWith('Aprovação em '))).length;
+
+            const cards = [
+                {
+                    icon: 'fa-user-clock',
+                    color: 'text-caern-primary dark:text-sky-400 bg-caern-light dark:bg-sky-950/60',
+                    title: 'Maior Frequência no Recorte',
+                    text: `<strong>${escapeHtml(topColab[0])}</strong> lidera o recorte com <strong>${topColab[1]} solicitações</strong> (${((topColab[1] / filteredDataset.length) * 100).toFixed(1)}% do volume).`
+                },
+                {
+                    icon: 'fa-building-user',
+                    color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60',
+                    title: 'Unidade Mais Demandante',
+                    text: `<strong>${escapeHtml(topDept[0])}</strong> concentra <strong>${topDept[1]} registros (${topDeptPct}%)</strong> das justificativas analisadas.`
+                },
+                {
+                    icon: 'fa-file-contract',
+                    color: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60',
+                    title: 'Abonos Específicos (ACT / TRE / 12x36)',
+                    text: `Registrados <strong>${actCount}</strong> abonos ACT, <strong>${treCount}</strong> folgas TRE/Eleitoral e <strong>${esc12Count}</strong> ocorrências em escala 12x36h.`
+                },
+                {
+                    icon: 'fa-shield-virus',
+                    color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60',
+                    title: 'Triagem Normativa • Controle de Jornada',
+                    text: `<strong>${acimaLimite4}</strong> empregado(s) com mais de 4 possíveis esquecimentos na competência e <strong>${atrasosCriticos}</strong> aprovação(ões) acima de 24h, sujeitas a conferência normativa.`
+                },
+                {
+                    icon: 'fa-hourglass-half',
+                    color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60',
+                    title: 'Fila de Análise',
+                    text: `<strong>${filteredDataset.filter(d => d.status.toLowerCase().includes('pendente')).length}</strong> solicitações permanecem pendentes neste recorte; priorize a conferência das sinalizadas.`
+                },
+                {
+                    icon: 'fa-stopwatch',
+                    color: 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60',
+                    title: 'Tempo de Resposta',
+                    text: (() => { const h = filteredDataset.map(getDecisionHours).filter(v => v !== null); return h.length ? `Decisão média de <strong>${(h.reduce((a,b)=>a+b,0)/h.length).toFixed(1)} horas</strong> entre <strong>${h.length}</strong> solicitações com datas válidas.` : 'Não há solicitações com datas de decisão válidas no recorte.'; })()
+                },
+                {
+                    icon: 'fa-chart-pie',
+                    color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60',
+                    title: 'Concentração dos Registros',
+                    text: (() => { const v = Object.values(colabMap).sort((a,b)=>b-a); const top = v.slice(0,Math.max(1,Math.ceil(v.length*.2))).reduce((a,b)=>a+b,0); return `Os <strong>20% de empregados mais recorrentes</strong> (arredondado para cima) concentram <strong>${(top/filteredDataset.length*100).toFixed(1)}%</strong> das solicitações no recorte.`; })()
+                },
+                {
+                    icon: 'fa-user-shield',
+                    color: 'text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60',
+                    title: 'Gestores com Pendências',
+                    text: (() => {const managers = summarizeManagers(filteredDataset);return `<strong>${managers.filter(m=>m.pendentes>0).length}</strong> de <strong>${managers.length}</strong> gestores possuem solicitações pendentes no recorte.`;})()
+                }
+            ];
+
+            container.innerHTML = cards.map(c => `
+                <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-lg ${c.color} flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid ${c.icon}"></i>
+                    </div>
+                    <div class="text-xs leading-relaxed">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 mb-0.5">${c.title}</div>
+                        <p class="text-slate-600 dark:text-slate-300">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =========================================================================
+        // 8. GRÁFICOS INTERATIVOS (CHART.JS)
+        // =========================================================================
+        function renderCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#334155';
+            const gridColor = isDark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(15, 23, 42, 0.06)';
+
+            const motivoCounts = {};
+            filteredDataset.forEach(d => { motivoCounts[d.motivo] = (motivoCounts[d.motivo] || 0) + 1; });
+            const sortedMotivos = Object.entries(motivoCounts).sort((a, b) => b[1] - a[1]);
+
+            if (chartMotivosInstance) chartMotivosInstance.destroy();
+            chartMotivosInstance = new Chart(document.getElementById('chartMotivos'), {
+                type: 'bar',
+                data: {
+                    labels: sortedMotivos.map(m => m[0].length > 32 ? m[0].slice(0, 30) + '...' : m[0]),
+                    datasets: [{
+                        label: 'Ocorrências',
+                        data: sortedMotivos.map(m => m[1]),
+                        backgroundColor: ['#004b93', '#0072ce', '#00a8e8', '#0d9488', '#6366f1', '#f59e0b', '#ec4899'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            const deptCounts = {};
+            filteredDataset.forEach(d => { deptCounts[d.deptNome] = (deptCounts[d.deptNome] || 0) + 1; });
+            const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
+
+            if (chartDeptInstance) chartDeptInstance.destroy();
+            chartDeptInstance = new Chart(document.getElementById('chartDepartamentos'), {
+                type: 'bar',
+                data: {
+                    labels: sortedDepts.map(d => d[0].length > 34 ? d[0].slice(0, 32) + '...' : d[0]),
+                    datasets: [{
+                        label: 'Justificativas',
+                        data: sortedDepts.map(d => d[1]),
+                        backgroundColor: '#0072ce',
+                        hoverBackgroundColor: '#004b93',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            const dateSet = new Set();
+            const occByDate = {};
+            const solByDate = {};
+            filteredDataset.forEach(d => {
+                if (d.dataJustificativaIso) {
+                    dateSet.add(d.dataJustificativaIso);
+                    occByDate[d.dataJustificativaIso] = (occByDate[d.dataJustificativaIso] || 0) + 1;
+                }
+                if (d.dataSolicitacaoIso) {
+                    dateSet.add(d.dataSolicitacaoIso);
+                    solByDate[d.dataSolicitacaoIso] = (solByDate[d.dataSolicitacaoIso] || 0) + 1;
+                }
+            });
+            const sortedDates = Array.from(dateSet).sort();
+            const formattedLabels = sortedDates.map(iso => `${iso.split('-')[2]}/${iso.split('-')[1]}`);
+
+            if (chartTemporalInstance) chartTemporalInstance.destroy();
+            chartTemporalInstance = new Chart(document.getElementById('chartTemporal'), {
+                type: 'line',
+                data: {
+                    labels: formattedLabels,
+                    datasets: [
+                        {
+                            label: 'Data da Ocorrência',
+                            data: sortedDates.map(dt => occByDate[dt] || 0),
+                            borderColor: '#004b93',
+                            backgroundColor: 'rgba(0, 75, 147, 0.15)',
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Data da Solicitação',
+                            data: sortedDates.map(dt => solByDate[dt] || 0),
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderDash: [5, 4],
+                            tension: 0.35,
+                            fill: false,
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: textColor, font: { size: 11 } } } },
+                    scales: {
+                        x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor } }
+                    }
+                }
+            });
+
+            const slaCounts = { 'Retroativa': 0, 'No Mesmo Dia': 0, 'Antecipada / Programada': 0 };
+            filteredDataset.forEach(d => { slaCounts[d.classificacaoTemporal] = (slaCounts[d.classificacaoTemporal] || 0) + 1; });
+
+            if (chartSlaInstance) chartSlaInstance.destroy();
+            chartSlaInstance = new Chart(document.getElementById('chartSlaPerfil'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(slaCounts),
+                    datasets: [{
+                        data: Object.values(slaCounts),
+                        backgroundColor: ['#f59e0b', '#0072ce', '#8b5cf6'],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#0f172a' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: {
+                        legend: { position: 'right', labels: { color: textColor, font: { size: 12 }, padding: 14 } }
+                    }
+                }
+            });
+        }
+
+        // =========================================================================
+        // 9. RENDERIZAÇÃO DAS TABELAS DAS ABAS & MODAL DE DETALHES
+        // =========================================================================
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value, 10) || 30;
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            const totalItems = filteredDataset.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, totalItems);
+            const slice = filteredDataset.slice(startIdx, endIdx);
+
+            document.getElementById('tableCountInfo').textContent = `Exibindo ${totalItems === 0 ? 0 : startIdx + 1}–${endIdx} de ${totalItems} registros`;
+
+            if (slice.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500">Nenhum registro corresponde aos filtros selecionados.</td></tr>`;
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            tbody.innerHTML = slice.map(item => {
+                let statusBadge = 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300';
+                if (item.status.toLowerCase().includes('aprovad')) statusBadge = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300';
+                else if (item.status.toLowerCase().includes('reprovad')) statusBadge = 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300';
+
+                let slaBadge = 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300';
+                if (item.classificacaoTemporal === 'Retroativa') {
+                    slaBadge = item.diasDiferenca > 5 ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300';
+                } else if (item.classificacaoTemporal.includes('Antecipada')) {
+                    slaBadge = 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300';
+                }
+
+                const hasAlert = item.flagsAuditoria.length > 0;
+                const auditHtml = hasAlert
+                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800"><i class="fa-solid fa-triangle-exclamation"></i> ${item.flagsAuditoria.length} alerta(s)</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"><i class="fa-solid fa-check"></i> Regular</span>`;
+
+                const duracaoStr = item.duracaoEstimadaMin > 0
+                    ? `<span class="text-[10px] text-slate-400 block">${(item.duracaoEstimadaMin / 60).toFixed(1)}h (${item.duracaoEstimadaMin}m)</span>`
+                    : (item.periodoBatida !== '-' ? `<span class="text-[10px] text-slate-400 block">Período: ${item.periodoBatida}</span>` : '');
+
+                let punchBadgeColor = 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300';
+                if (item.totalInclusoesColab >= 7) {
+                    punchBadgeColor = 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300';
+                } else if (item.totalInclusoesColab >= 5) {
+                    punchBadgeColor = 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300';
+                }
+
+                return `
+                    <tr onclick="openDetailModal(${item.id})" class="hover:bg-caern-light/60 dark:hover:bg-slate-800/70 transition cursor-pointer">
+                        <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400 whitespace-nowrap">
+                            ${escapeHtml(item.matricula)}
+                        </td>
+                        <td class="py-2.5 px-3.5 font-medium text-slate-900 dark:text-slate-100">
+                            <div class="max-w-[200px] truncate" title="${escapeHtml(item.funcionario)}">${escapeHtml(item.funcionario)}</div>
+                            <span class="inline-block mt-0.5 px-1.5 py-0.2 rounded text-[10px] font-semibold ${punchBadgeColor}">
+                                ${item.totalInclusoesColab} inclusão(ões) batida
+                            </span>
+                        </td>
+                        <td class="py-2.5 px-3.5">
+                            <div class="max-w-[210px] truncate font-medium text-slate-700 dark:text-slate-300" title="${escapeHtml(item.deptNome)}">${escapeHtml(item.deptNome)}</div>
+                            <span class="text-[10px] text-slate-400">Filial: ${escapeHtml(item.filial)} • ${escapeHtml(item.grupoRegra)}</span>
+                        </td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap font-medium">
+                            ${escapeHtml(item.dataJustificativaStr)}
+                            <span class="block text-[10px] text-slate-400">${escapeHtml(item.diaSemana)}</span>
+                        </td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${slaBadge}">${escapeHtml(item.classificacaoTemporal)}</span>
+                            <span class="block text-[10px] text-slate-400 mt-0.5">${item.diasDiferenca >= 0 ? '+' + item.diasDiferenca : item.diasDiferenca} dia(s)</span>
+                        </td>
+                        <td class="py-2.5 px-3.5">
+                            <span class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(item.tipo)}</span>
+                            <div class="max-w-[180px] truncate text-[11px] text-slate-500 dark:text-slate-400" title="${escapeHtml(item.motivo)}">${escapeHtml(item.motivo)}</div>
+                        </td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap font-mono text-[11px]">
+                            ${escapeHtml(item.horarioOuIntervalo)}
+                            ${duracaoStr}
+                        </td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}">${escapeHtml(item.status)}</span>
+                        </td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap">${auditHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationControls');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            let html = `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 text-xs disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-chevron-left"></i></button>`;
+            for (let p = 1; p <= totalPages; p++) {
+                if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                    const activeClass = p === currentPage ? 'bg-caern-primary text-white border-caern-primary font-bold' : 'border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800';
+                    html += `<button onclick="goToPage(${p})" class="px-3 py-1 rounded-lg border text-xs ${activeClass}">${p}</button>`;
+                } else if (p === currentPage - 2 || p === currentPage + 2) {
+                    html += `<span class="px-1 text-slate-400 text-xs">...</span>`;
+                }
+            }
+            html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 text-xs disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-chevron-right"></i></button>`;
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+
+        function getFilteredEmployeesList() {
+            const rule = document.getElementById('empTabPunchFilter').value;
+            return Object.values(employeeStatsMap)
+                .filter(e => filteredDataset.some(d => d.matricula === e.matricula && d.funcionario === e.funcionario))
+                .filter(e => matchPunchCountRule(e.totalInclusoesBatida, rule))
+                .sort((a, b) => b.totalInclusoesBatida - a.totalInclusoesBatida || b.totalSolicitacoes - a.totalSolicitacoes);
+        }
+
+        function toggleNormativeInfo(force) {
+            const panel = document.getElementById('normativeInfo');
+            const opened = force === undefined ? panel.classList.contains('hidden') : force;
+            panel.classList.toggle('hidden', !opened);
+            document.querySelector('[aria-describedby="normativeInfo"]').setAttribute('aria-expanded', String(opened));
+        }
+
+        function openAllUnits(updateRoute = true) {
+            document.getElementById('filterDept').value = '';
+            document.getElementById('globalEmployee').value = '';
+            activeEmployeeKey = null;
+            applyFilters();
+            switchTab('tabUnits', false);
+            if (updateRoute && !navigatingFromRoute) location.hash = '#/unidades';
+        }
+
+        function openUnitEmployees(index, updateRoute = true) {
+            const unit = currentUnitRows[index];
+            if (!unit) return;
+            document.getElementById('filterDept').value = unit.nome;
+            document.getElementById('globalEmployee').value = '';
+            document.getElementById('empTabPunchFilter').value = '';
+            activeEmployeeKey = null;
+            applyFilters();
+            switchTab('tabEmployees', false);
+            if (updateRoute && !navigatingFromRoute) location.hash = '#/unidades/' + encodeURIComponent(String(unit.codigo));
+            document.getElementById('tabEmployees').scrollIntoView({behavior:'smooth',block:'start'});
+        }
+
+        function openEmployeeAnalysis(index) {
+            const emp = getFilteredEmployeesList()[index];
+            if (!emp) return;
+            activeEmployeeKey = emp.matricula;
+            drawEmployeeAnalysis(emp);
+            if (!navigatingFromRoute) location.hash = '#/empregados/' + encodeURIComponent(emp.matricula);
+            document.getElementById('employeeDetail').scrollIntoView({behavior:'smooth',block:'start'});
+        }
+
+        function monthHistoryForEmployee(matricula) {
+            // Histórico completo disponível na importação, independentemente da competência visualizada.
+            const results = new Map();
+            fullImportedDataset.forEach(row => {
+                const digits = String(row['Matrícula'] || '').replace(/\D/g,'');
+                const employeeId = digits ? digits.slice(-6).padStart(6,'0') : '';
+                if (!matricula || employeeId !== matricula) return;
+                const month = getCompetence(row['Data da justificativa']);
+                if (!month) return;
+                if (!results.has(month)) results.set(month,{month,total:0,forgot:0,inclusions:0,abonos:0,approvals:[],status:{},types:{}});
+                const v = results.get(month);
+                v.total++;
+                const tipo = String(row['Tipo']||'').trim();
+                const status = String(row['Status']||'').trim() || 'Não informado';
+                const info = `${row['Informação']||''} ${row['Motivo']||''}`;
+                const inclusion = /inclus[aã]o de batida/i.test(tipo);
+                if (inclusion) v.inclusions++;
+                if (inclusion && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(info)) v.forgot++;
+                if (/abono/i.test(tipo)) v.abonos++;
+                v.status[status] = (v.status[status]||0)+1;
+                v.types[tipo||'Não informado'] = (v.types[tipo||'Não informado']||0)+1;
+                const request = parseBrDate(row['Data solicitação']);
+                const approved = parseBrDate(row['Data e hora da aprovação']);
+                if (request && approved && approved >= request) v.approvals.push((approved-request)/3600000);
+            });
+            return Array.from(results.values()).sort((a,b)=>a.month.localeCompare(b.month));
+        }
+
+        function drawEmployeeAnalysis(emp) {
+            const panel = document.getElementById('employeeDetail');
+            const history = monthHistoryForEmployee(emp.matricula);
+            const current = filteredDataset.filter(d=>d.matricula===emp.matricula);
+            const unit = filteredDataset.filter(d=>d.deptNome===emp.deptNome);
+            const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+            const approvalHours = current.map(getDecisionHours).filter(v=>v!==null);
+            const avgCurrent = avg(approvalHours);
+            const unitAvg = avg(unit.map(getDecisionHours).filter(v=>v!==null));
+            const unitEmployees = new Set(unit.map(d=>d.matricula).filter(Boolean)).size;
+            const relative = unitEmployees ? unit.length/unitEmployees : 0;
+            const sortedTypes = Object.entries(current.reduce((m,d)=>{const k=d.motivo||d.tipo||'Não informado';m[k]=(m[k]||0)+1;return m},{})).sort((a,b)=>b[1]-a[1]);
+            const pending = current.filter(d=>/pendente/i.test(d.status)).length;
+            const fmt = x => x===null?'N/D':`${x.toFixed(1)} h`;
+            const cards = [
+              ['Solicitações (recorte)',current.length],
+              ['Possíveis esquecimentos (recorte)',current.filter(d=>d.isEsquecimento).length],
+              ['Pendentes (recorte)',pending],
+              ['Decisão média (recorte)',fmt(avgCurrent)],
+              ['Média por empregado na unidade',relative.toFixed(1)],
+              ['Decisão média da unidade',fmt(unitAvg)]
+            ];
+            const maxCount = Math.max(1,...history.map(h=>h.total));
+            panel.innerHTML = `
+                <div class="flex flex-wrap justify-between gap-3 items-start">
+                    <div><p class="text-xs uppercase tracking-wider text-sky-700 dark:text-sky-300 font-semibold">Ficha analítica individual</p>
+                    <h3 class="text-lg font-extrabold">${escapeHtml(emp.funcionario)}</h3>
+                    <p class="text-xs text-slate-500">Matrícula ${escapeHtml(emp.matricula)} • ${escapeHtml(emp.deptNome)}</p></div>
+                    <button onclick="closeEmployeeAnalysis()" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-xs font-semibold"><i class="fa-solid fa-xmark mr-1"></i>Fechar análise</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">${cards.map(([name,value])=>`<div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3"><p class="text-[11px] text-slate-500">${name}</p><strong class="text-xl">${value}</strong></div>`).join('')}</div>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4">
+                        <h4 class="font-bold text-sm mb-3">Evolução mensal das solicitações</h4>
+                        ${history.length ? history.map(h=>`<div class="flex gap-3 items-center mb-2"><span class="text-xs w-16">${h.month.slice(5)}/${h.month.slice(0,4)}</span><div class="flex-1 rounded-full bg-slate-100 dark:bg-slate-800 h-3 overflow-hidden"><div class="h-full bg-sky-600 rounded-full" style="width:${100*h.total/maxCount}%"></div></div><strong class="text-xs w-6 text-right">${h.total}</strong></div>`).join(''):'<p class="text-xs text-slate-500">Sem histórico válido.</p>'}
+                    </div>
+                    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4">
+                        <h4 class="font-bold text-sm mb-3">Perfil das justificativas no recorte</h4>
+                        ${sortedTypes.length?sortedTypes.slice(0,8).map(([name,num])=>`<div class="flex justify-between gap-4 border-b border-slate-100 dark:border-slate-800 py-2 text-xs"><span>${escapeHtml(name)}</span><strong>${num}</strong></div>`).join(''):'<p class="text-xs text-slate-500">Sem ocorrências no recorte.</p>'}
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                    <table class="w-full text-xs text-left"><thead class="bg-slate-100 dark:bg-slate-800"><tr><th class="p-3">Mês</th><th class="p-3">Solicitações</th><th class="p-3">Inclusões</th><th class="p-3">Esquecimentos*</th><th class="p-3">Abonos</th><th class="p-3">Aprovação média</th></tr></thead>
+                    <tbody>${history.map(h=>`<tr class="border-t border-slate-100 dark:border-slate-800"><td class="p-3">${h.month.slice(5)}/${h.month.slice(0,4)}</td><td class="p-3">${h.total}</td><td class="p-3">${h.inclusions}</td><td class="p-3 font-semibold ${h.forgot>4?'text-amber-600':''}">${h.forgot}</td><td class="p-3">${h.abonos}</td><td class="p-3">${fmt(avg(h.approvals))}</td></tr>`).join('')}</tbody></table>
+                </div>
+                <p class="text-xs text-slate-500">* Esquecimentos identificados por descrição textual. Histórico limitado aos meses contidos no arquivo importado; sem integração externa. Comparações usam a unidade e o mesmo recorte de filtros ativo, não taxas ajustadas pela quantidade de jornadas.</p>`;
+            panel.classList.remove('hidden');
+        }
+
+        function closeEmployeeAnalysis(updateRoute = true) { activeEmployeeKey=null; document.getElementById('employeeDetail').classList.add('hidden'); if (updateRoute && !navigatingFromRoute) location.hash = '#/empregados'; }
+
+        function renderEmployeeTab() {
+            const tbody = document.getElementById('employeeTableBody');
+            const list = getFilteredEmployeesList();
+            const selected = activeEmployeeKey && list.find(e => e.matricula === activeEmployeeKey);
+            if (selected) drawEmployeeAnalysis(selected);
+            else { document.getElementById('employeeDetail').classList.add('hidden'); activeEmployeeKey = null; }
+            const unitFilter = document.getElementById('filterDept').value;
+            document.getElementById('employeeListTitle').textContent = unitFilter ? `Unidade: ${unitFilter} • ${list.length} empregado(s)` : `${list.length} empregado(s) • selecione para abrir a análise individual`;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-500">Nenhum empregado encontrado para o filtro selecionado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((emp, idx) => {
+                const avgDelay = (emp.somaDiasPrazo / (emp.totalSolicitacoes || 1)).toFixed(1);
+                let riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">Sem esquecimentos identificados</span>`;
+                if (selectedCompetence && emp.totalEsquecimentos > 4) {
+                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Conferir ${emp.totalEsquecimentos} esquecimentos</span>`;
+                } else if (emp.totalEsquecimentos > 0) {
+                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">${emp.totalEsquecimentos} possível(is) esquecimento(s)</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-sky-50 dark:hover:bg-sky-950/40 cursor-pointer focus:outline focus:outline-2 focus:outline-sky-600" onclick="openEmployeeAnalysis(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEmployeeAnalysis(${idx})}" tabindex="0" role="button" title="Abrir análise detalhada deste empregado">
+                        <td class="py-2.5 px-3.5 font-semibold text-slate-400">${idx + 1}</td>
+                        <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${escapeHtml(emp.matricula)}</td>
+                        <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(emp.funcionario)}</td>
+                        <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[240px] truncate" title="${escapeHtml(emp.deptNome)}">
+                            <span class="font-semibold text-slate-500 dark:text-slate-400">${escapeHtml(emp.filial)}</span> • ${escapeHtml(emp.deptNome)}
+                        </td>
+                        <td class="py-2.5 px-3.5 text-slate-500">${escapeHtml(emp.grupoRegra)}</td>
+                        <td class="py-2.5 px-3.5 text-center font-bold">${emp.totalSolicitacoes}</td>
+                        <td class="py-2.5 px-3.5 text-center font-extrabold text-caern-secondary dark:text-sky-400">${emp.totalInclusoesBatida}</td>
+                        <td class="py-2.5 px-3.5 text-center font-semibold text-emerald-600 dark:text-emerald-400">${emp.totalAbonos}</td>
+                        <td class="py-2.5 px-3.5 text-center">${avgDelay}d</td>
+                        <td class="py-2.5 px-3.5">${riskBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderUnitTab() {
+            const tbody = document.getElementById('unitTableBody');
+            const total = filteredDataset.length || 1;
+            const unitMap = {};
+
+            filteredDataset.forEach(d => {
+                const k = d.deptNome;
+                if (!unitMap[k]) {
+                    unitMap[k] = { codigo: d.deptCodigo, nome: k, total: 0, inclusoes: 0, abonos: 0, aprovadas: 0, pendentes: 0, alertas: 0 };
+                }
+                unitMap[k].total++;
+                if (d.isInclusao) unitMap[k].inclusoes++;
+                if (d.isAbono) unitMap[k].abonos++;
+                if (d.status.toLowerCase().includes('aprovad')) unitMap[k].aprovadas++;
+                if (d.status.toLowerCase().includes('pendente')) unitMap[k].pendentes++;
+                if (d.flagsAuditoria.length > 0) unitMap[k].alertas++;
+            });
+
+            const rows = Object.values(unitMap).sort((a, b) => b.total - a.total);
+            currentUnitRows = rows;
+            tbody.innerHTML = rows.map((u, idx) => `
+                <tr onclick="openUnitEmployees(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUnitEmployees(${idx})}" tabindex="0" role="button" title="Ver empregados desta unidade" class="hover:bg-sky-50 dark:hover:bg-sky-950/40 cursor-pointer focus:outline focus:outline-2 focus:outline-sky-600">
+                    <td class="py-2.5 px-3.5 font-mono text-slate-500">${escapeHtml(u.codigo)}</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(u.nome)}</td>
+                    <td class="py-2.5 px-3.5 text-center font-bold">${u.total}</td>
+                    <td class="py-2.5 px-3.5 text-center text-caern-secondary dark:text-sky-400 font-semibold">${u.inclusoes}</td>
+                    <td class="py-2.5 px-3.5 text-center text-emerald-600 dark:text-emerald-400 font-semibold">${u.abonos}</td>
+                    <td class="py-2.5 px-3.5 text-center">${u.aprovadas}</td>
+                    <td class="py-2.5 px-3.5 text-center text-amber-600 dark:text-amber-400 font-semibold">${u.pendentes}</td>
+                    <td class="py-2.5 px-3.5 text-center text-rose-600 dark:text-rose-400 font-bold">${u.alertas}</td>
+                    <td class="py-2.5 px-3.5 text-center font-semibold">${((u.total / total) * 100).toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+
+        // Relatório de gestão: indícios rastreáveis por competência e empregado.
+        // Nunca classificar automaticamente como infração nem aplicar sanção.
+        function normMonth(item) {
+            return item.dataJustificativaIso ? item.dataJustificativaIso.slice(0, 7) : '';
+        }
+
+        function getConformityFindings(rows, referenceRows = rows) {
+            const findings = [];
+            const monthly = new Map();
+            // A contagem de esquecimentos é por empregado e competência do evento,
+            // nunca a soma de toda a planilha nem de qualquer inclusão de batida.
+            referenceRows.forEach(item => {
+                const month = normMonth(item);
+                if (!item.isEsquecimento || !item.matricula || !month) return;
+                const key = `${item.matricula}::${month}`;
+                if (!monthly.has(key)) monthly.set(key, []);
+                monthly.get(key).push(item);
+            });
+            const selectedIds = new Set(rows.map(item => item.id));
+            function add(item, ruleId, rule, label, evidence, severity, action, quantity = 1) {
+                findings.push({id:item.id, matricula:item.matricula, funcionario:item.funcionario,
+                    unidade:item.deptNome, codigo:item.deptCodigo, filial:item.filial,
+                    competencia:normMonth(item) || 'Não identificada', gestor:item.gestor,
+                    regraId:ruleId, regra:rule, indício:label, evidencia:evidence, quantidade:quantity,
+                    prioridade:severity, providencia:action, situacao:'Pendente de conferência'});
+            }
+            rows.forEach(item => {
+                if (!item.dtJustificativa || !item.dtSolicitacao) {
+                    add(item, 'DADOS', 'Validação da base • Ahgora', 'Data não identificada',
+                        'Data da ocorrência ou solicitação ausente/inválida', 'Atenção',
+                        'Conferir arquivo de origem; não concluir descumprimento');
+                } else if (item.diasDiferenca > 0) {
+                    add(item, 'PRAZO_SOL', 'Norma art. 12, caput e §2º', 'Solicitação posterior ao fato',
+                        `${item.diasDiferenca} dia(s) após ocorrência em ${item.dataJustificativaStr}`, 'Atenção',
+                        'Verificar imprevisibilidade, justificativa, prazos e fechamento mensal');
+                }
+                const approvedAt = parseBrDate(item.dataAprovacao);
+                if (approvedAt && item.dtSolicitacao) {
+                    const hours = (approvedAt.getTime() - item.dtSolicitacao.getTime()) / 3600000;
+                    if (hours > 24) {
+                        add(item, 'APROVACAO', 'Norma art. 12 × Manual p. 4', 'Prazo de análise do gestor a conferir',
+                            `Aprovação após ${hours.toFixed(1)} h corridas (há divergência documental: 24h / 2 dias úteis)`,
+                            'Informativa', 'Verificar prazo aplicável e dias úteis antes de avaliar a atuação do gestor');
+                    } else if (hours < 0) {
+                        add(item, 'DADOS', 'Validação da base • Ahgora', 'Datas cronologicamente inconsistentes',
+                            'Aprovação anterior à solicitação', 'Atenção', 'Conferir datas e sistema de origem');
+                    }
+                }
+                const info = String(item.informacao || '').trim().toLowerCase();
+                if (info.length < 5 || ['act','ok','ponto','batida','ajuste','teste'].includes(info)) {
+                    add(item, 'FUNDAMENTACAO', 'Norma art. 7º, §2º e art. 12', 'Descrição insuficiente para análise',
+                        `Texto informado: ${item.informacao || '(vazio)'}`, 'Atenção',
+                        'Solicitar esclarecimento e documentação; texto curto não prova descumprimento');
+                }
+                const isMotivo12x36 = /12x36/i.test(`${item.motivo} ${item.informacao}`);
+                const isLocRevezamento = /revezamento|12x36/i.test(`${item.grupoRegra} ${item.localizacaoOriginal}`);
+                if (isMotivo12x36 && !isLocRevezamento) {
+                    add(item, 'ESCALA', 'Norma art. 2º, II e art. 7º', 'Possível divergência de escala',
+                        'Texto cita 12x36; localização não indica revezamento', 'Atenção',
+                        'Confirmar escala cadastrada e espelho de ponto antes de concluir');
+                }
+            });
+            for (const items of monthly.values()) {
+                if (items.length <= 4) continue;
+                const item = items.find(x => selectedIds.has(x.id));
+                if (!item) continue;
+                add(item, 'ESQUECIMENTO', 'Norma art. 7º, §§3º e 4º; Manual p. 6',
+                    'Possível excesso mensal de esquecimentos',
+                    `${items.length} solicitações com texto indicativo de esquecimento em ${normMonth(item)}; limite de validações: 4/mês`,
+                    'Prioritária', 'Conferir motivo oficial, quantidade de validações efetivas e eventual comunicação à chefia', items.length);
+            }
+            const rank = {'Prioritária':0, 'Atenção':1, 'Informativa':2};
+            return findings.sort((a,b)=>(rank[a.prioridade]-rank[b.prioridade]) || a.unidade.localeCompare(b.unidade,'pt-BR') || a.funcionario.localeCompare(b.funcionario,'pt-BR'));
+        }
+
+        let currentConformityRows = [];
+        function syncConformitySelect(id, values, emptyLabel) {
+            const select = document.getElementById(id);
+            const prior = select.value;
+            select.replaceChildren(new Option(emptyLabel, ''));
+            values.filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(v=>select.add(new Option(v,v)));
+            select.value = values.includes(prior) ? prior : '';
+        }
+        function getVisibleConformityRows() {
+            const findings = getConformityFindings(filteredDataset, processedDataset);
+            const unit = document.getElementById('confUnit').value;
+            const rule = document.getElementById('confRule').value;
+            const severity = document.getElementById('confSeverity').value;
+            const search = document.getElementById('confSearch').value.toLocaleLowerCase('pt-BR').trim();
+            return findings.filter(f => (!unit || f.unidade === unit) && (!rule || f.regraId === rule) &&
+                (!severity || f.prioridade === severity) &&
+                (!search || `${f.funcionario} ${f.matricula} ${f.gestor} ${f.unidade} ${f.indício}`.toLocaleLowerCase('pt-BR').includes(search)));
+        }
+        function renderConformityReport() {
+            const all = getConformityFindings(filteredDataset, processedDataset);
+            const unitSelect = document.getElementById('confUnit');
+            syncConformitySelect('confUnit', [...new Set(all.map(f=>f.unidade))], 'Todas as unidades');
+            const currentRule = document.getElementById('confRule').value;
+            const ruleOptions = [...new Map(all.map(f=>[f.regraId, f])).values()].sort((a,b)=>a.indício.localeCompare(b.indício,'pt-BR'));
+            const ruleSelect = document.getElementById('confRule');
+            ruleSelect.replaceChildren(new Option('Todas as regras', ''));
+            ruleOptions.forEach(f=>ruleSelect.add(new Option(f.indício, f.regraId)));
+            ruleSelect.value = ruleOptions.some(f=>f.regraId===currentRule) ? currentRule : '';
+            currentConformityRows = getVisibleConformityRows();
+            document.getElementById('conformityCounter').textContent = String(all.length);
+            document.getElementById('confTotal').textContent = currentConformityRows.length.toLocaleString('pt-BR');
+            document.getElementById('confEmployees').textContent = new Set(currentConformityRows.map(f=>f.matricula || `${f.unidade}:${f.funcionario}`)).size;
+            document.getElementById('confUnits').textContent = new Set(currentConformityRows.map(f=>f.unidade)).size;
+            document.getElementById('confPriority').textContent = currentConformityRows.filter(f=>f.prioridade==='Prioritária').length;
+            document.getElementById('confCount').textContent = `${currentConformityRows.length} indício(s) no recorte • ${all.length} antes dos filtros desta aba`;
+            const tbody = document.getElementById('conformityTableBody');
+            tbody.innerHTML = currentConformityRows.length ? currentConformityRows.map(f=>`<tr class="hover:bg-sky-50 dark:hover:bg-slate-800/70">
+                <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.codigo)} • ${escapeHtml(f.unidade)}</td>
+                <td class="p-3"><button type="button" class="font-semibold text-caern-primary dark:text-sky-300 underline decoration-dotted text-left" onclick="openConformityEmployee(${f.id})">${escapeHtml(f.funcionario)}</button><div class="font-mono text-slate-500 mt-1">${escapeHtml(f.matricula)}</div></td>
+                <td class="p-3 whitespace-nowrap">${escapeHtml(f.competencia==='Não identificada'?f.competencia:f.competencia.slice(5)+'/'+f.competencia.slice(0,4))}</td>
+                <td class="p-3">${escapeHtml(f.regra)}</td><td class="p-3 font-semibold">${escapeHtml(f.indício)}</td>
+                <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.evidencia)}</td>
+                <td class="p-3"><span class="rounded-lg px-2 py-1 font-semibold ${f.prioridade==='Prioritária'?'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300':f.prioridade==='Atenção'?'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300':'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">${escapeHtml(f.prioridade)}</span></td>
+                <td class="p-3">${escapeHtml(f.gestor)}</td><td class="p-3">${escapeHtml(f.providencia)}</td>
+                <td class="p-3"><button type="button" class="text-caern-secondary dark:text-sky-300 underline" onclick="openDetailModal(${f.id})">Ver registro</button></td>
+            </tr>`).join('') : '<tr><td colspan="10" class="p-8 text-center text-slate-500">Nenhum indício para os filtros selecionados.</td></tr>';
+        }
+        function resetConformityFilters() {
+            ['confUnit','confRule','confSeverity','confSearch'].forEach(id=>document.getElementById(id).value='');
+            renderConformityReport();
+        }
+        function openConformityEmployee(id) {
+            const record = processedDataset.find(r=>r.id===id);
+            if (!record) return;
+            document.getElementById('filterDept').value = '';
+            document.getElementById('globalEmployee').value = record.matricula;
+            applyFilters();
+            switchTab('tabEmployees');
+            const emp = getFilteredEmployeesList().find(e=>e.matricula===record.matricula);
+            if (emp) { activeEmployeeKey=emp.matricula; drawEmployeeAnalysis(emp); }
+        }
+        function addConformitySheet(workbook, rows, referenceRows=rows) {
+            const ws = workbook.addWorksheet('Inconformidades');
+            ws.columns = [
+                ['Unidade','unidade',38],['Código','codigo',15],['Filial','filial',18],
+                ['Matrícula','matricula',16],['Empregado','funcionario',34],['Competência','competencia',18],
+                ['Gestor','gestor',34],['Referência','regra',38],['Indício','indício',42],
+                ['Evidência','evidencia',78],['Quantidade','quantidade',15],['Prioridade','prioridade',18],
+                ['Situação','situacao',25],['Providência sugerida','providencia',78],
+                ['Análise do gestor (preencher)','analiseGestor',44]
+            ].map(([header,key,width])=>({header,key,width}));
+            ws.views = [{state:'frozen',ySplit:1}];
+            ws.autoFilter = {from:'A1',to:'O1'};
+            ws.getRow(1).height=30;
+            ws.getRow(1).eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF004B93'}};c.font={bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',wrapText:true};});
+            getConformityFindings(rows,referenceRows).forEach(f=>{
+                const record = {...f, analiseGestor:''};
+                const row=ws.addRow(record);
+                row.alignment={vertical:'top',wrapText:true};
+                if (f.prioridade==='Prioritária') {row.getCell('prioridade').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFEDD5'}};row.getCell('prioridade').font={bold:true,color:{argb:'FF9A3412'}};}
+            });
+            return ws;
+        }
+        async function exportConformityReport() {
+            if (!currentConformityRows.length) {showToast('Nenhum indício para exportar.', 'warning');return;}
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const sheet = addConformitySheet(workbook, [], []);
+                currentConformityRows.forEach(f=>sheet.addRow({...f,analiseGestor:''}));
+                await downloadWorkbook(workbook, `justificativas_Inconformidades_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/','.')}.xlsx`);
+                showToast(`Relatório gerado com ${currentConformityRows.length} indício(s).`, 'success');
+            } catch(error) {console.error(error);showToast('Não foi possível exportar o relatório de inconformidades.', 'error');}
+        }
+
+        function renderAlertsTab() {
+            const tbody = document.getElementById('alertsTableBody');
+            const alerts = filteredDataset.filter(d => d.flagsAuditoria.length > 0);
+
+            if (alerts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-emerald-600 font-semibold">Nenhum ponto de atenção detectado na planilha analisada.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = alerts.map(item => `
+                <tr onclick="openDetailModal(${item.id})" class="hover:bg-rose-50/60 dark:hover:bg-rose-950/30 cursor-pointer">
+                    <td class="py-2.5 px-3.5 font-mono font-bold text-caern-primary dark:text-sky-400">${escapeHtml(item.matricula)}</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-slate-900 dark:text-white">${escapeHtml(item.funcionario)}</td>
+                    <td class="py-2.5 px-3.5 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">${escapeHtml(item.filial)} • ${escapeHtml(item.deptNome)}</td>
+                    <td class="py-2.5 px-3.5 whitespace-nowrap">${escapeHtml(item.dataJustificativaStr)}</td>
+                    <td class="py-2.5 px-3.5">${escapeHtml(item.tipo)} • <span class="text-slate-500">${escapeHtml(item.motivo)}</span></td>
+                    <td class="py-2.5 px-3.5 italic text-slate-600 dark:text-slate-300">"${escapeHtml(item.informacao || '-')}"</td>
+                    <td class="py-2.5 px-3.5 font-semibold text-rose-700 dark:text-rose-300">${escapeHtml(item.flagAuditoriaStr)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function openDetailModal(id) {
+            const item = processedDataset.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('modalTitle').textContent = `${item.funcionario} (${item.matricula})`;
+            document.getElementById('modalSubtitle').textContent = `${item.departamentoOriginal} • Gestor: ${item.gestor}`;
+
+            const flagsHtml = item.flagsAuditoria.length > 0
+                ? item.flagsAuditoria.map(f => `<div class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(f)}</div>`).join('')
+                : `<div class="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Registro regular conforme parâmetros administrativos.</div>`;
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Parecer de Auditoria</h4>
+                    ${flagsHtml}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                    <div><span class="text-slate-400 block">Matrícula Original Ahgora:</span><strong class="font-mono">${escapeHtml(item.matriculaOriginal)}</strong></div>
+                    <div><span class="text-slate-400 block">Matrícula Padronizada:</span><strong class="font-mono">${escapeHtml(item.matricula)}</strong></div>
+                    <div><span class="text-slate-400 block">Filial / Centro Custo:</span><strong>${escapeHtml(item.filial)} • CC ${escapeHtml(item.centroCusto)}</strong></div>
+                    <div><span class="text-slate-400 block">Regime / Grupo Jornada:</span><strong>${escapeHtml(item.grupoRegra)}</strong></div>
+                    <div><span class="text-slate-400 block">Data da Ocorrência:</span><strong>${escapeHtml(item.dataJustificativaStr)} (${escapeHtml(item.diaSemana)})</strong></div>
+                    <div><span class="text-slate-400 block">Data da Solicitação:</span><strong>${escapeHtml(item.dataSolicitacaoStr)} (${escapeHtml(item.classificacaoTemporal)}: ${item.diasDiferenca}d)</strong></div>
+                    <div><span class="text-slate-400 block">Tipo & Motivo:</span><strong>${escapeHtml(item.tipo)} — ${escapeHtml(item.motivo)}</strong></div>
+                    <div><span class="text-slate-400 block">Horário / Intervalo & Duração:</span><strong>${escapeHtml(item.horarioOuIntervalo)} ${item.duracaoEstimadaMin > 0 ? `(${item.duracaoEstimadaMin} min)` : ''}</strong></div>
+                    <div><span class="text-slate-400 block">Histórico do Empregado na Base:</span><strong>${item.totalOcorrenciasColab} solicitação(ões) • ${item.totalInclusoesColab} inclusão(ões) batida (volume informativo) • ${item.totalEsquecimentosColab} possíveis esquecimentos identificados</strong></div>
+                    <div><span class="text-slate-400 block">Status & Aprovação:</span><strong>${escapeHtml(item.status)} ${item.dataAprovacao ? `(${escapeHtml(item.dataAprovacao)})` : ''}</strong></div>
+                    <div class="sm:col-span-2"><span class="text-slate-400 block">Texto Informado pelo Empregado:</span><p class="mt-1 p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">${item.informacao ? escapeHtml(item.informacao) : '<em>Sem texto informado</em>'}</p></div>
+                </div>
+            `;
+
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // =========================================================================
+        // 10. EXPORTAÇÃO EXCEL ESTILIZADA & COLORIDA (EXCELJS)
+        // =========================================================================
+        // Analytics: todas as métricas abaixo usam filteredDataset, sem modificar regras de auditoria.
+        function isLateApproval(item) {
+            const approved = parseBrDate(item.dataAprovacao);
+            return Boolean(approved && item.dtSolicitacao && (approved - item.dtSolicitacao) > 24 * 3600000);
+        }
+
+        function getDecisionHours(item) {
+            const approved = parseBrDate(item.dataAprovacao);
+            if (!approved || !item.dtSolicitacao) return null;
+            const hours = (approved.getTime() - item.dtSolicitacao.getTime()) / 3600000;
+            return hours >= 0 ? hours : null;
+        }
+
+        function summarizeManagers(records) {
+            const map = new Map();
+            records.forEach(d => {
+                const name = d.gestor || 'Não atribuído';
+                if (!map.has(name)) map.set(name, { gestor: name, total: 0, pendentes: 0, aprovadas: 0, late: 0, alertas: 0, sumHours: 0, decisions: 0 });
+                const e = map.get(name);
+                e.total++;
+                if (d.status.toLowerCase().includes('pendente')) e.pendentes++;
+                if (d.status.toLowerCase().includes('aprovad')) e.aprovadas++;
+                if (isLateApproval(d)) e.late++;
+                if (d.flagsAuditoria.length) e.alertas++;
+                const hours = getDecisionHours(d);
+                if (hours !== null) { e.sumHours += hours; e.decisions++; }
+            });
+            return [...map.values()].sort((a,b) => b.pendentes - a.pendentes || b.total - a.total);
+        }
+
+        function renderDashboardAdvanced() {
+            const records = filteredDataset;
+            const total = records.length;
+            const approved = records.filter(d => d.status.toLowerCase().includes('aprovad')).length;
+            const hours = records.map(getDecisionHours).filter(v => v !== null);
+            const late = records.filter(isLateApproval).length;
+            const rejected = records.filter(d => d.status.toLowerCase().includes('reprovad')).length;
+            document.getElementById('extraApproval').textContent = total ? `${(approved / total * 100).toFixed(1)}%` : '—';
+            document.getElementById('extraDecision').textContent = hours.length ? `${(hours.reduce((a,b)=>a+b,0)/hours.length).toFixed(1)}h` : '—';
+            document.getElementById('extraLate').textContent = late;
+            document.getElementById('extraRejected').textContent = rejected;
+            document.getElementById('extraForgotten').textContent = records.filter(d => d.isEsquecimento).length;
+            document.getElementById('extraManagers').textContent = new Set(records.map(d => d.gestor)).size;
+
+            const managers = summarizeManagers(records);
+            const tbody = document.getElementById('managerDashboardBody');
+            tbody.innerHTML = managers.length ? managers.map(m => `<tr class="border-t border-slate-200 dark:border-slate-800 hover:bg-slate-100/60 dark:hover:bg-slate-800/50"><td class="p-3 font-semibold">${escapeHtml(m.gestor)}</td><td class="p-3 text-center">${m.total}</td><td class="p-3 text-center font-bold text-amber-600">${m.pendentes}</td><td class="p-3 text-center">${m.aprovadas}</td><td class="p-3 text-center">${m.late}</td><td class="p-3 text-center">${m.decisions ? `${(m.sumHours/m.decisions).toFixed(1)}h` : '—'}</td><td class="p-3 text-center">${m.alertas}</td></tr>`).join('') : '<tr><td colspan="7" class="p-8 text-center text-slate-500">Sem dados para os filtros atuais</td></tr>';
+
+            if (typeof Chart === 'undefined') return;
+            const dark = document.documentElement.classList.contains('dark');
+            const fontColor = dark ? '#cbd5e1' : '#334155';
+            const gridColor = dark ? 'rgba(148, 163, 184, .12)' : 'rgba(15, 23, 42, .07)';
+            const render = (id, type, labels, datasets, horizontal=false) => {
+                if (dashboardCharts[id]) dashboardCharts[id].destroy();
+                dashboardCharts[id] = new Chart(document.getElementById(id), {type, data:{labels,datasets}, options:{responsive:true,maintainAspectRatio:false,indexAxis:horizontal?'y':'x',plugins:{legend:{display:datasets.length>1,labels:{color:fontColor,font:{size:11}}}},scales:{x:{ticks:{color:fontColor,precision:0},grid:{color:gridColor}},y:{ticks:{color:fontColor,precision:0},grid:{color:gridColor}}}}});
+            };
+            const statusMap = new Map();
+            records.forEach(d => statusMap.set(d.status, (statusMap.get(d.status)||0)+1));
+            const statuses = [...statusMap.entries()].sort((a,b)=>b[1]-a[1]);
+            render('chartStatus','bar',statuses.map(e=>e[0]),[{label:'Solicitações',data:statuses.map(e=>e[1]),backgroundColor:'#0072ce',borderRadius:6}]);
+            const topManagers = managers.slice().sort((a,b)=>b.total-a.total).slice(0,10);
+            render('chartManager','bar',topManagers.map(e=>e.gestor),[{label:'Pendentes',data:topManagers.map(e=>e.pendentes),backgroundColor:'#f59e0b',borderRadius:4},{label:'Outras situações',data:topManagers.map(e=>e.total-e.pendentes),backgroundColor:'#0072ce',borderRadius:4}],true);
+            const emap = new Map();
+            records.forEach(d => { const k = d.matricula || d.funcionario; const e = emap.get(k) || {name:d.funcionario,total:0}; e.total++; emap.set(k,e); });
+            const topEmployees = [...emap.values()].sort((a,b)=>b.total-a.total).slice(0,10);
+            render('chartEmployee','bar',topEmployees.map(e=>e.name),[{label:'Solicitações',data:topEmployees.map(e=>e.total),backgroundColor:'#0d9488',borderRadius:4}],true);
+            const weekdays = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+            const dayCounts = Array(7).fill(0);
+            records.forEach(d=>{ if(d.dtJustificativa) dayCounts[d.dtJustificativa.getDay()]++; });
+            render('chartWeekday','bar',weekdays.map(d=>d.replace('-feira','')),[{label:'Ocorrências',data:dayCounts,backgroundColor:'#6366f1',borderRadius:5}]);
+        }
+
+        async function exportDashboardExcel() {
+            if (!filteredDataset.length) { showToast('Nenhum registro para exportar.', 'warning'); return; }
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'CAERN - NUPNN';
+                const styles = getExcelStyleHelpers(workbook);
+                const {setupStyledSheet} = styles;
+                const data = filteredDataset;
+                const managers = summarizeManagers(data);
+                setupStyledSheet('Dashboard',[
+                    {header:'Indicador',key:'indicador',width:38},{header:'Valor',key:'valor',width:25}
+                ],[
+                    {indicador:'Competência',valor:selectedCompetence||'Todas (exploratório)'},
+                    {indicador:'Registros filtrados',valor:data.length},
+                    {indicador:'Empregados distintos',valor:new Set(data.map(d=>d.matricula)).size},
+                    {indicador:'Gestores distintos',valor:managers.length},
+                    {indicador:'Pendentes',valor:data.filter(d=>d.status.toLowerCase().includes('pendente')).length},
+                    {indicador:'Aprovadas',valor:data.filter(d=>d.status.toLowerCase().includes('aprovad')).length},
+                    {indicador:'Reprovadas',valor:data.filter(d=>d.status.toLowerCase().includes('reprovad')).length},
+                    {indicador:'Aprovações acima de 24h (triagem)',valor:data.filter(isLateApproval).length},
+                    {indicador:'Possíveis esquecimentos',valor:data.filter(d=>d.isEsquecimento).length},
+                    {indicador:'Registros sinalizados',valor:data.filter(d=>d.flagsAuditoria.length).length}
+                ]);
+                setupStyledSheet('Gestores',[
+                    {header:'Gestor',key:'gestor',width:44},{header:'Total',key:'total',width:15},{header:'Pendentes',key:'pendentes',width:16},{header:'Aprovadas',key:'aprovadas',width:16},{header:'Acima de 24h',key:'late',width:19},{header:'Tempo médio decisão (h)',key:'avg',width:26},{header:'Sinalizadas',key:'alertas',width:17}
+                ],managers.map(e=>({gestor:e.gestor,total:e.total,pendentes:e.pendentes,aprovadas:e.aprovadas,late:e.late,avg:e.decisions?Number((e.sumHours/e.decisions).toFixed(2)):'N/D',alertas:e.alertas})));
+                buildBaseTratadaSheet(setupStyledSheet, styles, data, 'Registros_Filtrados');
+                await downloadWorkbook(workbook, `${currentSourceName}_Dashboard_${selectedCompetence||'Todas'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+                showToast('Dashboard exportado com sucesso!', 'success');
+            } catch (error) { console.error(error); showToast('Não foi possível exportar o Dashboard.', 'error'); }
+        }
+
+        function getExcelStyleHelpers(workbook) {
+            const HEADER_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF004B93' } };
+            const SUBHEADER_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0072CE' } };
+            const ZEBRA_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+            const WHITE_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+
+            const FILL_RED = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+            const FONT_RED = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF991B1B' } };
+
+            const FILL_AMBER = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+            const FONT_AMBER = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+
+            const FILL_GREEN = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+            const FONT_GREEN = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF065F46' } };
+
+            const FILL_BLUE = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
+            const FONT_BLUE = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF1E40AF' } };
+
+            const FILL_PURPLE = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE9FE' } };
+            const FONT_PURPLE = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF5B21B6' } };
+
+            const HEADER_FONT = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+            const BODY_FONT = { name: 'Calibri', size: 10, color: { argb: 'FF1E293B' } };
+            const THIN_BORDER = {
+                top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+            };
+
+            function setupStyledSheet(sheetName, columns, rowsData, rowStyler) {
+                const ws = workbook.addWorksheet(sheetName, {
+                    views: [{ state: 'frozen', ySplit: 1 }]
+                });
+
+                ws.columns = columns;
+
+                const headerRow = ws.getRow(1);
+                headerRow.height = 28;
+                headerRow.eachCell((cell) => {
+                    cell.fill = HEADER_FILL;
+                    cell.font = HEADER_FONT;
+                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                    cell.border = THIN_BORDER;
+                });
+
+                ws.autoFilter = {
+                    from: { row: 1, column: 1 },
+                    to: { row: 1, column: columns.length }
+                };
+
+                rowsData.forEach((rObj, idx) => {
+                    const row = ws.addRow(rObj);
+                    row.height = 22;
+                    const baseFill = idx % 2 === 1 ? ZEBRA_FILL : WHITE_FILL;
+                    row.eachCell((cell) => {
+                        cell.fill = baseFill;
+                        cell.font = BODY_FONT;
+                        cell.border = THIN_BORDER;
+                        cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                    });
+                    if (rowStyler) rowStyler(row, rObj);
+                });
+
+                return ws;
+            }
+
+            return {
+                HEADER_FILL, SUBHEADER_FILL, ZEBRA_FILL, WHITE_FILL,
+                FILL_RED, FONT_RED, FILL_AMBER, FONT_AMBER,
+                FILL_GREEN, FONT_GREEN, FILL_BLUE, FONT_BLUE,
+                FILL_PURPLE, FONT_PURPLE, HEADER_FONT, BODY_FONT,
+                THIN_BORDER, setupStyledSheet
+            };
+        }
+
+        function buildBaseTratadaSheet(setupStyledSheet, styles, datasetToExport, sheetTitle = 'Base_Tratada') {
+            const colsBase = [
+                { header: 'Matrícula', key: 'mat', width: 14 },
+                { header: 'Empregado', key: 'emp', width: 32 },
+                { header: 'Filial', key: 'filial', width: 15 },
+                { header: 'Centro Custo', key: 'cc', width: 15 },
+                { header: 'Regime / Grupo', key: 'regime', width: 24 },
+                { header: 'Departamento / Unidade', key: 'dept', width: 38 },
+                { header: 'Data Ocorrência', key: 'dtOcor', width: 17 },
+                { header: 'Dia Semana', key: 'diaSem', width: 15 },
+                { header: 'Data Solicitação', key: 'dtSol', width: 19 },
+                { header: 'Prazo Registro', key: 'prazoClass', width: 22 },
+                { header: 'Dias Dif.', key: 'diasDif', width: 11 },
+                { header: 'Tipo', key: 'tipo', width: 19 },
+                { header: 'Motivo Tratado', key: 'motivo', width: 28 },
+                { header: 'Horário / Intervalo', key: 'horario', width: 20 },
+                { header: 'Período Dia', key: 'periodo', width: 16 },
+                { header: 'Duração (Min)', key: 'durMin', width: 14 },
+                { header: 'Status', key: 'status', width: 14 },
+                { header: 'Qtd. Inclusões Emp.', key: 'qtdInc', width: 18 },
+                { header: 'Informação Original', key: 'info', width: 34 },
+                { header: 'Auditoria / Observações', key: 'auditoria', width: 44 }
+            ];
+
+            const rowsBase = datasetToExport.map(d => ({
+                mat: d.matricula,
+                emp: d.funcionario,
+                filial: d.filial,
+                cc: d.centroCusto,
+                regime: d.grupoRegra,
+                dept: d.deptNome,
+                dtOcor: d.dataJustificativaStr,
+                diaSem: d.diaSemana,
+                dtSol: d.dataSolicitacaoStr,
+                prazoClass: d.classificacaoTemporal,
+                diasDif: d.diasDiferenca,
+                tipo: d.tipo,
+                motivo: d.motivo,
+                horario: d.horarioOuIntervalo,
+                periodo: d.periodoBatida,
+                durMin: d.duracaoEstimadaMin,
+                status: d.status,
+                qtdInc: d.totalInclusoesColab,
+                info: d.informacao,
+                auditoria: d.flagAuditoriaStr
+            }));
+
+            return setupStyledSheet(sheetTitle, colsBase, rowsBase, (row, data) => {
+                const cMat = row.getCell('mat');
+                cMat.alignment = { vertical: 'middle', horizontal: 'center' };
+                cMat.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF004B93' } };
+                cMat.numFmt = '@';
+
+                const cDtOcor = row.getCell('dtOcor');
+                cDtOcor.alignment = { vertical: 'middle', horizontal: 'center' };
+                cDtOcor.numFmt = '@';
+
+                row.getCell('filial').alignment = { vertical: 'middle', horizontal: 'center' };
+                row.getCell('diasDif').alignment = { vertical: 'middle', horizontal: 'center' };
+                row.getCell('durMin').alignment = { vertical: 'middle', horizontal: 'center' };
+                row.getCell('qtdInc').alignment = { vertical: 'middle', horizontal: 'center' };
+
+                // Colorir Tipo
+                const cTipo = row.getCell('tipo');
+                cTipo.alignment = { vertical: 'middle', horizontal: 'center' };
+                if (data.tipo.toLowerCase().includes('inclus')) {
+                    cTipo.fill = styles.FILL_BLUE; cTipo.font = styles.FONT_BLUE;
+                } else if (data.tipo.toLowerCase().includes('abono')) {
+                    cTipo.fill = styles.FILL_GREEN; cTipo.font = styles.FONT_GREEN;
+                }
+
+                // Colorir Prazo
+                const cPrazo = row.getCell('prazoClass');
+                cPrazo.alignment = { vertical: 'middle', horizontal: 'center' };
+                if (data.prazoClass === 'Retroativa') {
+                    cPrazo.fill = data.diasDif > 5 ? styles.FILL_RED : styles.FILL_AMBER;
+                    cPrazo.font = data.diasDif > 5 ? styles.FONT_RED : styles.FONT_AMBER;
+                } else if (data.prazoClass.includes('Antecipada')) {
+                    cPrazo.fill = styles.FILL_PURPLE; cPrazo.font = styles.FONT_PURPLE;
+                } else {
+                    cPrazo.fill = styles.FILL_BLUE; cPrazo.font = styles.FONT_BLUE;
+                }
+
+                // Colorir Status
+                const cStatus = row.getCell('status');
+                cStatus.alignment = { vertical: 'middle', horizontal: 'center' };
+                if (data.status.toLowerCase().includes('aprovad')) {
+                    cStatus.fill = styles.FILL_GREEN; cStatus.font = styles.FONT_GREEN;
+                } else if (data.status.toLowerCase().includes('pendente')) {
+                    cStatus.fill = styles.FILL_AMBER; cStatus.font = styles.FONT_AMBER;
+                } else {
+                    cStatus.fill = styles.FILL_RED; cStatus.font = styles.FONT_RED;
+                }
+
+                // Volume de inclusões: informação quantitativa, não violação normativa.
+                row.getCell('qtdInc').alignment = { vertical: 'middle', horizontal: 'center' };
+
+                // Colorir Auditoria
+                const cAud = row.getCell('auditoria');
+                if (data.auditoria === 'Regular') {
+                    cAud.fill = styles.FILL_GREEN; cAud.font = styles.FONT_GREEN;
+                } else {
+                    cAud.fill = styles.FILL_RED; cAud.font = styles.FONT_RED;
+                }
+            });
+        }
+
+        function buildRankingEmpregadosSheet(setupStyledSheet, styles, empList, sheetTitle = 'Ranking_Empregados') {
+            const colsEmp = [
+                { header: 'Posição', key: 'pos', width: 11 },
+                { header: 'Matrícula', key: 'mat', width: 14 },
+                { header: 'Empregado', key: 'emp', width: 34 },
+                { header: 'Filial', key: 'filial', width: 15 },
+                { header: 'Unidade', key: 'dept', width: 38 },
+                { header: 'Regime', key: 'regime', width: 24 },
+                { header: 'Total Solicitações', key: 'tot', width: 18 },
+                { header: 'Qtd. Inclusões Batida', key: 'inc', width: 21 },
+                { header: 'Qtd. Abonos', key: 'abono', width: 15 },
+                { header: 'Média Dias Prazo', key: 'media', width: 18 },
+                { header: 'Classificação Risco', key: 'risco', width: 24 }
+            ];
+
+            const rowsEmp = empList.map((e, i) => ({
+                pos: i + 1,
+                mat: e.matricula,
+                emp: e.funcionario,
+                filial: e.filial,
+                dept: e.deptNome,
+                regime: e.grupoRegra,
+                tot: e.totalSolicitacoes,
+                inc: e.totalInclusoesBatida,
+                abono: e.totalAbonos,
+                media: Number((e.somaDiasPrazo / (e.totalSolicitacoes || 1)).toFixed(1)),
+                risco: `${e.totalInclusoesBatida} inclusões (volume)`
+            }));
+
+            return setupStyledSheet(sheetTitle, colsEmp, rowsEmp, (row, data) => {
+                ['pos', 'mat', 'filial', 'tot', 'inc', 'abono', 'media', 'risco'].forEach(k => {
+                    row.getCell(k).alignment = { vertical: 'middle', horizontal: 'center' };
+                });
+                row.getCell('mat').numFmt = '@';
+                row.getCell('mat').font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF004B93' } };
+
+                const cRisco = row.getCell('risco');
+                if (data.inc >= 7) {
+                    cRisco.fill = styles.FILL_RED; cRisco.font = styles.FONT_RED;
+                    row.getCell('inc').fill = styles.FILL_RED; row.getCell('inc').font = styles.FONT_RED;
+                } else if (data.inc >= 5) {
+                    cRisco.fill = styles.FILL_AMBER; cRisco.font = styles.FONT_AMBER;
+                    row.getCell('inc').fill = styles.FILL_AMBER; row.getCell('inc').font = styles.FONT_AMBER;
+                } else if (data.inc >= 1) {
+                    cRisco.fill = styles.FILL_BLUE; cRisco.font = styles.FONT_BLUE;
+                } else {
+                    cRisco.fill = styles.FILL_GREEN; cRisco.font = styles.FONT_GREEN;
+                }
+            });
+        }
+
+        async function downloadWorkbook(workbook, fileName) {
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Exportar APENAS os registros filtrados da Aba "Base Tratada & Filtros"
+        async function exportFilteredRecordsExcel() {
+            if (!filteredDataset || filteredDataset.length === 0) {
+                showToast('Não há registros filtrados para exportar.', 'warning');
+                return;
+            }
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'CAERN - NUPNN';
+                workbook.created = new Date();
+                const styles = getExcelStyleHelpers(workbook);
+                buildBaseTratadaSheet(styles.setupStyledSheet, styles, filteredDataset, 'Base_Filtrada');
+
+                const dateStamp = new Date().toISOString().slice(0, 10);
+                const outputFileName = `${currentSourceName}_Base_Filtrada_${dateStamp}.xlsx`;
+                await downloadWorkbook(workbook, outputFileName);
+                showToast(`Exportados ${filteredDataset.length} registros filtrados em "${outputFileName}".`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao exportar os registros filtrados.', 'error');
+            }
+        }
+
+        // Exportar APENAS o ranking filtrado da Aba "Análise por Empregado"
+        async function exportFilteredEmployeesExcel() {
+            const empList = getFilteredEmployeesList();
+            if (!empList || empList.length === 0) {
+                showToast('Não há empregados no filtro atual para exportar.', 'warning');
+                return;
+            }
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'CAERN - NUPNN';
+                workbook.created = new Date();
+                const styles = getExcelStyleHelpers(workbook);
+                buildRankingEmpregadosSheet(styles.setupStyledSheet, styles, empList, 'Analise_Empregados');
+
+                const dateStamp = new Date().toISOString().slice(0, 10);
+                const outputFileName = `${currentSourceName}_Ranking_Empregados_${dateStamp}.xlsx`;
+                await downloadWorkbook(workbook, outputFileName);
+                showToast(`Exportado ranking com ${empList.length} empregado(s) em "${outputFileName}".`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao exportar o ranking de empregados.', 'error');
+            }
+        }
+
+        // Exportação com escopo próprio. Não depende dos filtros visuais do Dashboard.
+        function exportUnitsFromDataset(rows = processedDataset) {
+            const byName = new Map();
+            rows.forEach(d => {
+                const name = String(d.deptNome || 'Não informada');
+                if (!byName.has(name)) byName.set(name, { name, code: d.deptCodigo || '', count: 0 });
+                byName.get(name).count++;
+            });
+            return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        }
+        function openExportModal() {
+            if (!processedDataset.length) { showToast('Importe uma planilha primeiro.', 'warning'); return; }
+            document.querySelector('input[name="exportScope"][value="all"]').checked = true;
+            document.getElementById('exportUnitSearch').value = '';
+            const list = document.getElementById('exportUnitsList');
+            list.replaceChildren();
+            exportUnitsFromDataset().forEach((unit, index) => {
+                const label = document.createElement('label');
+                label.className = 'flex gap-2 items-start rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-xs';
+                const input = document.createElement('input');
+                input.type = 'checkbox'; input.className = 'export-unit-checkbox mt-0.5 accent-emerald-600';
+                input.value = unit.name; input.id = `export-unit-${index}`;
+                input.addEventListener('change', updateExportSummary);
+                const span = document.createElement('span');
+                span.textContent = `${unit.code ? unit.code + ' · ' : ''}${unit.name} (${unit.count})`;
+                label.append(input, span); list.append(label);
+            });
+            updateExportScope();
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.querySelector('input[name="exportScope"][value="all"]').focus();
+        }
+        function closeExportModal() {
+            const modal = document.getElementById('exportModal');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+        }
+        function updateExportScope() {
+            const byUnits = document.querySelector('input[name="exportScope"]:checked')?.value === 'units';
+            document.getElementById('exportUnitsArea').classList.toggle('hidden', !byUnits);
+            updateExportSummary();
+        }
+        function filterExportUnits() {
+            const query = document.getElementById('exportUnitSearch').value.toLocaleLowerCase('pt-BR').trim();
+            document.querySelectorAll('#exportUnitsList label').forEach(label => {
+                label.classList.toggle('hidden', !label.textContent.toLocaleLowerCase('pt-BR').includes(query));
+            });
+        }
+        function setAllExportUnits(checked) {
+            document.querySelectorAll('.export-unit-checkbox').forEach(input => { if (!input.closest('label').classList.contains('hidden')) input.checked = checked; });
+            updateExportSummary();
+        }
+        function getExportRows() {
+            const mode = document.querySelector('input[name="exportScope"]:checked')?.value;
+            if (mode !== 'units') return processedDataset;
+            const chosen = new Set([...document.querySelectorAll('.export-unit-checkbox:checked')].map(input => input.value));
+            return processedDataset.filter(row => chosen.has(String(row.deptNome || 'Não informada')));
+        }
+        function updateExportSummary() {
+            const rows = getExportRows();
+            const count = new Set(rows.map(d => String(d.deptNome || 'Não informada'))).size;
+            document.getElementById('exportSelectionSummary').textContent = `${count} unidade(s) · ${rows.length.toLocaleString('pt-BR')} registro(s) · competência: ${selectedCompetence ? selectedCompetence.slice(5) + '/' + selectedCompetence.slice(0, 4) : 'todas'}`;
+            document.getElementById('exportConfirmButton').disabled = !rows.length;
+            document.getElementById('exportConfirmButton').classList.toggle('opacity-50', !rows.length);
+        }
+        async function confirmExportSelection() {
+            const rows = getExportRows();
+            if (!rows.length) { showToast('Selecione pelo menos uma unidade.', 'warning'); return; }
+            const button = document.getElementById('exportConfirmButton');
+            button.disabled = true;
+            try {
+                const success = await exportStyledExcel(rows);
+                if (success) closeExportModal();
+            } finally { button.disabled = false; }
+        }
+
+        // Exportação Completa Multi-Abas (8 abas formatadas)
+        async function exportStyledExcel(exportRows = processedDataset) {
+            const processedDataset = exportRows; // escopo específico desta exportação
+            if (!processedDataset || processedDataset.length === 0) {
+                showToast('Carregue uma planilha antes de exportar.', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Gerando planilha Excel formatada e colorida...', 'info');
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'CAERN - NUPNN (Hagliberto Alves de Oliveira)';
+                workbook.created = new Date();
+
+                const total = processedDataset.length;
+                const styles = getExcelStyleHelpers(workbook);
+                const {
+                    HEADER_FILL, SUBHEADER_FILL, FILL_RED, FONT_RED,
+                    FILL_AMBER, FONT_AMBER, FILL_GREEN, FONT_GREEN,
+                    FILL_BLUE, FONT_BLUE, HEADER_FONT, BODY_FONT,
+                    THIN_BORDER, setupStyledSheet
+                } = styles;
+
+                // ABA 1: Base_Tratada
+                buildBaseTratadaSheet(setupStyledSheet, styles, processedDataset, 'Base_Tratada');
+                addConformitySheet(workbook, processedDataset);
+
+                // ABA 2: Resumo_Executivo
+                const wsResumo = workbook.addWorksheet('Resumo_Executivo', {
+                    views: [{ state: 'frozen', ySplit: 1 }]
+                });
+                wsResumo.columns = [
+                    { header: 'INDICADOR / DIMENSÃO ANALÍTICA', key: 'indicador', width: 48 },
+                    { header: 'QUANTIDADE / VALOR', key: 'valor', width: 22 },
+                    { header: 'PERCENTUAL / OBSERVAÇÃO', key: 'obs', width: 34 }
+                ];
+                const resHeader = wsResumo.getRow(1);
+                resHeader.height = 28;
+                resHeader.eachCell(cell => {
+                    cell.fill = HEADER_FILL;
+                    cell.font = HEADER_FONT;
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.border = THIN_BORDER;
+                });
+
+                const uniqueColabs = new Set(processedDataset.map(d => d.matricula)).size;
+                const aprovadas = processedDataset.filter(d => d.status.toLowerCase().includes('aprovad')).length;
+                const pendentes = processedDataset.filter(d => d.status.toLowerCase().includes('pendente')).length;
+                const reprovadas = processedDataset.filter(d => d.status.toLowerCase().includes('reprovad')).length;
+                const alertsCount = processedDataset.filter(d => d.flagsAuditoria.length > 0).length;
+                const avgLead = Number((processedDataset.reduce((a, b) => a + b.diasDiferenca, 0) / (total || 1)).toFixed(2));
+                const empAcimaLimite4 = selectedCompetence ? [...new Set(processedDataset.filter(d => d.isEsquecimento).map(d => d.matricula))].filter(mat => processedDataset.filter(d => d.matricula === mat && d.isEsquecimento).length >= 5).length : 0;
+
+                const addSectionBanner = (title) => {
+                    const r = wsResumo.addRow({ indicador: title, valor: '', obs: '' });
+                    r.height = 24;
+                    wsResumo.mergeCells(`A${r.number}:C${r.number}`);
+                    const c = r.getCell(1);
+                    c.fill = SUBHEADER_FILL;
+                    c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+                    c.alignment = { vertical: 'middle', horizontal: 'left' };
+                    c.border = THIN_BORDER;
+                };
+
+                const addKpiRow = (label, val, obs, highlightFill = null, highlightFont = null) => {
+                    const r = wsResumo.addRow({ indicador: label, valor: val, obs: obs });
+                    r.height = 21;
+                    r.eachCell((cell, colIdx) => {
+                        cell.border = THIN_BORDER;
+                        cell.font = highlightFont || BODY_FONT;
+                        if (highlightFill) cell.fill = highlightFill;
+                        cell.alignment = { vertical: 'middle', horizontal: colIdx === 2 ? 'center' : 'left' };
+                    });
+                };
+
+                addSectionBanner('1. INDICADORES GERAIS DA BASE');
+                addKpiRow('Total de Justificativas Analisadas', total, '100.0% da planilha', FILL_BLUE, FONT_BLUE);
+                addKpiRow('Empregados Únicos Envolvidos', uniqueColabs, `Média de ${(total / (uniqueColabs || 1)).toFixed(2)} por empregado`);
+                addKpiRow('Solicitações Aprovadas', aprovadas, `${((aprovadas / total) * 100).toFixed(1)}%`, FILL_GREEN, FONT_GREEN);
+                addKpiRow('Solicitações Pendentes', pendentes, `${((pendentes / total) * 100).toFixed(1)}%`, FILL_AMBER, FONT_AMBER);
+                addKpiRow('Solicitações Reprovadas', reprovadas, `${((reprovadas / total) * 100).toFixed(1)}%`);
+                addKpiRow('Média de Dias entre Ocorrência e Solicitação', avgLead, 'Dias corridos médios');
+                addKpiRow('Possíveis esquecimentos >4 no mês', empAcimaLimite4, selectedCompetence ? 'Triagem textual, conferir motivo' : 'Selecione uma competência', empAcimaLimite4 > 0 ? FILL_AMBER : FILL_GREEN, empAcimaLimite4 > 0 ? FONT_AMBER : FONT_GREEN);
+                addKpiRow('Registros com Pontos de Atenção (Auditoria)', alertsCount, `${((alertsCount / total) * 100).toFixed(1)}%`, FILL_RED, FONT_RED);
+
+                const appendDistBlock = (bannerTitle, extractor) => {
+                    wsResumo.addRow({});
+                    addSectionBanner(bannerTitle);
+                    const map = {};
+                    processedDataset.forEach(d => { const k = extractor(d); map[k] = (map[k] || 0) + 1; });
+                    Object.entries(map).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => {
+                        addKpiRow(k, v, `${((v / total) * 100).toFixed(1)}%`);
+                    });
+                };
+
+                appendDistBlock('2. DISTRIBUIÇÃO POR TIPO DE SOLICITAÇÃO', d => d.tipo);
+                appendDistBlock('3. DISTRIBUIÇÃO POR MOTIVO PADRONIZADO', d => d.motivo);
+                appendDistBlock('4. DISTRIBUIÇÃO POR PRAZO DE REGISTRO', d => d.classificacaoTemporal);
+                appendDistBlock('5. DISTRIBUIÇÃO POR REGIME DE JORNADA', d => d.grupoRegra);
+
+                // ABA 3: Analise_Por_Unidade
+                const unitMap = {};
+                processedDataset.forEach(d => {
+                    const k = d.deptNome;
+                    if (!unitMap[k]) {
+                        unitMap[k] = { cod: d.deptCodigo, nome: k, total: 0, inc: 0, abono: 0, aprov: 0, pend: 0, alert: 0, dias: 0 };
+                    }
+                    unitMap[k].total++;
+                    if (d.isInclusao) unitMap[k].inc++;
+                    if (d.isAbono) unitMap[k].abono++;
+                    if (d.status.toLowerCase().includes('aprovad')) unitMap[k].aprov++;
+                    if (d.status.toLowerCase().includes('pendente')) unitMap[k].pend++;
+                    if (d.flagsAuditoria.length > 0) unitMap[k].alert++;
+                    unitMap[k].dias += d.diasDiferenca;
+                });
+
+                const colsUnidade = [
+                    { header: 'Código Unidade', key: 'cod', width: 16 },
+                    { header: 'Departamento / Unidade', key: 'nome', width: 42 },
+                    { header: 'Total Registros', key: 'total', width: 16 },
+                    { header: 'Inclusões Batida', key: 'inc', width: 18 },
+                    { header: 'Abonos', key: 'abono', width: 14 },
+                    { header: 'Aprovadas', key: 'aprov', width: 14 },
+                    { header: 'Pendentes', key: 'pend', width: 14 },
+                    { header: 'Pontos Atenção', key: 'alert', width: 16 },
+                    { header: 'Média Dias Prazo', key: 'mediaDias', width: 18 },
+                    { header: '% Participação', key: 'pct', width: 16 }
+                ];
+
+                const rowsUnidade = Object.values(unitMap).sort((a, b) => b.total - a.total).map(u => ({
+                    cod: u.cod,
+                    nome: u.nome,
+                    total: u.total,
+                    inc: u.inc,
+                    abono: u.abono,
+                    aprov: u.aprov,
+                    pend: u.pend,
+                    alert: u.alert,
+                    mediaDias: Number((u.dias / (u.total || 1)).toFixed(1)),
+                    pct: `${((u.total / total) * 100).toFixed(1)}%`
+                }));
+
+                setupStyledSheet('Analise_Por_Unidade', colsUnidade, rowsUnidade, (row, data) => {
+                    ['cod', 'total', 'inc', 'abono', 'aprov', 'pend', 'alert', 'mediaDias', 'pct'].forEach(k => {
+                        row.getCell(k).alignment = { vertical: 'middle', horizontal: 'center' };
+                    });
+                    if (data.pend > 0) { row.getCell('pend').fill = FILL_AMBER; row.getCell('pend').font = FONT_AMBER; }
+                    if (data.alert > 0) { row.getCell('alert').fill = FILL_RED; row.getCell('alert').font = FONT_RED; }
+                });
+
+                // ABA 4: Ranking_Empregados
+                const allEmpSorted = Object.values(employeeStatsMap)
+                    .sort((a, b) => b.totalInclusoesBatida - a.totalInclusoesBatida || b.totalSolicitacoes - a.totalSolicitacoes);
+                buildRankingEmpregadosSheet(setupStyledSheet, styles, allEmpSorted, 'Ranking_Empregados');
+
+                // ABA 5: Analise_Motivos_ACT
+                const abonoItems = processedDataset.filter(d => d.isAbono);
+                const motivoMap = {};
+                abonoItems.forEach(d => {
+                    if (!motivoMap[d.motivo]) {
+                        motivoMap[d.motivo] = { motivo: d.motivo, qtd: 0, aprov: 0, pend: 0, minTotal: 0 };
+                    }
+                    motivoMap[d.motivo].qtd++;
+                    if (d.status.toLowerCase().includes('aprovad')) motivoMap[d.motivo].aprov++;
+                    if (d.status.toLowerCase().includes('pendente')) motivoMap[d.motivo].pend++;
+                    motivoMap[d.motivo].minTotal += d.duracaoEstimadaMin;
+                });
+
+                const colsAct = [
+                    { header: 'Motivo do Abono', key: 'motivo', width: 36 },
+                    { header: 'Qtd. Solicitações', key: 'qtd', width: 18 },
+                    { header: 'Aprovadas', key: 'aprov', width: 15 },
+                    { header: 'Pendentes', key: 'pend', width: 15 },
+                    { header: 'Total Horas Estimadas', key: 'horas', width: 22 },
+                    { header: '% dos Abonos', key: 'pct', width: 16 }
+                ];
+
+                const totalAbonos = abonoItems.length || 1;
+                const rowsAct = Object.values(motivoMap).sort((a, b) => b.qtd - a.qtd).map(m => ({
+                    motivo: m.motivo,
+                    qtd: m.qtd,
+                    aprov: m.aprov,
+                    pend: m.pend,
+                    horas: Number((m.minTotal / 60).toFixed(1)),
+                    pct: `${((m.qtd / totalAbonos) * 100).toFixed(1)}%`
+                }));
+
+                setupStyledSheet('Analise_Motivos_ACT', colsAct, rowsAct.length ? rowsAct : [{ motivo: 'Sem abonos na base', qtd: 0, aprov: 0, pend: 0, horas: 0, pct: '0%' }], (row) => {
+                    ['qtd', 'aprov', 'pend', 'horas', 'pct'].forEach(k => {
+                        row.getCell(k).alignment = { vertical: 'middle', horizontal: 'center' };
+                    });
+                });
+
+                // ABA 6: Distribuicao_Temporal
+                const dayOrder = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+                const colsTemp = [
+                    { header: 'Dia da Semana', key: 'dia', width: 22 },
+                    { header: 'Total Ocorrências', key: 'tot', width: 18 },
+                    { header: 'Inclusões Batida', key: 'inc', width: 18 },
+                    { header: 'Abonos', key: 'abono', width: 15 },
+                    { header: 'Turno Manhã', key: 'manha', width: 16 },
+                    { header: 'Turno Tarde', key: 'tarde', width: 16 },
+                    { header: 'Noite / Madrugada', key: 'noite', width: 18 }
+                ];
+
+                const rowsTemp = dayOrder.map(dia => {
+                    const items = processedDataset.filter(d => d.diaSemana === dia);
+                    return {
+                        dia,
+                        tot: items.length,
+                        inc: items.filter(d => d.isInclusao).length,
+                        abono: items.filter(d => d.isAbono).length,
+                        manha: items.filter(d => d.periodoBatida === 'Manhã').length,
+                        tarde: items.filter(d => d.periodoBatida === 'Tarde').length,
+                        noite: items.filter(d => d.periodoBatida === 'Noite/Madrugada').length
+                    };
+                });
+
+                setupStyledSheet('Distribuicao_Temporal', colsTemp, rowsTemp, (row, data) => {
+                    ['tot', 'inc', 'abono', 'manha', 'tarde', 'noite'].forEach(k => {
+                        row.getCell(k).alignment = { vertical: 'middle', horizontal: 'center' };
+                    });
+                    if (data.dia === 'Sábado' || data.dia === 'Domingo') {
+                        row.getCell('dia').fill = FILL_AMBER;
+                        row.getCell('dia').font = FONT_AMBER;
+                    }
+                });
+
+                // ABA 7: Alertas_Auditoria
+                const colsAlerts = [
+                    { header: 'Severidade', key: 'sev', width: 15 },
+                    { header: 'Matrícula', key: 'mat', width: 14 },
+                    { header: 'Empregado', key: 'emp', width: 32 },
+                    { header: 'Filial', key: 'filial', width: 15 },
+                    { header: 'Unidade', key: 'dept', width: 36 },
+                    { header: 'Data Ocorrência', key: 'dtOcor', width: 17 },
+                    { header: 'Dias Dif.', key: 'dias', width: 12 },
+                    { header: 'Tipo', key: 'tipo', width: 19 },
+                    { header: 'Motivo', key: 'motivo', width: 26 },
+                    { header: 'Texto Informado', key: 'info', width: 30 },
+                    { header: 'Status', key: 'status', width: 14 },
+                    { header: 'Motivo da Sinalização', key: 'flags', width: 48 }
+                ];
+
+                const alertItems = processedDataset.filter(d => d.flagsAuditoria.length > 0);
+                const rowsAlerts = alertItems.length > 0
+                    ? alertItems.map(d => ({
+                        sev: d.severidade === 'CRITICO' ? 'ALTA' : 'MÉDIA',
+                        mat: d.matricula,
+                        emp: d.funcionario,
+                        filial: d.filial,
+                        dept: d.deptNome,
+                        dtOcor: d.dataJustificativaStr,
+                        dias: d.diasDiferenca,
+                        tipo: d.tipo,
+                        motivo: d.motivo,
+                        info: d.informacao,
+                        status: d.status,
+                        flags: d.flagAuditoriaStr
+                    }))
+                    : [{ sev: 'OK', mat: '-', emp: 'Nenhum ponto de atenção detectado na base.', filial: '-', dept: '-', dtOcor: '-', dias: 0, tipo: '-', motivo: '-', info: '-', status: '-', flags: 'Regular' }];
+
+                setupStyledSheet('Alertas_Auditoria', colsAlerts, rowsAlerts, (row, data) => {
+                    row.getCell('mat').alignment = { vertical: 'middle', horizontal: 'center' };
+                    row.getCell('mat').numFmt = '@';
+                    row.getCell('filial').alignment = { vertical: 'middle', horizontal: 'center' };
+                    row.getCell('dtOcor').alignment = { vertical: 'middle', horizontal: 'center' };
+                    row.getCell('dtOcor').numFmt = '@';
+
+                    const cSev = row.getCell('sev');
+                    cSev.alignment = { vertical: 'middle', horizontal: 'center' };
+                    if (data.sev === 'ALTA') {
+                        cSev.fill = FILL_RED; cSev.font = FONT_RED;
+                        row.getCell('flags').fill = FILL_RED; row.getCell('flags').font = FONT_RED;
+                    } else if (data.sev === 'MÉDIA') {
+                        cSev.fill = FILL_AMBER; cSev.font = FONT_AMBER;
+                        row.getCell('flags').fill = FILL_AMBER; row.getCell('flags').font = FONT_AMBER;
+                    }
+                });
+
+                const dateStamp = new Date().toISOString().slice(0, 10);
+                const outputFileName = `justificativas_Analitica_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/', '.')}.xlsx`;
+                await downloadWorkbook(workbook, outputFileName);
+
+                showToast(`Planilha "${outputFileName}" exportada com 8 abas e ${processedDataset.length} registros!`, 'success');
+                return true;
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao gerar a planilha formatada.', 'error');
+                return false;
+            }
+        }
