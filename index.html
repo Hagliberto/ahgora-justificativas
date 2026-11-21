@@ -39,6 +39,7 @@
     
     <!-- ExcelJS para Exportação Estilizada com Cores, Bordas e Cabeçalho Fixo -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -187,7 +188,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.5.0 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.6.0 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -216,13 +217,14 @@
     <div id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle" onclick="if(event.target===this) closeExportModal()" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
         <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start gap-3">
-                <div><h2 id="exportModalTitle" class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i>Exportar análise CAERN</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Escolha quais unidades integrarão a planilha de 8 abas.</p></div>
+                <div><h2 id="exportModalTitle" class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i>Exportar análise</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Escolha uma planilha completa, um conjunto de unidades ou um ZIP com uma planilha para cada unidade.</p></div>
                 <button type="button" onclick="closeExportModal()" aria-label="Fechar opções de exportação" class="rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <fieldset class="grid gap-2 text-sm">
                 <legend class="font-semibold mb-2">Escopo da exportação</legend>
                 <label class="flex items-center gap-2 p-3 border rounded-xl dark:border-slate-700 cursor-pointer"><input type="radio" name="exportScope" value="all" checked onchange="updateExportScope()" class="accent-emerald-600"><span><strong>Completa</strong><span class="block text-xs text-slate-500">Todas as unidades do arquivo importado na competência selecionada, sem filtros visuais.</span></span></label>
                 <label class="flex items-center gap-2 p-3 border rounded-xl dark:border-slate-700 cursor-pointer"><input type="radio" name="exportScope" value="units" onchange="updateExportScope()" class="accent-emerald-600"><span><strong>Por unidade</strong><span class="block text-xs text-slate-500">Escolha uma unidade ou marque várias na lista.</span></span></label>
+                <label class="flex items-center gap-2 p-3 border rounded-xl dark:border-slate-700 cursor-pointer"><input type="radio" name="exportScope" value="zip" onchange="updateExportScope()" class="accent-emerald-600"><span><strong>ZIP por unidade</strong><span class="block text-xs text-slate-500">Uma planilha Excel formatada (8 abas) para cada unidade, em um único arquivo ZIP.</span></span></label>
             </fieldset>
             <div id="exportUnitsArea" class="hidden space-y-2">
                 <div class="flex flex-wrap items-center justify-between gap-2"><label for="exportUnitSearch" class="text-xs font-semibold">Selecionar unidades</label><div class="flex gap-3"><button type="button" onclick="setAllExportUnits(true)" class="text-xs text-caern-secondary hover:underline">Marcar todas</button><button type="button" onclick="setAllExportUnits(false)" class="text-xs text-caern-secondary hover:underline">Limpar</button></div></div>
@@ -243,7 +245,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.5.0</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.6.0</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -377,14 +379,15 @@
                         <button type="button" onclick="resetGlobalFilters()" class="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar globais</button>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-2.5">
+                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-2.5">
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">De (ocorrência)<input id="globalDateStart" type="date" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Até (ocorrência)<input id="globalDateEnd" type="date" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"></label>
+                    <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Unidade<select id="globalUnit" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todas</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Empregado<select id="globalEmployee" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Gestor<select id="globalManager" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Filial<select id="globalBranch" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todas</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Regime<select id="globalRegime" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option></select></label>
-                    <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Auditoria<select id="globalRisk" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option><option value="alerts">Com sinalização</option><option value="ok">Sem sinalização</option><option value="late">Aprovação acima de 24h*</option><option value="forgotten">Esquecimento identificado</option></select></label>
+                    <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Auditoria<select id="globalRisk" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option><option value="alerts">Com sinalização</option><option value="ok">Sem sinalização</option><option value="late">Aprovação acima de 24h*</option><option value="forgotten">Esquecimento identificado</option><option value="inclusions">Todas as inclusões de batida</option><option value="other-inclusions">Inclusões sem indicação de esquecimento</option><option value="recurrent-forgotten">Empregados com 5+ possíveis esquecimentos no mês</option></select></label>
                 </div>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400">* Prazo exibido para conferência: Norma art. 12 e Manual apresentam orientações diferentes. Contagem de esquecimentos considera toda a competência, mesmo com filtros ativos.</p>
             </section>
@@ -551,6 +554,20 @@
                     <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Possíveis esquecimentos</p><p id="extraForgotten" class="text-xl font-bold text-teal-600 mt-2" aria-live="polite">0</p></div>
                     <div class="glass-card rounded-xl p-3"><p class="text-xs text-slate-500 dark:text-slate-400">Gestores distintos</p><p id="extraManagers" class="text-xl font-bold text-caern-primary dark:text-sky-300 mt-2" aria-live="polite">0</p></div>
                  </section>
+                 <section class="glass-card rounded-2xl p-5 space-y-4 border-l-4 border-l-teal-500" aria-label="Monitoramento de inclusões de batida">
+                    <div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="font-bold text-base"><i class="fa-solid fa-fingerprint mr-2 text-teal-600"></i>Inclusões de batida e possíveis esquecimentos</h3><p class="text-xs text-slate-500">Visualização por unidade e empregado; diferencia ajustes genéricos dos casos com texto que indica esquecimento</p></div><button type="button" onclick="focusPunchIssues()" class="text-xs font-semibold text-white bg-teal-700 hover:bg-teal-600 px-3 py-2 rounded-lg">Ver somente esquecimentos</button></div>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div class="rounded-xl bg-sky-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Inclusões de batida</p><p id="punchTotal" class="text-2xl font-bold text-sky-700 dark:text-sky-300">0</p></div>
+                      <div class="rounded-xl bg-teal-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Possíveis esquecimentos</p><p id="punchForgotten" class="text-2xl font-bold text-teal-700 dark:text-teal-300">0</p></div>
+                      <div class="rounded-xl bg-amber-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Inclusões sem indicação de esquecimento</p><p id="punchOther" class="text-2xl font-bold text-amber-700 dark:text-amber-300">0</p></div>
+                      <div class="rounded-xl bg-rose-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Empregados com 5+ possíveis esquecimentos / mês</p><p id="punchRecurrent" class="text-2xl font-bold text-rose-700 dark:text-rose-300">0</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div><h4 class="text-xs font-bold mb-2">Distribuição das inclusões</h4><div class="relative h-56"><canvas id="chartPunchTypes"></canvas></div></div>
+                      <div><h4 class="text-xs font-bold mb-2">Empregados com mais possíveis esquecimentos</h4><div class="relative h-56"><canvas id="chartPunchEmployees"></canvas></div></div>
+                    </div>
+                    <p class="text-[11px] text-slate-500">O limite de quatro validações refere-se a esquecimentos, conforme Norma art. 7º, §3º. A contagem é por empregado e competência do evento; registros textuais são indícios e exigem verificação. Sem competência selecionada, são consideradas as competências de cada registro separadamente.</p>
+                 </section>
                  <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" aria-label="Análise gerencial complementar">
                     <div class="glass-card rounded-2xl p-5"><h3 class="font-bold text-sm sm:text-base">Status das solicitações</h3><p class="text-xs text-slate-500 mb-3">Situação atual na base importada</p><div class="relative h-64"><canvas id="chartStatus"></canvas></div></div>
                     <div class="glass-card rounded-2xl p-5"><h3 class="font-bold text-sm sm:text-base">Solicitações por gestor</h3><p class="text-xs text-slate-500 mb-3">Volume e pendências por responsável</p><div class="relative h-64"><canvas id="chartManager"></canvas></div></div>
@@ -559,7 +576,7 @@
                  </section>
                  <section class="glass-card rounded-2xl p-5 space-y-3" aria-label="Análise gerencial de responsáveis">
                     <div class="flex flex-wrap justify-between items-center gap-2"><div><h3 class="font-bold text-sm sm:text-base">Painel de gestores • pendências e tempo de decisão</h3><p class="text-xs text-slate-500">Visão de trabalho para tratativas, não avaliação disciplinar automática</p></div><button onclick="exportDashboardExcel()" class="rounded-lg bg-emerald-600 text-white text-xs font-semibold px-3 py-2 hover:bg-emerald-500"><i class="fa-solid fa-file-excel mr-1"></i>Exportar Dashboard XLSX</button></div>
-                    <div class="overflow-auto max-h-[370px] rounded-xl border border-slate-200 dark:border-slate-800"><table class="w-full text-left text-xs"><thead class="sticky top-0 bg-caern-primary text-white"><tr><th class="p-3">Gestor responsável</th><th class="p-3 text-center">Total</th><th class="p-3 text-center">Pendentes</th><th class="p-3 text-center">Aprovadas</th><th class="p-3 text-center">Acima de 24h*</th><th class="p-3 text-center">Média decisão</th><th class="p-3 text-center">Sinalizadas</th></tr></thead><tbody id="managerDashboardBody"></tbody></table></div>
+                    <div class="overflow-auto max-h-[370px] rounded-xl border border-slate-200 dark:border-slate-800"><table class="w-full text-left text-xs"><thead class="sticky top-0 bg-caern-primary text-white"><tr><th class="p-3">Gestor ou Núcleo de Pessoal</th><th class="p-3 text-center">Total</th><th class="p-3 text-center">Pendentes</th><th class="p-3 text-center">Aprovadas</th><th class="p-3 text-center">Acima de 24h*</th><th class="p-3 text-center">Média decisão</th><th class="p-3 text-center">Sinalizadas</th></tr></thead><tbody id="managerDashboardBody"></tbody></table></div>
                  </section>
              </div>
 
@@ -744,7 +761,7 @@
                         <table class="w-full text-left border-collapse text-xs">
                             <thead class="bg-caern-primary text-white font-semibold uppercase tracking-wider">
                                 <tr>
-                                    <th class="py-3 px-3.5">Código</th>
+                                    <th class="py-3 px-3.5">Departamento</th>
                                     <th class="py-3 px-3.5">Departamento / Unidade</th>
                                     <th class="py-3 px-3.5 text-center">Total</th>
                                     <th class="py-3 px-3.5 text-center">Inclusões de Batida</th>
@@ -797,7 +814,7 @@
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 max-h-[620px]">
                         <table class="w-full text-left text-xs border-collapse min-w-[1250px]">
                             <thead class="bg-caern-primary text-white sticky top-0 z-10 uppercase tracking-wide"><tr>
-                                <th class="p-3">Unidade</th><th class="p-3">Empregado / Matrícula</th><th class="p-3">Competência</th><th class="p-3">Referência normativa</th><th class="p-3">Indício identificado</th><th class="p-3">Evidência / quantidade</th><th class="p-3">Prioridade</th><th class="p-3">Gestor responsável</th><th class="p-3">Providência sugerida</th><th class="p-3">Detalhes</th>
+                                <th class="p-3">Unidade</th><th class="p-3">Empregado / Matrícula</th><th class="p-3">Competência</th><th class="p-3">Referência normativa</th><th class="p-3">Indício identificado</th><th class="p-3">Evidência / quantidade</th><th class="p-3">Prioridade</th><th class="p-3">Gestor ou Núcleo de Pessoal</th><th class="p-3">Providência sugerida</th><th class="p-3">Detalhes</th>
                             </tr></thead>
                             <tbody id="conformityTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900/70"></tbody>
                         </table>
@@ -1500,6 +1517,7 @@
             const motivos = [...new Set(processedDataset.map(d => d.motivo))].sort();
 
             fillSelect('filterDept', depts, 'Todas as Unidades');
+            fillSelect('globalUnit', depts, 'Todas as unidades');
             fillSelect('filterTipo', tipos, 'Todos os Tipos');
             fillSelect('filterStatus', statuses, 'Todos os Status');
             fillSelect('filterMotivo', motivos, 'Todos os Motivos');
@@ -1533,7 +1551,7 @@
         }
 
         function resetGlobalFilters() {
-            ['globalDateStart','globalDateEnd','globalEmployee','globalManager','globalBranch','globalRegime','globalRisk'].forEach(id => {
+            ['globalDateStart','globalDateEnd','globalUnit','globalEmployee','globalManager','globalBranch','globalRegime','globalRisk'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             applyFilters();
@@ -1549,6 +1567,17 @@
             return true;
         }
 
+        function hasRecurrentForgotten(item) {
+            if (!item.isEsquecimento) return false;
+            const month = normMonth(item);
+            if (!month) return false;
+            return processedDataset.filter(d => d.matricula === item.matricula && d.isEsquecimento &&
+                normMonth(d) === month).length >= 5;
+        }
+        function focusPunchIssues() {
+            document.getElementById('globalRisk').value = 'forgotten';
+            applyFilters();
+        }
         function applyFilters() {
             const search = document.getElementById('searchInput').value.trim().toLowerCase();
             const dept = document.getElementById('filterDept').value;
@@ -1560,6 +1589,7 @@
             const onlyAlerts = document.getElementById('filterOnlyAlerts').checked;
             const globalStart = document.getElementById('globalDateStart').value;
             const globalEnd = document.getElementById('globalDateEnd').value;
+            const globalUnit = document.getElementById('globalUnit').value;
             const globalEmployee = document.getElementById('globalEmployee').value;
             const globalManager = document.getElementById('globalManager').value;
             const globalBranch = document.getElementById('globalBranch').value;
@@ -1569,6 +1599,7 @@
             filteredDataset = processedDataset.filter(item => {
                 if (globalStart && (!item.dataJustificativaIso || item.dataJustificativaIso < globalStart)) return false;
                 if (globalEnd && (!item.dataJustificativaIso || item.dataJustificativaIso > globalEnd)) return false;
+                if (globalUnit && item.deptNome !== globalUnit) return false;
                 if (globalEmployee && item.matricula !== globalEmployee) return false;
                 if (globalManager && item.gestor !== globalManager) return false;
                 if (globalBranch && item.filial !== globalBranch) return false;
@@ -1577,6 +1608,9 @@
                 if (globalRisk === 'ok' && item.flagsAuditoria.length) return false;
                 if (globalRisk === 'late' && !isLateApproval(item)) return false;
                 if (globalRisk === 'forgotten' && !item.isEsquecimento) return false;
+                if (globalRisk === 'inclusions' && !item.isInclusao) return false;
+                if (globalRisk === 'other-inclusions' && (!item.isInclusao || item.isEsquecimento)) return false;
+                if (globalRisk === 'recurrent-forgotten' && !hasRecurrentForgotten(item)) return false;
                 if (dept && item.deptNome !== dept) return false;
                 if (tipo && item.tipo !== tipo) return false;
                 if (status && item.status !== status) return false;
@@ -2318,7 +2352,7 @@
             tbody.innerHTML = currentConformityRows.length ? currentConformityRows.map(f=>`<tr class="hover:bg-sky-50 dark:hover:bg-slate-800/70">
                 <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.codigo)} • ${escapeHtml(f.unidade)}</td>
                 <td class="p-3"><button type="button" class="font-semibold text-caern-primary dark:text-sky-300 underline decoration-dotted text-left" onclick="openConformityEmployee(${f.id})">${escapeHtml(f.funcionario)}</button><div class="font-mono text-slate-500 mt-1">${escapeHtml(f.matricula)}</div></td>
-                <td class="p-3 whitespace-nowrap">${escapeHtml(f.competencia==='Não identificada'?f.competencia:f.competencia.slice(5)+'/'+f.competencia.slice(0,4))}</td>
+                <td class="p-3 whitespace-nowrap">${escapeHtml(formatCompetenceBR(f.competencia))}</td>
                 <td class="p-3">${escapeHtml(f.regra)}</td><td class="p-3 font-semibold">${escapeHtml(f.indício)}</td>
                 <td class="p-3 text-slate-600 dark:text-slate-300">${escapeHtml(f.evidencia)}</td>
                 <td class="p-3"><span class="rounded-lg px-2 py-1 font-semibold ${f.prioridade==='Prioritária'?'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300':f.prioridade==='Atenção'?'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300':'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">${escapeHtml(f.prioridade)}</span></td>
@@ -2340,12 +2374,15 @@
             const emp = getFilteredEmployeesList().find(e=>e.matricula===record.matricula);
             if (emp) { activeEmployeeKey=emp.matricula; drawEmployeeAnalysis(emp); }
         }
+        function formatCompetenceBR(value) {
+            return /^\d{4}-\d{2}$/.test(String(value || '')) ? `${value.slice(5,7)}/${value.slice(0,4)}` : (value || 'Não identificada');
+        }
         function addConformitySheet(workbook, rows, referenceRows=rows) {
             const ws = workbook.addWorksheet('Inconformidades');
             ws.columns = [
-                ['Unidade','unidade',38],['Código','codigo',15],['Filial','filial',18],
+                ['Unidade','unidade',38],['Departamento','codigo',15],['Filial','filial',18],
                 ['Matrícula','matricula',16],['Empregado','funcionario',34],['Competência','competencia',18],
-                ['Gestor','gestor',34],['Referência','regra',38],['Indício','indício',42],
+                ['Gestor ou Núcleo de Pessoal','gestor',34],['Referência','regra',38],['Indício','indício',42],
                 ['Evidência','evidencia',78],['Quantidade','quantidade',15],['Prioridade','prioridade',18],
                 ['Situação','situacao',25],['Providência sugerida','providencia',78],
                 ['Análise do gestor (preencher)','analiseGestor',44]
@@ -2355,7 +2392,7 @@
             ws.getRow(1).height=30;
             ws.getRow(1).eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF004B93'}};c.font={bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',wrapText:true};});
             getConformityFindings(rows,referenceRows).forEach(f=>{
-                const record = {...f, analiseGestor:''};
+                const record = {...f, competencia: formatCompetenceBR(f.competencia), analiseGestor:''};
                 const row=ws.addRow(record);
                 row.alignment={vertical:'top',wrapText:true};
                 if (f.prioridade==='Prioritária') {row.getCell('prioridade').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFEDD5'}};row.getCell('prioridade').font={bold:true,color:{argb:'FF9A3412'}};}
@@ -2367,7 +2404,7 @@
             try {
                 const workbook = new ExcelJS.Workbook();
                 const sheet = addConformitySheet(workbook, [], []);
-                currentConformityRows.forEach(f=>sheet.addRow({...f,analiseGestor:''}));
+                currentConformityRows.forEach(f=>sheet.addRow({...f,competencia:formatCompetenceBR(f.competencia),analiseGestor:''}));
                 await downloadWorkbook(workbook, `justificativas_Inconformidades_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/','.')}.xlsx`);
                 showToast(`Relatório gerado com ${currentConformityRows.length} indício(s).`, 'success');
             } catch(error) {console.error(error);showToast('Não foi possível exportar o relatório de inconformidades.', 'error');}
@@ -2464,6 +2501,28 @@
             return [...map.values()].sort((a,b) => b.pendentes - a.pendentes || b.total - a.total);
         }
 
+        function renderPunchDashboard(records) {
+            const inclusions = records.filter(d => d.isInclusao);
+            const forgotten = inclusions.filter(d => d.isEsquecimento);
+            const other = inclusions.length - forgotten.length;
+            const recurrent = new Set(forgotten.filter(hasRecurrentForgotten).map(d => d.matricula)).size;
+            document.getElementById('punchTotal').textContent = inclusions.length.toLocaleString('pt-BR');
+            document.getElementById('punchForgotten').textContent = forgotten.length.toLocaleString('pt-BR');
+            document.getElementById('punchOther').textContent = other.toLocaleString('pt-BR');
+            document.getElementById('punchRecurrent').textContent = recurrent.toLocaleString('pt-BR');
+            if (typeof Chart === 'undefined') return;
+            const add = (id, type, labels, values, color, horizontal=false) => {
+                const node = document.getElementById(id);
+                if (!node) return;
+                if (dashboardCharts[id]) dashboardCharts[id].destroy();
+                dashboardCharts[id] = new Chart(node, {type, data:{labels,datasets:[{data:values,backgroundColor:color,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:horizontal?'y':'x',plugins:{legend:{display:false}},scales: type==='bar'?{x:{ticks:{precision:0}}}:undefined}});
+            };
+            add('chartPunchTypes','doughnut',['Possíveis esquecimentos','Outras inclusões'],[forgotten.length,other],['#0d9488','#f59e0b']);
+            const emap = new Map();
+            forgotten.forEach(d => { const key = d.matricula || d.funcionario; const e = emap.get(key) || {name:d.funcionario,total:0}; e.total++; emap.set(key,e); });
+            const top = [...emap.values()].sort((a,b)=>b.total-a.total).slice(0,8);
+            add('chartPunchEmployees','bar',top.map(e=>e.name),top.map(e=>e.total),'#0d9488',true);
+        }
         function renderDashboardAdvanced() {
             const records = filteredDataset;
             const total = records.length;
@@ -2477,6 +2536,7 @@
             document.getElementById('extraRejected').textContent = rejected;
             document.getElementById('extraForgotten').textContent = records.filter(d => d.isEsquecimento).length;
             document.getElementById('extraManagers').textContent = new Set(records.map(d => d.gestor)).size;
+            renderPunchDashboard(records);
 
             const managers = summarizeManagers(records);
             const tbody = document.getElementById('managerDashboardBody');
@@ -2800,6 +2860,7 @@
 
                 const dateStamp = new Date().toISOString().slice(0, 10);
                 const outputFileName = `${currentSourceName}_Base_Filtrada_${dateStamp}.xlsx`;
+                if (options.returnBuffer) return await workbook.xlsx.writeBuffer();
                 await downloadWorkbook(workbook, outputFileName);
                 showToast(`Exportados ${filteredDataset.length} registros filtrados em "${outputFileName}".`, 'success');
             } catch (err) {
@@ -2824,6 +2885,7 @@
 
                 const dateStamp = new Date().toISOString().slice(0, 10);
                 const outputFileName = `${currentSourceName}_Ranking_Empregados_${dateStamp}.xlsx`;
+                if (options.returnBuffer) return await workbook.xlsx.writeBuffer();
                 await downloadWorkbook(workbook, outputFileName);
                 showToast(`Exportado ranking com ${empList.length} empregado(s) em "${outputFileName}".`, 'success');
             } catch (err) {
@@ -2869,7 +2931,7 @@
             modal.classList.add('hidden'); modal.classList.remove('flex');
         }
         function updateExportScope() {
-            const byUnits = document.querySelector('input[name="exportScope"]:checked')?.value === 'units';
+            const byUnits = ['units','zip'].includes(document.querySelector('input[name="exportScope"]:checked')?.value);
             document.getElementById('exportUnitsArea').classList.toggle('hidden', !byUnits);
             updateExportSummary();
         }
@@ -2885,7 +2947,7 @@
         }
         function getExportRows() {
             const mode = document.querySelector('input[name="exportScope"]:checked')?.value;
-            if (mode !== 'units') return processedDataset;
+            if (mode !== 'units' && mode !== 'zip') return processedDataset;
             const chosen = new Set([...document.querySelectorAll('.export-unit-checkbox:checked')].map(input => input.value));
             return processedDataset.filter(row => chosen.has(String(row.deptNome || 'Não informada')));
         }
@@ -2895,6 +2957,7 @@
             document.getElementById('exportSelectionSummary').textContent = `${count} unidade(s) · ${rows.length.toLocaleString('pt-BR')} registro(s) · competência: ${selectedCompetence ? selectedCompetence.slice(5) + '/' + selectedCompetence.slice(0, 4) : 'todas'}`;
             document.getElementById('exportConfirmButton').disabled = !rows.length;
             document.getElementById('exportConfirmButton').classList.toggle('opacity-50', !rows.length);
+            document.getElementById('exportConfirmButton').innerHTML = document.querySelector('input[name="exportScope"]:checked')?.value === 'zip' ? '<i class="fa-solid fa-file-zipper mr-2"></i>Gerar ZIP' : '<i class="fa-solid fa-file-excel mr-2"></i>Gerar Excel';
         }
         async function confirmExportSelection() {
             const rows = getExportRows();
@@ -2902,13 +2965,45 @@
             const button = document.getElementById('exportConfirmButton');
             button.disabled = true;
             try {
-                const success = await exportStyledExcel(rows);
+                const mode = document.querySelector('input[name="exportScope"]:checked')?.value;
+                const success = mode === 'zip' ? await exportUnitsZip(rows) : await exportStyledExcel(rows);
                 if (success) closeExportModal();
             } finally { button.disabled = false; }
         }
 
+        function safeExportFilename(name) {
+            return String(name || 'Unidade').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9 _-]/g, '_').trim().replace(/\s+/g,'_').slice(0,75) || 'Unidade';
+        }
+        function saveBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 30000);
+        }
+        async function exportUnitsZip(rows) {
+            if (typeof JSZip === 'undefined') { showToast('Biblioteca ZIP indisponível. Verifique sua conexão.', 'error'); return false; }
+            const units = exportUnitsFromDataset(rows);
+            const zip = new JSZip();
+            const stamp = new Date().toLocaleDateString('pt-BR').replaceAll('/','.');
+            try {
+                for (let i=0; i<units.length; i++) {
+                    const unit = units[i];
+                    const subset = rows.filter(r => String(r.deptNome || 'Não informada') === unit.name);
+                    const buffer = await exportStyledExcel(subset, {returnBuffer:true});
+                    if (!buffer) throw new Error('Falha ao gerar planilha para ' + unit.name);
+                    const filename = `justificativas_Analitica_CAERN_${safeExportFilename(unit.code || '')}_${safeExportFilename(unit.name)}_${stamp}.xlsx`;
+                    zip.file(filename, buffer);
+                }
+                const content = await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+                saveBlob(content, `justificativas_Analiticas_Unidades_${stamp}.zip`);
+                showToast(`ZIP gerado com ${units.length} planilha(s) formatada(s).`, 'success');
+                return true;
+            } catch(error) { console.error(error); showToast('Falha ao gerar ZIP de unidades.', 'error'); return false; }
+        }
+
         // Exportação Completa Multi-Abas (8 abas formatadas)
-        async function exportStyledExcel(exportRows = processedDataset) {
+        async function exportStyledExcel(exportRows = processedDataset, options = {}) {
             const processedDataset = exportRows; // escopo específico desta exportação
             if (!processedDataset || processedDataset.length === 0) {
                 showToast('Carregue uma planilha antes de exportar.', 'warning');
@@ -2916,7 +3011,7 @@
             }
 
             try {
-                showToast('Gerando planilha Excel formatada e colorida...', 'info');
+                if (!options.returnBuffer) showToast('Gerando planilha Excel formatada e colorida...', 'info');
                 const workbook = new ExcelJS.Workbook();
                 workbook.creator = 'CAERN - NUPNN (Hagliberto Alves de Oliveira)';
                 workbook.created = new Date();
@@ -3189,13 +3284,14 @@
 
                 const dateStamp = new Date().toISOString().slice(0, 10);
                 const outputFileName = `justificativas_Analitica_CAERN_${new Date().toLocaleDateString('pt-BR').replaceAll('/', '.')}.xlsx`;
+                if (options.returnBuffer) return await workbook.xlsx.writeBuffer();
                 await downloadWorkbook(workbook, outputFileName);
 
                 showToast(`Planilha "${outputFileName}" exportada com 8 abas e ${processedDataset.length} registros!`, 'success');
                 return true;
             } catch (err) {
                 console.error(err);
-                showToast('Erro ao gerar a planilha formatada.', 'error');
+                if (!options.returnBuffer) showToast('Erro ao gerar a planilha formatada.', 'error');
                 return false;
             }
         }

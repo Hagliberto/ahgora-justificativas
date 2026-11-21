@@ -37,6 +37,6 @@ Tailwind CDN (script de navegador, sem versão travada na URL), SheetJS 0.20.2, 
 **Evolução proposta**, não implementada: separar `src/core`, `src/import`, `src/export`, `src/ui`, criar testes unitários e automatizados e adotar build leve somente após homologação da versão atual.
 
 
-## Evolução 2.5.0
+## Evolução 2.6.0
 
 Relatório de Inconformidades por empregado, competência, unidade e gestor. Rota `#/inconformidades` e geração XLSX com aba de evidências e providências. A lógica permanece no HTML monolítico; futura separação em módulos continua recomendada. Ver `RELATORIO_INCONFORMIDADES.md`.

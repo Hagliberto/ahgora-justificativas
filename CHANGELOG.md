@@ -1,3 +1,21 @@
+## [2.6.0] - 2026-11-21
+
+### Dashboard e inclusões de batida
+- Novo painel dedicado a inclusões de batida, triagem de possíveis esquecimentos, inclusões sem texto indicativo e casos com cinco ou mais possíveis esquecimentos em uma mesma competência.
+- Gráficos com distribuição das inclusões e empregados com mais registros indicativos de esquecimento.
+- Filtro global por Unidade atualiza todos os indicadores do Dashboard e análises que respeitam o recorte global.
+- Filtro de Auditoria inclui todas as inclusões, possíveis esquecimentos, demais inclusões e reincidência mensal (para revisão humana).
+
+### Inconformidades e relatórios
+- Rótulo `Gestor ou Núcleo de Pessoal` e coluna `Departamento` no lugar de `Código`.
+- Competência no formato MM/AAAA na interface e na aba Excel de Inconformidades.
+- Modal `Exportar análise` sem sufixo CAERN.
+- Nova exportação ZIP com uma planilha `.xlsx` formatada de oito abas por unidade selecionada.
+- Os XLSX preservam as propriedades de células geradas pelo ExcelJS; exibição no Excel Online/SharePoint pode variar conforme o recurso.
+
+### Regras
+- Os indícios de esquecimento são detectados por texto, não por toda inclusão; limite de quatro validações mensais por esquecimento conforme norma, sujeito a conferência.
+
 ## [2.5.0] - 2026-11-20
 
 - Nova aba `Inconformidades` (`#/inconformidades`), com indicadores, filtros e tabela gerencial por empregado, unidade e competência.

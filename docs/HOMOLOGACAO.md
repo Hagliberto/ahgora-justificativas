@@ -47,9 +47,9 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Avaliar migração do Tailwind Play CDN para build CSS local.
 
 
-## Checklist 2.5.0 — Inconformidades
+## Checklist 2.6.0 — Inconformidades
 
-- [ ] Versão 2.5.0 indicada em appbar, configurações e documentação.
+- [ ] Versão 2.6.0 indicada em appbar, configurações e documentação.
 - [ ] Aba `#/inconformidades` acessível após importação e pelo histórico do navegador.
 - [ ] Filtros de unidade, regra, prioridade, pesquisa, gestor e competência funcionais.
 - [ ] Quatro esquecimentos no mês não geram alerta de excesso; cinco geram um único caso no mês.
