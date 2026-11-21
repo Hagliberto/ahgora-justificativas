@@ -1,3 +1,12 @@
+# Histórico de alterações
+
+## 2.1.0 — 20/11/2026
+- Filtro por competência baseado na data da ocorrência, com reapuração mensal.
+- Triagem de possíveis esquecimentos sem confundir todas as inclusões com motivo normativo.
+- Alertas de prazo preventivos e conflito Norma vs Manual documentado.
+- Validação de estrutura e tamanho da importação; datas estritas e matrícula ausente não substituída por zeros.
+- Novos testes para competência, datas inválidas e classificação do motivo.
+
 # Changelog
 
 Formato inspirado em Keep a Changelog. Versões do aplicativo são distintas das tags Git.

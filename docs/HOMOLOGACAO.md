@@ -17,3 +17,12 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Confirmar formalmente fundamento/competência das regras com RH/jurídico.
 
 **Critério de aceite:** nenhuma mudança não autorizada nos resultados do motor; divergências documentadas em issue e corrigidas antes da publicação.
+
+## Checklist 2.1.0
+- [ ] Base de duas competências: a mais recente aparece por padrão; alternar mês recarrega KPIs, tabelas, alertas e Excel.
+- [ ] “Todas” mostra dados exploratórios sem afirmar excesso mensal de esquecimentos.
+- [ ] Cinco ajustes com motivo textual explícito de esquecimento sinalizam conferência; cinco inclusões sem tal texto NÃO disparam a regra de quatro.
+- [ ] Aprovação após 24h sinaliza alerta **sem decisão de infração**; registrar divergência entre Norma e Manual.
+- [ ] Datas impossíveis e matrículas ausentes não geram agrupamento fraudulento.
+- [ ] Arquivo sem campos essenciais não substitui base já carregada; arquivo >25MB é recusado.
+- [ ] Conferir funcionamento de todas as cinco abas, gráficos e exportações no navegador (não automatizado nos testes unitários).

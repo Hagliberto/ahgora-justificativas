@@ -1,13 +1,14 @@
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.0.1.** Esta entrega padroniza o repositório sem migrar a interface para um framework.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.1.0.** Esta versão adiciona competência mensal e triagem normativa sem migrar a interface para um framework.
 
 ## Como executar
 
 1. Baixe/descompacte o projeto e abra `index.html` em um navegador atualizado conectado à internet para carregar as bibliotecas externas.
 2. Importe um `.xlsx`, `.xls` ou `.csv` do Ahgora (primeira aba) ou use a demonstração em **Configurações**.
-3. Explore as abas **Visão Geral**, **Base Tratada**, **Empregados**, **Unidades** e **Alertas**.
-4. Exporte os registros filtrados, o ranking ou o relatório analítico de **7 abas** em `.xlsx`.
+3. Selecione a **competência MM/AAAA** (a mais recente é selecionada por padrão). A opção “Todas” é exploratória e desativa a checagem mensal do limite de esquecimentos.
+4. Explore as abas **Visão Geral**, **Base Tratada**, **Empregados**, **Unidades** e **Alertas**.
+5. Exporte os registros filtrados, o ranking ou o relatório analítico de **7 abas** em `.xlsx`.
 
 Alternativamente, para servir localmente: `python -m http.server 8000` e acesse `http://localhost:8000`.
 
@@ -51,12 +52,12 @@ Não há `npm install` obrigatório para executar a aplicação. O arquivo HTML 
 ## Fluxo Git sugerido
 
 ```powershell
-git checkout -b chore/padronizacao-v2.0.1
+git checkout -b chore/padronizacao-v2.1.0
 # copie os arquivos desta entrega sobre o repositório e confira o diff
 git status
 git add .
 git commit -m "chore: documenta e padroniza auditoria de justificativas"
-git push -u origin chore/padronizacao-v2.0.1
+git push -u origin chore/padronizacao-v2.1.0
 ```
 
 A versão original estava na `main` com a árvore limpa; esta entrega **não alterou seu repositório local nem fez push**. Homologue antes de mesclar na `main`.
@@ -64,3 +65,13 @@ A versão original estava na `main` com a árvore limpa; esta entrega **não alt
 ## Limites
 
 O sistema **sinaliza** registros para conferência e não decide automaticamente a validade jurídica ou administrativa de uma justificativa. Os parâmetros atuais de 4 inclusões, 5/7 dias e escala 12x36 vêm do código recebido; precisam de confirmação formal na norma aplicável e no período de apuração. Consulte [regras](docs/REGRAS_DE_NEGOCIO.md) e [homologação](docs/HOMOLOGACAO.md).
+
+## Mudanças da versão 2.1.0
+
+- Competência por **data da justificativa** (ocorrência), com totalização e reapuração dos indicadores ao alternar mês.
+- Não considera todas as inclusões como “esquecimento”: triagem mensal somente quando o texto indica explicitamente esquecimento. O limite da Norma art. 7º §3º é específico para validação desses casos. A exportação continua trazendo volume total de inclusões como indicador, **não como conclusão de infração**.
+- Sinalização de solicitações posteriores à ocorrência para conferência do art. 12, sem condenação automática; aprovação acima de 24h sinalizada com ressalva de conflito entre Norma e Manual.
+- Rejeita importações sem campos essenciais e arquivos maiores que 25MB; valida datas com rejeição de valores impossíveis; ausência de matrícula não vira `000000`.
+- Todas as avaliações são preventivas; exceções, calendário de dias úteis, razão efetiva do ajuste e aprovação normativa demandam validação humana.
+
+**Limitação da origem:** não há campo estruturado que confirme “esqueci de bater ponto”. A heurística textual pode deixar de reconhecer situações. Consulte `docs/CONCILIACAO_NORMATIVA.md`.

@@ -294,6 +294,19 @@
         <!-- Painel Principal Organizado em Abas (Exibido após carga) -->
         <div id="analyticsDashboard" class="hidden space-y-5 w-full">
 
+            <!-- Apuração por competência: recalcula indicadores e limites mensais -->
+            <section class="glass-card rounded-2xl p-3 sm:px-5 flex flex-col md:flex-row md:items-center justify-between gap-3" aria-label="Configuração da competência">
+                <div>
+                    <p class="text-sm font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-calendar-check mr-2 text-caern-secondary"></i>Competência da auditoria</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Limites mensais e indicadores são recalculados ao selecionar o mês. Em “Todas”, os números servem apenas à exploração.</p>
+                </div>
+                <select id="competenceSelect" aria-label="Selecionar competência" onchange="changeCompetence()" class="w-full md:w-64 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-semibold focus:ring-2 focus:ring-caern-secondary">
+                    <option value="">Todas as competências (exploratório)</option>
+                </select>
+            </section>
+            <section class="rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/80 dark:bg-amber-950/20 px-4 py-3 text-xs text-amber-900 dark:text-amber-200" role="note">
+                <strong>Auditoria preventiva:</strong> alertas dependem de conferência humana. O limite normativo de quatro validações mensais se refere a <strong>esquecimento de registro</strong> (Norma, art. 7º, §3º), e não a qualquer inclusão de batida. Há divergência entre a Norma (24 h) e o Manual (2 dias úteis) para análise do gestor; ver documentação.
+            </section>
             <!-- Faixa de Contexto da Planilha Carregada + Navegação por Abas -->
             <div class="glass-card rounded-2xl p-3 sm:px-5 flex flex-col xl:flex-row xl:items-center justify-between gap-3 border-l-4 border-l-caern-secondary">
                 <div class="flex items-center gap-3">
@@ -551,12 +564,12 @@
                         <!-- FILTRO: Quantidade de Inclusões de Batida por Empregado (Limite até 4) -->
                         <div>
                             <select id="filterPunchCount" onchange="applyFilters()" title="Filtrar pela quantidade total de inclusões de batida do empregado" class="w-full px-3 py-2 rounded-xl bg-sky-50/80 dark:bg-sky-950/40 border border-caern-secondary/40 text-caern-dark dark:text-sky-200 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-caern-secondary">
-                                <option value="">Inclusões Batida / Empregado</option>
-                                <option value="0">0 inclusões (Regular)</option>
-                                <option value="1-4">1 a 4 inclusões (Dentro do limite)</option>
-                                <option value="5+">5 ou mais inclusões (Reincidente / Crítico)</option>
-                                <option value="5-6">5 a 6 inclusões (Reincidente)</option>
-                                <option value="7+">7 ou mais inclusões (Crítico)</option>
+                                <option value="">Volume de Inclusões / Empregado</option>
+                                <option value="0">0 inclusões</option>
+                                <option value="1-4">1 a 4 inclusões (volume)</option>
+                                <option value="5+">5 ou mais inclusões (volume)</option>
+                                <option value="5-6">5 a 6 inclusões (volume)</option>
+                                <option value="7+">7 ou mais inclusões (volume)</option>
                             </select>
                         </div>
                     </div>
@@ -615,16 +628,16 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3.5">
                         <div>
                             <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Consolidado & Ranking por Empregado</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">Acompanhamento individual de frequência de justificativas e inclusões de batida (tolerância de até 4 inclusões)</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Acompanhamento do volume de inclusões e triagem separada de esquecimentos identificáveis (Norma, art. 7º, §3º)</p>
                         </div>
                         <div class="flex items-center gap-2.5">
                             <select id="empTabPunchFilter" onchange="renderEmployeeTab()" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-caern-secondary">
-                                <option value="">Inclusões Batida / Empregado</option>
-                                <option value="0">0 inclusões (Regular)</option>
-                                <option value="1-4">1 a 4 inclusões (Dentro do limite)</option>
-                                <option value="5+">5 ou mais inclusões (Reincidente / Crítico)</option>
-                                <option value="5-6">5 a 6 inclusões (Reincidente)</option>
-                                <option value="7+">7 ou mais inclusões (Crítico)</option>
+                                <option value="">Volume de Inclusões / Empregado</option>
+                                <option value="0">0 inclusões</option>
+                                <option value="1-4">1 a 4 inclusões (volume)</option>
+                                <option value="5+">5 ou mais inclusões (volume)</option>
+                                <option value="5-6">5 a 6 inclusões (volume)</option>
+                                <option value="7+">7 ou mais inclusões (volume)</option>
                             </select>
                             <button onclick="exportFilteredEmployeesExcel()" title="Baixar ranking filtrado de empregados (.xlsx)" data-tooltip="Baixar ranking filtrado (.xlsx)" class="icon-btn icon-btn-right w-9 h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shadow-sm transition cursor-pointer">
                                 <i class="fa-solid fa-file-excel"></i>
@@ -695,7 +708,7 @@
                             <i class="fa-solid fa-triangle-exclamation"></i>
                             <span>Registros Sinalizados para Conferência Gerencial</span>
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Ocorrências com atraso superior a 5 dias, registros antecipados, justificativas genéricas, inclusões de batida acima de 4 (Reincidente/Crítico) ou divergência de escala</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Triagem de justificativas, prazos, possíveis esquecimentos acima de 4 por mês e compatibilidade textual de escala. A classificação não equivale a infração confirmada</p>
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 max-h-[600px]">
@@ -744,6 +757,10 @@
         let chartTemporalInstance = null;
         let chartSlaInstance = null;
 
+        let fullImportedDataset = [];
+        let currentDatasetLabel = '';
+        let selectedCompetence = '';
+        const ESSENTIAL_COLUMNS = ['Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário', 'Tipo', 'Status'];
         const EXPECTED_COLUMNS = [
             'Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário',
             'Localização', 'Departamento', 'Tipo', 'Status', 'Gestor Responsável',
@@ -947,6 +964,10 @@
                 return;
             }
 
+            if (file.size > 25 * 1024 * 1024) {
+                showToast('Arquivo maior que 25 MB. Divida a exportação por período.', 'error');
+                return;
+            }
             currentSourceName = file.name.replace(/\.[^/.]+$/, "");
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -963,10 +984,11 @@
                     }
 
                     const fileCols = Object.keys(jsonRows[0]).map(c => c.trim());
-                    const missingCols = EXPECTED_COLUMNS.filter(col => !fileCols.includes(col));
+                    
 
-                    if (missingCols.length > 4) {
-                        showToast(`Estrutura divergente do padrão Ahgora. Colunas ausentes: ${missingCols.slice(0, 4).join(', ')}...`, 'error');
+                    const missingEssential = ESSENTIAL_COLUMNS.filter(col => !fileCols.includes(col));
+                    if (missingEssential.length) {
+                        showToast(`Importação bloqueada. Campos obrigatórios ausentes: ${missingEssential.join(', ')}`, 'error');
                         return;
                     }
 
@@ -996,28 +1018,15 @@
             const clean = String(dateStr).trim();
             const match = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
             if (match) {
-                return new Date(
-                    parseInt(match[3], 10),
-                    parseInt(match[2], 10) - 1,
-                    parseInt(match[1], 10),
-                    match[4] ? parseInt(match[4], 10) : 0,
-                    match[5] ? parseInt(match[5], 10) : 0,
-                    match[6] ? parseInt(match[6], 10) : 0
-                );
+                const dt = new Date(+match[3], +match[2] - 1, +match[1], +(match[4] || 0), +(match[5] || 0), +(match[6] || 0));
+                return dt.getFullYear() === +match[3] && dt.getMonth() === +match[2] - 1 && dt.getDate() === +match[1] ? dt : null;
             }
             const isoMatch = clean.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
             if (isoMatch) {
-                return new Date(
-                    parseInt(isoMatch[1], 10),
-                    parseInt(isoMatch[2], 10) - 1,
-                    parseInt(isoMatch[3], 10),
-                    isoMatch[4] ? parseInt(isoMatch[4], 10) : 0,
-                    isoMatch[5] ? parseInt(isoMatch[5], 10) : 0,
-                    isoMatch[6] ? parseInt(isoMatch[6], 10) : 0
-                );
+                const dt = new Date(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3], +(isoMatch[4] || 0), +(isoMatch[5] || 0), +(isoMatch[6] || 0));
+                return dt.getFullYear() === +isoMatch[1] && dt.getMonth() === +isoMatch[2] - 1 && dt.getDate() === +isoMatch[3] ? dt : null;
             }
-            const iso = new Date(clean);
-            return isNaN(iso.getTime()) ? null : iso;
+            return null; // Não interpretar formatos ambíguos dependentes do navegador
         }
 
         function formatDateOnly(dateObj) {
@@ -1034,11 +1043,38 @@
             return 'Crítico (7+)';
         }
 
-        function processDataset(rows, sourceLabel) {
-            rawDataset = rows;
+        function getCompetence(dateValue) {
+            const date = parseBrDate(dateValue);
+            return date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}` : '';
+        }
+
+        function isForgottenPunch(item) {
+            // A norma limita validações por ESQUECIMENTO; inclusão genérica não comprova esquecimento.
+            return item.isInclusao && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(`${item.informacao} ${item.motivo}`);
+        }
+
+        function changeCompetence() {
+            selectedCompetence = document.getElementById('competenceSelect').value;
+            processDataset(fullImportedDataset, currentDatasetLabel, true);
+        }
+
+        function processDataset(rows, sourceLabel, preserveCompetence = false) {
+            fullImportedDataset = rows;
+            currentDatasetLabel = sourceLabel;
+            const available = [...new Set(rows.map(r => getCompetence(r['Data da justificativa'])).filter(Boolean))].sort().reverse();
+            if (!preserveCompetence) selectedCompetence = available[0] || '';
+            if (selectedCompetence && !available.includes(selectedCompetence)) selectedCompetence = available[0] || '';
+            const competenceSelect = document.getElementById('competenceSelect');
+            competenceSelect.replaceChildren();
+            const allOption = new Option('Todas as competências (exploratório)', '');
+            competenceSelect.add(allOption);
+            available.forEach(value => competenceSelect.add(new Option(`${value.slice(5)}/${value.slice(0, 4)}`, value)));
+            competenceSelect.value = selectedCompetence;
+            const scopedRows = selectedCompetence ? rows.filter(r => getCompetence(r['Data da justificativa']) === selectedCompetence) : rows;
+            rawDataset = scopedRows;
 
             // Primeira passagem: normalização linha a linha
-            const tempProcessed = rows.map((row, idx) => {
+            const tempProcessed = scopedRows.map((row, idx) => {
                 const cleanRow = {};
                 Object.keys(row).forEach(k => {
                     cleanRow[k.trim()] = row[k] !== null && row[k] !== undefined ? String(row[k]).trim() : '';
@@ -1046,7 +1082,7 @@
 
                 const rawMat = cleanRow['Matrícula'] || '';
                 const digitsOnly = rawMat.replace(/\D/g, '');
-                const mat6D = digitsOnly.length >= 6 ? digitsOnly.slice(-6) : digitsOnly.padStart(6, '0');
+                const mat6D = digitsOnly.length >= 6 ? digitsOnly.slice(-6) : (digitsOnly ? digitsOnly.padStart(6, '0') : '');
 
                 const rawLoc = cleanRow['Localização'] || '';
                 const locParts = rawLoc.split(/\s+/);
@@ -1069,7 +1105,7 @@
                 }
 
                 const tipo = cleanRow['Tipo'] || 'Outros';
-                const status = cleanRow['Status'] || 'Pendente';
+                const status = cleanRow['Status'] || 'Não informado';
                 const funcionario = (cleanRow['Funcionário'] || 'NÃO IDENTIFICADO').toUpperCase();
                 const gestor = cleanRow['Gestor Responsável'] || 'Não atribuído';
                 const informacao = cleanRow['Informação'] || '';
@@ -1085,7 +1121,7 @@
                 const isAbono = tipo.toLowerCase().includes('abono');
 
                 if (isInclusao) {
-                    if (!motivo) motivo = 'Inclusão de Batida / Esquecimento';
+                    if (!motivo) motivo = 'Inclusão de Batida / Motivo não informado';
                     const timeMatch = detalhes.match(/(\d{1,2}):(\d{2})/);
                     if (timeMatch) {
                         const hh = parseInt(timeMatch[1], 10);
@@ -1125,7 +1161,7 @@
                     : (cleanRow['Data da justificativa'] || '').split(' ')[0];
 
                 let diasDiferenca = 0;
-                let classificacaoTemporal = 'No Mesmo Dia';
+                let classificacaoTemporal = 'Não informado';
                 let diaSemana = '-';
 
                 if (dtJustificativa) {
@@ -1149,8 +1185,8 @@
                     dtSolicitacao,
                     dtJustificativa,
                     diaSemana,
-                    dataJustificativaIso: dtJustificativa ? dtJustificativa.toISOString().split('T')[0] : '',
-                    dataSolicitacaoIso: dtSolicitacao ? dtSolicitacao.toISOString().split('T')[0] : '',
+                    dataJustificativaIso: dtJustificativa ? `${dtJustificativa.getFullYear()}-${String(dtJustificativa.getMonth()+1).padStart(2,'0')}-${String(dtJustificativa.getDate()).padStart(2,'0')}` : '',
+                    dataSolicitacaoIso: dtSolicitacao ? `${dtSolicitacao.getFullYear()}-${String(dtSolicitacao.getMonth()+1).padStart(2,'0')}-${String(dtSolicitacao.getDate()).padStart(2,'0')}` : '',
                     matriculaOriginal: rawMat,
                     matricula: mat6D,
                     funcionario,
@@ -1175,6 +1211,7 @@
                     duracaoEstimadaMin,
                     diasDiferenca,
                     classificacaoTemporal,
+                    isEsquecimento: isInclusao && /esqueci|esquecimento|esqueceu|esquecid[ao]/i.test(`${informacao} ${cleanRow['Motivo'] || ''}`),
                     flagsAuditoria: [],
                     flagAuditoriaStr: 'Regular',
                     severidade: 'OK'
@@ -1184,7 +1221,7 @@
             // Segunda passagem: consolidar totais por empregado
             employeeStatsMap = {};
             tempProcessed.forEach(item => {
-                const key = item.matricula || item.funcionario;
+                const key = item.matricula || `SEM-MATRICULA:${item.funcionario}:${item.id}`;
                 if (!employeeStatsMap[key]) {
                     employeeStatsMap[key] = {
                         matricula: item.matricula,
@@ -1194,12 +1231,14 @@
                         grupoRegra: item.grupoRegra,
                         totalSolicitacoes: 0,
                         totalInclusoesBatida: 0,
+                        totalEsquecimentos: 0,
                         totalAbonos: 0,
                         somaDiasPrazo: 0
                     };
                 }
                 employeeStatsMap[key].totalSolicitacoes++;
                 if (item.isInclusao) employeeStatsMap[key].totalInclusoesBatida++;
+                if (item.isEsquecimento) employeeStatsMap[key].totalEsquecimentos++;
                 if (item.isAbono) employeeStatsMap[key].totalAbonos++;
                 employeeStatsMap[key].somaDiasPrazo += item.diasDiferenca;
             });
@@ -1208,20 +1247,30 @@
             processedDataset = tempProcessed.map(item => {
                 const flags = [];
                 let sev = 'OK';
-                const key = item.matricula || item.funcionario;
+                const key = item.matricula || `SEM-MATRICULA:${item.funcionario}:${item.id}`;
                 const empStat = employeeStatsMap[key];
 
-                if (item.diasDiferenca < 0) {
-                    flags.push(`Registro Antecipado (${Math.abs(item.diasDiferenca)}d antes)`);
+                if (!item.dtJustificativa || !item.dtSolicitacao) {
+                    flags.push('Data de ocorrência ou solicitação inválida/ausente: conferir origem');
+                    sev = 'ATENCAO';
+                } else if (item.diasDiferenca < 0) {
+                    // Solicitação prévia pode ser exigida pelo art. 12; não constitui infração isoladamente.
+                    item.classificacaoTemporal = 'Antecipada / Programada';
+                } else if (item.diasDiferenca > 0) {
+                    // Art. 12: há exceções, distinção entre ocorrência previsível/imprevisível e fechamento.
+                    flags.push(`Solicitação posterior à ocorrência (${item.diasDiferenca}d): verificar hipóteses do art. 12`);
                     sev = 'ATENCAO';
                 }
-
-                if (item.diasDiferenca > 7) {
-                    flags.push(`Atraso Superior a 7 dias (${item.diasDiferenca}d)`);
-                    sev = 'CRITICO';
-                } else if (item.diasDiferenca > 5) {
-                    flags.push(`Atraso Superior a 5 dias (${item.diasDiferenca}d)`);
-                    if (sev !== 'CRITICO') sev = 'ATENCAO';
+                const approvedAt = parseBrDate(item.dataAprovacao);
+                if (approvedAt && item.dtSolicitacao) {
+                    const diffHours = (approvedAt.getTime() - item.dtSolicitacao.getTime()) / 3600000;
+                    if (diffHours > 24) {
+                        flags.push(`Aprovação em ${diffHours.toFixed(1)}h: conferir prazo (Norma art. 12 x Manual p. 4)`);
+                        sev = 'ATENCAO';
+                    } else if (diffHours < 0) {
+                        flags.push('Aprovação anterior à solicitação: conferir datas');
+                        sev = 'ATENCAO';
+                    }
                 }
 
                 const infoClean = item.informacao.trim().toLowerCase();
@@ -1230,24 +1279,23 @@
                     if (sev !== 'CRITICO') sev = 'ATENCAO';
                 }
 
-                // Regra de tolerância: até 4 inclusões é permitido; acima de 4 dispara Reincidente (5-6) ou Crítico (7+)
-                if (empStat.totalInclusoesBatida >= 7) {
-                    flags.push(`Excesso Crítico de Inclusões de Batida (${empStat.totalInclusoesBatida}x — limite: 4)`);
-                    sev = 'CRITICO';
-                } else if (empStat.totalInclusoesBatida >= 5) {
-                    flags.push(`Reincidente: Acima do Limite de 4 Inclusões de Batida (${empStat.totalInclusoesBatida}x)`);
+                // Apenas os registros textualmente identificados como esquecimento
+                // integram esta triagem; não há inferência de motivo para os demais ajustes.
+                if (selectedCompetence && item.isEsquecimento && empStat.totalEsquecimentos > 4) {
+                    flags.push(`Possível excesso de esquecimentos identificados (${empStat.totalEsquecimentos}/mês; Norma art. 7º, §3º)`);
                     if (sev !== 'CRITICO') sev = 'ATENCAO';
                 }
 
                 const isMotivo12x36 = item.motivo.toLowerCase().includes('12x36') || item.informacao.toLowerCase().includes('12x36');
                 const isLocRevezamento = item.grupoRegra.toLowerCase().includes('revezamento') || item.localizacaoOriginal.toLowerCase().includes('12x36');
                 if (isMotivo12x36 && !isLocRevezamento) {
-                    flags.push('Divergência Escala 12x36 vs Lotação');
-                    sev = 'CRITICO';
+                    flags.push('Possível divergência textual 12x36 vs localização: confirmar escala cadastrada');
+                    if (sev !== 'CRITICO') sev = 'ATENCAO';
                 }
 
                 item.totalOcorrenciasColab = empStat.totalSolicitacoes;
                 item.totalInclusoesColab = empStat.totalInclusoesBatida;
+                item.totalEsquecimentosColab = empStat.totalEsquecimentos;
                 item.classificacaoInclusao = getInclusionClassification(empStat.totalInclusoesBatida);
                 item.flagsAuditoria = flags;
                 item.flagAuditoriaStr = flags.length > 0 ? flags.join(' | ') : 'Regular';
@@ -1268,16 +1316,16 @@
             document.getElementById('tabAlertCounter').textContent = alertsTotal;
 
             const validDates = processedDataset.map(d => d.dtJustificativa).filter(Boolean).sort((a, b) => a - b);
-            if (validDates.length > 0) {
-                document.getElementById('loadedDateRange').textContent = `Período das ocorrências: ${formatDateOnly(validDates[0])} a ${formatDateOnly(validDates[validDates.length - 1])}`;
-            }
+            document.getElementById('loadedDateRange').textContent = validDates.length > 0
+                ? `Período das ocorrências: ${formatDateOnly(validDates[0])} a ${formatDateOnly(validDates[validDates.length - 1])}`
+                : 'Período não identificável na base';
 
             populateFilterOptions();
             applyFilters();
             renderEmployeeTab();
             renderUnitTab();
             renderAlertsTab();
-            showToast(`Planilha processada! ${processedDataset.length} registros analisados.`, 'success');
+            if (!preserveCompetence) showToast(`Planilha processada! ${processedDataset.length} registros na competência selecionada.`, 'success');
         }
 
         // =========================================================================
@@ -1424,8 +1472,8 @@
             const treCount = filteredDataset.filter(d => d.motivo.toLowerCase().includes('tre')).length;
             const esc12Count = filteredDataset.filter(d => d.motivo.toLowerCase().includes('12x36')).length;
 
-            const acimaLimite4 = Object.values(employeeStatsMap).filter(e => e.totalInclusoesBatida >= 5).length;
-            const atrasosCriticos = filteredDataset.filter(d => d.diasDiferenca > 7).length;
+            const acimaLimite4 = Object.values(employeeStatsMap).filter(e => e.totalEsquecimentos >= 5).length;
+            const atrasosCriticos = filteredDataset.filter(d => d.flagsAuditoria.some(f => f.startsWith('Aprovação em '))).length;
 
             const cards = [
                 {
@@ -1449,8 +1497,8 @@
                 {
                     icon: 'fa-shield-virus',
                     color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60',
-                    title: 'Tolerância de Batidas & Prazos',
-                    text: `<strong>${acimaLimite4}</strong> empregado(s) ultrapassaram o limite de 4 inclusões de batida (≥5) e <strong>${atrasosCriticos}</strong> pedido(s) tiveram atraso > 7d.`
+                    title: 'Triagem Normativa • Controle de Jornada',
+                    text: `<strong>${acimaLimite4}</strong> empregado(s) com mais de 4 possíveis esquecimentos na competência e <strong>${atrasosCriticos}</strong> aprovação(ões) acima de 24h, sujeitas a conferência normativa.`
                 }
             ];
 
@@ -1749,13 +1797,11 @@
 
             tbody.innerHTML = list.map((emp, idx) => {
                 const avgDelay = (emp.somaDiasPrazo / (emp.totalSolicitacoes || 1)).toFixed(1);
-                let riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Regular (0)</span>`;
-                if (emp.totalInclusoesBatida >= 7) {
-                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">Crítico (7+)</span>`;
-                } else if (emp.totalInclusoesBatida >= 5) {
-                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Reincidente (5 a 6)</span>`;
-                } else if (emp.totalInclusoesBatida >= 1) {
-                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">Dentro do Limite (1 a 4)</span>`;
+                let riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">Sem esquecimentos identificados</span>`;
+                if (selectedCompetence && emp.totalEsquecimentos > 4) {
+                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Conferir ${emp.totalEsquecimentos} esquecimentos</span>`;
+                } else if (emp.totalEsquecimentos > 0) {
+                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">${emp.totalEsquecimentos} possível(is) esquecimento(s)</span>`;
                 }
 
                 return `
@@ -1837,8 +1883,8 @@
             const item = processedDataset.find(d => d.id === id);
             if (!item) return;
 
-            document.getElementById('modalTitle').textContent = `${escapeHtml(item.funcionario)} (${escapeHtml(item.matricula)})`;
-            document.getElementById('modalSubtitle').textContent = `${escapeHtml(item.departamentoOriginal)} • Gestor: ${item.gestor}`;
+            document.getElementById('modalTitle').textContent = `${item.funcionario} (${item.matricula})`;
+            document.getElementById('modalSubtitle').textContent = `${item.departamentoOriginal} • Gestor: ${item.gestor}`;
 
             const flagsHtml = item.flagsAuditoria.length > 0
                 ? item.flagsAuditoria.map(f => `<div class="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(f)}</div>`).join('')
@@ -1858,7 +1904,7 @@
                     <div><span class="text-slate-400 block">Data da Solicitação:</span><strong>${escapeHtml(item.dataSolicitacaoStr)} (${escapeHtml(item.classificacaoTemporal)}: ${item.diasDiferenca}d)</strong></div>
                     <div><span class="text-slate-400 block">Tipo & Motivo:</span><strong>${escapeHtml(item.tipo)} — ${escapeHtml(item.motivo)}</strong></div>
                     <div><span class="text-slate-400 block">Horário / Intervalo & Duração:</span><strong>${escapeHtml(item.horarioOuIntervalo)} ${item.duracaoEstimadaMin > 0 ? `(${item.duracaoEstimadaMin} min)` : ''}</strong></div>
-                    <div><span class="text-slate-400 block">Histórico do Empregado na Base:</span><strong>${item.totalOcorrenciasColab} solicitação(ões) • ${item.totalInclusoesColab} inclusão(ões) batida (${escapeHtml(item.classificacaoInclusao)})</strong></div>
+                    <div><span class="text-slate-400 block">Histórico do Empregado na Base:</span><strong>${item.totalOcorrenciasColab} solicitação(ões) • ${item.totalInclusoesColab} inclusão(ões) batida (volume informativo) • ${item.totalEsquecimentosColab} possíveis esquecimentos identificados</strong></div>
                     <div><span class="text-slate-400 block">Status & Aprovação:</span><strong>${escapeHtml(item.status)} ${item.dataAprovacao ? `(${escapeHtml(item.dataAprovacao)})` : ''}</strong></div>
                     <div class="sm:col-span-2"><span class="text-slate-400 block">Texto Informado pelo Empregado:</span><p class="mt-1 p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">${item.informacao ? escapeHtml(item.informacao) : '<em>Sem texto informado</em>'}</p></div>
                 </div>
@@ -2042,13 +2088,8 @@
                     cStatus.fill = styles.FILL_RED; cStatus.font = styles.FONT_RED;
                 }
 
-                // Colorir Qtd Inclusões (Limite até 4 normal; 5-6 Reincidente; 7+ Crítico)
-                const cQtdInc = row.getCell('qtdInc');
-                if (data.qtdInc >= 7) {
-                    cQtdInc.fill = styles.FILL_RED; cQtdInc.font = styles.FONT_RED;
-                } else if (data.qtdInc >= 5) {
-                    cQtdInc.fill = styles.FILL_AMBER; cQtdInc.font = styles.FONT_AMBER;
-                }
+                // Volume de inclusões: informação quantitativa, não violação normativa.
+                row.getCell('qtdInc').alignment = { vertical: 'middle', horizontal: 'center' };
 
                 // Colorir Auditoria
                 const cAud = row.getCell('auditoria');
@@ -2086,7 +2127,7 @@
                 inc: e.totalInclusoesBatida,
                 abono: e.totalAbonos,
                 media: Number((e.somaDiasPrazo / (e.totalSolicitacoes || 1)).toFixed(1)),
-                risco: getInclusionClassification(e.totalInclusoesBatida)
+                risco: `${e.totalInclusoesBatida} inclusões (volume)`
             }));
 
             return setupStyledSheet(sheetTitle, colsEmp, rowsEmp, (row, data) => {
@@ -2220,7 +2261,7 @@
                 const reprovadas = processedDataset.filter(d => d.status.toLowerCase().includes('reprovad')).length;
                 const alertsCount = processedDataset.filter(d => d.flagsAuditoria.length > 0).length;
                 const avgLead = Number((processedDataset.reduce((a, b) => a + b.diasDiferenca, 0) / (total || 1)).toFixed(2));
-                const empAcimaLimite4 = Object.values(employeeStatsMap).filter(e => e.totalInclusoesBatida >= 5).length;
+                const empAcimaLimite4 = selectedCompetence ? Object.values(employeeStatsMap).filter(e => e.totalEsquecimentos >= 5).length : 0;
 
                 const addSectionBanner = (title) => {
                     const r = wsResumo.addRow({ indicador: title, valor: '', obs: '' });
@@ -2251,7 +2292,7 @@
                 addKpiRow('Solicitações Pendentes', pendentes, `${((pendentes / total) * 100).toFixed(1)}%`, FILL_AMBER, FONT_AMBER);
                 addKpiRow('Solicitações Reprovadas', reprovadas, `${((reprovadas / total) * 100).toFixed(1)}%`);
                 addKpiRow('Média de Dias entre Ocorrência e Solicitação', avgLead, 'Dias corridos médios');
-                addKpiRow('Empregados Acima do Limite de 4 Inclusões (≥5)', empAcimaLimite4, 'Reincidente (5-6) ou Crítico (7+)', empAcimaLimite4 > 0 ? FILL_AMBER : FILL_GREEN, empAcimaLimite4 > 0 ? FONT_AMBER : FONT_GREEN);
+                addKpiRow('Possíveis esquecimentos >4 no mês', empAcimaLimite4, selectedCompetence ? 'Triagem textual, conferir motivo' : 'Selecione uma competência', empAcimaLimite4 > 0 ? FILL_AMBER : FILL_GREEN, empAcimaLimite4 > 0 ? FONT_AMBER : FONT_GREEN);
                 addKpiRow('Registros com Pontos de Atenção (Auditoria)', alertsCount, `${((alertsCount / total) * 100).toFixed(1)}%`, FILL_RED, FONT_RED);
 
                 const appendDistBlock = (bannerTitle, extractor) => {
