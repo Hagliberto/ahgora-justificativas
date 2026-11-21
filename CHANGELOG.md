@@ -1,3 +1,12 @@
+## [2.7.0] - 2026-11-21
+
+- Importação em lote (seleção múltipla e arrastar/soltar) e acréscimo posterior de planilhas à mesma análise.
+- Consolidação de linhas e descarte de duplicidades exatamente iguais; exibição de fontes e contadores.
+- Competência única, editável e independente dos meses de ocorrência, sem separar rankings por mês.
+- Ranking de possíveis esquecimentos por empregado e distribuição visual, com exportação `.xlsx` própria.
+- Relatório normativo distingue volume consolidado de excesso mensal confirmado.
+- Novos testes para importação múltipla, deduplicação e ranking consolidado.
+
 ## [2.6.0] - 2026-11-21
 
 ### Dashboard e inclusões de batida

@@ -18,8 +18,8 @@ test('seis KPIs avançados e a tabela de gestores estão presentes', () => {
 });
 
 test('erros de processamento não são confundidos com falhas de leitura da planilha', () => {
-  assert.match(html, /Falha no processamento ou na interface/);
-  assert.match(html, /Não foi possível interpretar a planilha/);
+  assert.match(html, /Falha ao processar base consolidada/);
+  assert.match(html, /Erro na importação/);
   assert.doesNotMatch(html, /Falha ao ler a planilha\. Verifique se o arquivo não está protegido por senha/);
 });
 

@@ -26,7 +26,7 @@ test('estrutura mínima da aplicação preservada', () => {
     for (const id of ['analyticsDashboard', 'tabOverview', 'tabRecords', 'tabEmployees', 'tabUnits', 'tabAlerts', 'fileInput']) {
         assert.ok(html.includes(`id="${id}"`), `Elemento ${id}`);
     }
-    for (const name of ['processUploadedFile','processDataset','exportStyledExcel','exportFilteredRecordsExcel','exportFilteredEmployeesExcel','escapeHtml']) {
+    for (const name of ['processUploadedFiles','processDataset','exportStyledExcel','exportFilteredRecordsExcel','exportFilteredEmployeesExcel','escapeHtml']) {
         assert.ok(html.includes(`function ${name}(`));
     }
 });

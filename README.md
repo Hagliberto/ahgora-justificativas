@@ -1,12 +1,26 @@
+# Ahgora Justificativas — v2.7.0
+
+## Novo: importação múltipla e ranking por competência única
+
+- Selecione várias planilhas `.xlsx`, `.xls` ou `.csv` em um só upload ou clique em **Adicionar planilhas** após processar a primeira. Também suporta soltar vários arquivos.
+- O sistema valida as colunas de cada arquivo e consolida os registros em uma **única competência**, identificada na appbar (padrão: `Consolidada`). Datas de meses diferentes são preservadas, sem separar o ranking por mês.
+- Arquivos repetidos (nome, tamanho e data de modificação idênticos) são ignorados; linhas **exatamente iguais nas colunas reconhecidas** são contabilizadas apenas uma vez. Alterações em qualquer campo podem produzir registros distintos; duplicidades semânticas exigem conferência.
+- O Dashboard apresenta o ranking de inclusões (tratadas operacionalmente como possíveis esquecimentos) e esquecimentos com texto explícito por empregado, a distribuição de 0, 1, 2, 3, 4 e 5+ casos, e exportação do ranking com filtros ativos.
+- A mesma base consolidada alimenta as abas, o relatório de inconformidades, as exportações por unidade e o ZIP. É possível limpar toda a base e começar novamente.
+- **Ressalva normativa:** a Norma art. 7º, §3º, trata de até quatro validações **por mês**. Um total de cinco ou mais na competência consolidada (que pode durar vários meses) **não comprova** infração mensal. A análise normativa exige verificação no sistema de origem das datas e das efetivas validações. Inclusões genéricas não são automaticamente esquecimentos comprovados.
+- Dados importados ficam em memória no navegador; recarregar a página remove a sessão. Evite compartilhar planilhas contendo dados pessoais.
+
+---
+
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.6.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.7.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
 
 ## Como executar
 
 1. Baixe/descompacte o projeto e abra `index.html` em um navegador atualizado conectado à internet para carregar as bibliotecas externas.
 2. Importe um `.xlsx`, `.xls` ou `.csv` do Ahgora (primeira aba) ou use a demonstração em **Configurações**.
-3. Selecione a **competência MM/AAAA** (a mais recente é selecionada por padrão). A opção “Todas” é exploratória e desativa a checagem mensal do limite de esquecimentos.
+3. A competência é **única e consolidada**, podendo abranger registros de vários meses; altere seu identificador na appbar conforme a apuração. Não há segmentação automática por mês.
 4. No **Dashboard & Insights**, selecione filtros globais de período, empregado, gestor, filial, regime e auditoria. Os filtros complementares da aba **Base Tratada** também afetam os gráficos, KPIs e demais abas.
 5. Explore **Base Tratada**, **Empregados**, **Unidades** e **Alertas**. Use **Limpar globais** para limpar apenas filtros globais ou **Limpar filtros** na base tratada para limpar os filtros complementares.
 6. Exporte o **Dashboard XLSX** (resumo, gestores, registros filtrados), os registros filtrados, o ranking ou o relatório analítico completo em `.xlsx`. O botão de exportação analítica completa não segue necessariamente o recorte global: use o botão dedicado do Dashboard para exportar a seleção.
@@ -67,7 +81,7 @@ A versão original estava na `main` com a árvore limpa; esta entrega **não alt
 
 O sistema **sinaliza** registros para conferência e não decide automaticamente a validade jurídica ou administrativa de uma justificativa. Os parâmetros atuais de 4 inclusões, 5/7 dias e escala 12x36 vêm do código recebido; precisam de confirmação formal na norma aplicável e no período de apuração. Consulte [regras](docs/REGRAS_DE_NEGOCIO.md) e [homologação](docs/HOMOLOGACAO.md).
 
-## Mudanças da versão 2.6.0
+## Mudanças das versões anteriores (histórico)
 - Navegação por botões discretos na appbar e competência em seletor compacto.
 - Aviso normativo recolhido em ícone informativo acessível.
 - Navegação hierárquica: Unidades → Empregados → Ficha individual.

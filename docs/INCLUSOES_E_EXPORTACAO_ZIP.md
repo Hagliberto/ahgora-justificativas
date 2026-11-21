@@ -1,15 +1,15 @@
-# Dashboard de inclusões e exportação ZIP — v2.6.0
+# Dashboard de inclusões e exportação ZIP — v2.7.0
 
 ## Filtros globais
 
-`globalUnit` filtra registros por nome da unidade (`deptNome`) em conjunto com datas, gestor, matrícula, filial, regime e auditoria. Por padrão todas as unidades. A competência inicial continua `Todas as competências`.
+`globalUnit` filtra registros por nome da unidade (`deptNome`) em conjunto com datas, gestor, matrícula, filial, regime e auditoria. Por padrão todas as unidades. A competência inicial é única, `Consolidada`, e pode abranger vários meses.
 
 ## Esquecimentos
 
 - **Inclusões de batida:** todos os ajustes classificados no Ahgora como inclusão.
 - **Possíveis esquecimentos:** subconjunto cuja informação ou motivo menciona esquecimento.
 - **Outras inclusões:** inclusões sem evidência textual de esquecimento, que podem demandar conferência; não se conclui que sejam ou não esquecimentos.
-- **Empregados com 5+ possíveis esquecimentos/mês:** conta as ocorrências na base da competência do evento por matrícula; a filtragem visual não altera a contagem mensal usada para sinalização.
+- **Empregados com 5+ no lote:** volume total de inclusões por matrícula na competência consolidada; não constitui descumprimento do limite mensal.
 
 Norma NN.DD.P.A.06.0008.05, art. 7º, §3º. A classificação é preventiva, nunca uma conclusão automática de infração.
 

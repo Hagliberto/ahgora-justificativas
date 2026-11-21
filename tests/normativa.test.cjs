@@ -33,6 +33,6 @@ test('inclusão comum não é confundida com esquecimento', () => {
 });
 test('seletor de competência está conectado à reapuração', () => {
   assert.match(html, /id="competenceSelect"[^>]*onchange="changeCompetence\(\)"/);
-  assert.match(html, /const scopedRows = selectedCompetence \?/);
-  assert.match(html, /selectedCompetence && item\.isEsquecimento && empStat\.totalEsquecimentos > 4/);
+  assert.match(html, /const scopedRows = rows;/);
+  assert.match(html, /selectedCompetence = document\.getElementById\('competenceSelect'\)\.value/);
 });

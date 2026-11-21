@@ -15,9 +15,10 @@ test('botão da appbar abre modal e exporta escopo selecionado', () => {
  assert.match(html, /const processedDataset = exportRows/);
  assert.match(html, /async function confirmExportSelection\(\)/);
 });
-test('todas as competências é seleção padrão', () => {
- assert.match(html, /if \(!preserveCompetence\) selectedCompetence = '';/);
- assert.match(html, /new Option\('Todas as competências', ''\)/);
+test('competência única consolidada sem filtro por mês de ocorrência', () => {
+ assert.match(html, /value="Consolidada"/);
+ assert.match(html, /const scopedRows = rows;/);
+ assert.match(html, /function changeCompetence\(\)/);
 });
 test('navegação por unidade e matrícula possui rota própria', () => {
  assert.match(html, /location.hash = '#\/unidades\/'/);

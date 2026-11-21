@@ -188,7 +188,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.6.0 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.7.0 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -245,7 +245,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.6.0</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.7.0</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -258,7 +258,7 @@
             <!-- Navegação compacta na barra superior -->
             <div id="appbarTools" class="hidden flex-1 min-w-[280px] items-center justify-end gap-2 flex-wrap order-3 xl:order-none">
                 <label for="competenceSelect" class="sr-only">Competência da auditoria</label>
-                <select id="competenceSelect" aria-label="Competência da auditoria" title="Competência da auditoria" onchange="changeCompetence()" class="max-w-40 bg-white/10 text-white border border-white/20 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-white/40 [&>option]:text-slate-900"><option value="">Todas as competências</option></select>
+                <input id="competenceSelect" type="text" maxlength="40" value="Consolidada" aria-label="Identificação da competência única" title="Competência consolidada: pode compreender mais de um mês" onchange="changeCompetence()" class="w-32 bg-white/10 text-white border border-white/20 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-white/40" />
                 <nav aria-label="Navegação das análises" class="flex items-center gap-1 overflow-x-auto max-w-full">
                     <button onclick="switchTab('tabOverview')" id="btn-tabOverview" class="tab-btn border border-white/15 active-tab px-2 py-1.5 rounded-lg text-[11px] font-semibold transition flex items-center gap-2 whitespace-nowrap cursor-pointer bg-white text-caern-primary shadow">
                         <i class="fa-solid fa-chart-pie"></i>
@@ -300,7 +300,7 @@
             <!-- Ações da AppBar (Somente Ícones + Único Botão de Download) -->
             <div class="flex items-center gap-2.5">
                 <!-- Novo Upload Rápido (visível após carga) -->
-                <button id="btnNewUpload" onclick="document.getElementById('fileInput').click()" data-tooltip="Importar Nova Planilha" class="hidden icon-btn w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center transition cursor-pointer">
+                <button id="btnNewUpload" onclick="document.getElementById('fileInput').click()" data-tooltip="Adicionar mais planilhas" class="hidden icon-btn w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center transition cursor-pointer">
                     <i class="fa-solid fa-folder-open text-base"></i>
                 </button>
 
@@ -343,15 +343,15 @@
                 <!-- DropZone -->
                 <div class="lg:w-7/12">
                     <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-caern-secondary/45 dark:border-sky-500/40 rounded-2xl p-6 sm:p-8 text-center cursor-pointer hover:border-caern-secondary hover:bg-caern-light/40 dark:hover:bg-slate-800/50 transition-all duration-200 group">
-                        <input type="file" id="fileInput" aria-label="Selecionar planilha de justificativas Ahgora" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
+                        <input type="file" id="fileInput" aria-label="Selecionar planilha de justificativas Ahgora" accept=".xlsx,.xls,.csv" multiple class="hidden" onchange="handleFileSelect(event)">
                         <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-caern-light dark:bg-slate-800 text-caern-primary dark:text-sky-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
                         <p class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100">
-                            Arraste e solte a planilha Ahgora aqui ou <span class="text-caern-secondary dark:text-sky-400 underline">clique para selecionar</span>
+                            Arraste e solte uma ou várias planilhas Ahgora aqui ou <span class="text-caern-secondary dark:text-sky-400 underline">clique para selecionar</span>
                         </p>
                         <p id="fileStatusText" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
-                            Dica: Caso queira testar o painel imediatamente, clique no ícone <i class="fa-solid fa-gear text-caern-primary dark:text-sky-400"></i> no canto superior direito e carregue os dados de demonstração.
+                            É possível selecionar vários arquivos de uma vez ou adicionar outros depois. Dica: para testar, clique no ícone <i class="fa-solid fa-gear text-caern-primary dark:text-sky-400"></i> no canto superior direito e carregue os dados de demonstração.
                         </p>
                     </div>
                 </div>
@@ -360,6 +360,10 @@
 
         <!-- Painel Principal Organizado em Abas (Exibido após carga) -->
         <div id="analyticsDashboard" class="hidden space-y-5 w-full">
+            <section class="glass-card rounded-xl px-4 py-3 flex flex-wrap justify-between items-center gap-3" aria-label="Fontes importadas">
+                <div class="min-w-0"><p class="text-xs font-bold text-slate-700 dark:text-slate-200">Planilhas consolidadas na competência <span id="importCompetenceLabel">Consolidada</span></p><div id="importedFilesList" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Nenhuma planilha</div><p id="importDedupSummary" class="text-[11px] text-slate-500 mt-1"></p></div>
+                <div class="flex gap-2"><button type="button" onclick="document.getElementById('fileInput').click()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-caern-primary text-white"><i class="fa-solid fa-plus mr-1"></i>Adicionar planilhas</button><button type="button" onclick="resetImportedFiles()" class="px-3 py-2 rounded-lg text-xs border border-slate-300 dark:border-slate-600">Limpar base</button></div>
+            </section>
 
             <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 px-1">
                 <i class="fa-solid fa-file-circle-check text-emerald-600"></i>
@@ -387,9 +391,9 @@
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Gestor<select id="globalManager" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Filial<select id="globalBranch" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todas</option></select></label>
                     <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Regime<select id="globalRegime" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option></select></label>
-                    <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Auditoria<select id="globalRisk" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option><option value="alerts">Com sinalização</option><option value="ok">Sem sinalização</option><option value="late">Aprovação acima de 24h*</option><option value="forgotten">Esquecimento identificado</option><option value="inclusions">Todas as inclusões de batida</option><option value="other-inclusions">Inclusões sem indicação de esquecimento</option><option value="recurrent-forgotten">Empregados com 5+ possíveis esquecimentos no mês</option></select></label>
+                    <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Auditoria<select id="globalRisk" onchange="applyFilters()" class="block mt-1 w-full rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2 py-2 text-xs"><option value="">Todos</option><option value="alerts">Com sinalização</option><option value="ok">Sem sinalização</option><option value="late">Aprovação acima de 24h*</option><option value="forgotten">Esquecimento identificado</option><option value="inclusions">Todas as inclusões de batida</option><option value="other-inclusions">Inclusões sem indicação de esquecimento</option><option value="recurrent-forgotten">Empregados com 5+ possíveis esquecimentos na competência</option></select></label>
                 </div>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400">* Prazo exibido para conferência: Norma art. 12 e Manual apresentam orientações diferentes. Contagem de esquecimentos considera toda a competência, mesmo com filtros ativos.</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">* Prazo exibido para conferência: Norma art. 12 e Manual apresentam orientações diferentes. A competência consolidada pode reunir meses distintos; o limite de quatro da Norma é mensal, portanto o ranking não prova excesso normativo.</p>
             </section>
 
             <!-- ===================================================================== -->
@@ -560,13 +564,19 @@
                       <div class="rounded-xl bg-sky-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Inclusões de batida</p><p id="punchTotal" class="text-2xl font-bold text-sky-700 dark:text-sky-300">0</p></div>
                       <div class="rounded-xl bg-teal-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Possíveis esquecimentos</p><p id="punchForgotten" class="text-2xl font-bold text-teal-700 dark:text-teal-300">0</p></div>
                       <div class="rounded-xl bg-amber-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Inclusões sem indicação de esquecimento</p><p id="punchOther" class="text-2xl font-bold text-amber-700 dark:text-amber-300">0</p></div>
-                      <div class="rounded-xl bg-rose-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Empregados com 5+ possíveis esquecimentos / mês</p><p id="punchRecurrent" class="text-2xl font-bold text-rose-700 dark:text-rose-300">0</p></div>
+                      <div class="rounded-xl bg-rose-50 dark:bg-slate-800 p-3"><p class="text-xs text-slate-600 dark:text-slate-300">Empregados com 5+ possíveis esquecimentos (competência)</p><p id="punchRecurrent" class="text-2xl font-bold text-rose-700 dark:text-rose-300">0</p></div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div><h4 class="text-xs font-bold mb-2">Distribuição das inclusões</h4><div class="relative h-56"><canvas id="chartPunchTypes"></canvas></div></div>
                       <div><h4 class="text-xs font-bold mb-2">Empregados com mais possíveis esquecimentos</h4><div class="relative h-56"><canvas id="chartPunchEmployees"></canvas></div></div>
                     </div>
-                    <p class="text-[11px] text-slate-500">O limite de quatro validações refere-se a esquecimentos, conforme Norma art. 7º, §3º. A contagem é por empregado e competência do evento; registros textuais são indícios e exigem verificação. Sem competência selecionada, são consideradas as competências de cada registro separadamente.</p>
+                    <p class="text-[11px] text-slate-500">O ranking reúne todos os meses abrangidos pela competência importada. A norma prevê quatro validações por esquecimento por mês (art. 7º, §3º): superar quatro no período consolidado NÃO comprova descumprimento mensal. Registros textuais exigem conferência.</p>
+                 </section>
+                 <section class="glass-card rounded-2xl p-5 space-y-4" aria-label="Ranking de esquecimentos por competência consolidada">
+                    <div class="flex justify-between items-center flex-wrap gap-2"><div><h3 class="font-bold text-base"><i class="fa-solid fa-ranking-star text-teal-600 mr-2"></i>Ranking de inclusões / esquecimentos • competência consolidada</h3><p class="text-xs text-slate-500">Abrange todos os meses de ocorrência incluídos nos arquivos; respeita os filtros do Dashboard</p></div><button onclick="exportForgottenRanking()" type="button" class="rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2"><i class="fa-solid fa-file-excel mr-1"></i>Exportar ranking</button></div>
+                    <div id="forgottenDistribution" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+                    <div class="overflow-x-auto max-h-[400px] rounded-xl border border-slate-200 dark:border-slate-700"><table class="w-full text-xs text-left"><thead class="sticky top-0 bg-caern-primary text-white"><tr><th class="p-3">#</th><th class="p-3">Empregado</th><th class="p-3">Matrícula</th><th class="p-3">Unidade</th><th class="p-3">Inclusões (volume)</th><th class="p-3">Com descrição de esquecimento</th><th class="p-3">Abrir</th></tr></thead><tbody id="forgottenRankBody"></tbody></table></div>
+                    <p class="text-[11px] text-slate-500">Para este ranking, toda inclusão de batida é contabilizada como possível esquecimento operacional, mas somente textos que indiquem esquecimento entram na triagem específica da Norma. O volume consolidado não comprova infração mensal.</p>
                  </section>
                  <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" aria-label="Análise gerencial complementar">
                     <div class="glass-card rounded-2xl p-5"><h3 class="font-bold text-sm sm:text-base">Status das solicitações</h3><p class="text-xs text-slate-500 mb-3">Situação atual na base importada</p><div class="relative h-64"><canvas id="chartStatus"></canvas></div></div>
@@ -887,7 +897,9 @@
 
         let fullImportedDataset = [];
         let currentDatasetLabel = '';
-        let selectedCompetence = '';
+        let selectedCompetence = 'Consolidada';
+        let importedFiles = [];
+        let duplicateImportRows = 0;
         const ESSENTIAL_COLUMNS = ['Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário', 'Tipo', 'Status'];
         const EXPECTED_COLUMNS = [
             'Data solicitação', 'Data da justificativa', 'Matrícula', 'Funcionário',
@@ -1111,78 +1123,107 @@
         });
         dropZone.addEventListener('drop', (e) => {
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                processUploadedFile(e.dataTransfer.files[0]);
+                processUploadedFiles(e.dataTransfer.files);
             }
         });
 
         function handleFileSelect(e) {
-            if (e.target.files && e.target.files.length > 0) {
-                processUploadedFile(e.target.files[0]);
-            }
+            if (e.target.files?.length) processUploadedFiles(e.target.files);
+            e.target.value = ''; // permite selecionar novamente o mesmo arquivo após limpar
         }
 
         // =========================================================================
         // 4. LEITURA E VALIDAÇÃO DE ARQUIVOS (.XLSX, .XLS, .CSV)
         // =========================================================================
-        function processUploadedFile(file) {
-            const validExts = ['.xlsx', '.xls', '.csv'];
-            const fileNameLower = file.name.toLowerCase();
-            if (!validExts.some(ext => fileNameLower.endsWith(ext))) {
-                showToast('Formato inválido! Envie arquivos .xlsx, .xls ou .csv exportados do Ahgora.', 'error');
-                return;
+        // Upload de várias fontes: validar cada uma ANTES de modificar a base em uso.
+        // Duplicação de linhas idênticas em arquivos sobrepostos é eliminada no conjunto.
+        function importedRowKey(row) {
+            return JSON.stringify(EXPECTED_COLUMNS.map(col => String(row[col] ?? '').trim().normalize('NFC')));
+        }
+        function mergeImportedRows(sources) {
+            const seen = new Set();
+            const result = [];
+            let duplicates = 0;
+            for (const source of sources) for (const row of source.rows) {
+                const key = importedRowKey(row);
+                if (seen.has(key)) { duplicates++; continue; }
+                seen.add(key);
+                result.push(row);
             }
-
-            if (file.size > 25 * 1024 * 1024) {
-                showToast('Arquivo maior que 25 MB. Divida a exportação por período.', 'error');
-                return;
-            }
-            currentSourceName = file.name.replace(/\.[^/.]+$/, "");
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            return {rows: result, duplicates};
+        }
+        function renderImportedSources() {
+            document.getElementById('importCompetenceLabel').textContent = selectedCompetence;
+            const list = document.getElementById('importedFilesList');
+            list.replaceChildren();
+            importedFiles.forEach(source => {
+                const chip = document.createElement('span');
+                chip.className = 'inline-block mr-2 mb-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800';
+                chip.textContent = `${source.name} (${source.rows.length} linhas)`;
+                list.append(chip);
+            });
+            document.getElementById('importDedupSummary').textContent = `${importedFiles.length} arquivo(s) · ${fullImportedDataset.length} registro(s) distintos · ${duplicateImportRows} duplicidade(s) exata(s) desconsiderada(s)`;
+        }
+        function resetImportedFiles() {
+            if (!confirm('Limpar todos os arquivos e os dados desta análise?')) return;
+            importedFiles = []; duplicateImportRows = 0; fullImportedDataset = [];
+            rawDataset = []; processedDataset = []; filteredDataset = [];
+            document.getElementById('analyticsDashboard').classList.add('hidden');
+            document.getElementById('uploadSection').classList.remove('hidden');
+            document.getElementById('btnNewUpload').classList.add('hidden');
+            document.getElementById('appbarTools').classList.add('hidden');
+            document.getElementById('btnExportSingle').disabled = true;
+            document.getElementById('fileInput').value = '';
+            location.hash = '#/unidades';
+            showToast('Base limpa. Importe uma ou várias planilhas.', 'success');
+        }
+        async function processUploadedFiles(fileList) {
+            const files = Array.from(fileList || []);
+            if (!files.length) return;
+            if (typeof XLSX === 'undefined') { showToast('Leitor de planilhas indisponível.', 'error'); return; }
+            const staged = [];
+            const errors = [];
+            const known = new Set(importedFiles.map(f => f.signature));
+            for (const file of files) {
+                const signature = `${file.name}::${file.size}::${file.lastModified}`;
+                if (known.has(signature)) { errors.push(`${file.name}: arquivo já importado`); continue; }
+                if (!/\.(xlsx|xls|csv)$/i.test(file.name)) { errors.push(`${file.name}: formato não suportado`); continue; }
+                if (file.size > 25 * 1024 * 1024) { errors.push(`${file.name}: excede 25 MB`); continue; }
                 try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', cellDates: false });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-
-                    if (!jsonRows || jsonRows.length === 0) {
-                        showToast('A planilha enviada está vazia.', 'error');
-                        return;
-                    }
-
-                    const fileCols = Object.keys(jsonRows[0]).map(c => c.trim());
-                    
-
-                    const missingEssential = ESSENTIAL_COLUMNS.filter(col => !fileCols.includes(col));
-                    if (missingEssential.length) {
-                        showToast(`Importação bloqueada. Campos obrigatórios ausentes: ${missingEssential.join(', ')}`, 'error');
-                        return;
-                    }
-
-                    // Leitura concluída. Falhas de processamento ou de interface
-                    // não devem ser relatadas como planilha protegida por senha.
-                    try {
-                        processDataset(jsonRows, file.name);
-                    } catch (processingError) {
-                        console.error('Falha no processamento ou na interface:', processingError);
-                        showToast('A planilha foi lida, mas ocorreu um erro ao processar ou exibir os dados. Consulte o console.', 'error');
-                    }
-                } catch (err) {
-                    console.error('Falha ao interpretar o arquivo:', err);
-                    showToast('Não foi possível interpretar a planilha. Verifique o formato e a integridade do arquivo.', 'error');
-                }
-            };
-            reader.onerror = function() {
-                console.error('Falha de leitura do arquivo:', reader.error);
-                showToast('Não foi possível acessar o arquivo selecionado. Tente novamente.', 'error');
-            };
-            reader.readAsArrayBuffer(file);
+                    const workbook = XLSX.read(new Uint8Array(await file.arrayBuffer()), {type:'array', cellDates:false});
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    if (!sheet) throw new Error('A primeira aba está vazia');
+                    const rows = XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false}).map(row =>
+                        Object.fromEntries(Object.entries(row).map(([key,value]) => [key.trim(),value])));
+                    if (!rows.length) throw new Error('Nenhum registro encontrado');
+                    const missing = ESSENTIAL_COLUMNS.filter(col => !Object.hasOwn(rows[0],col));
+                    if (missing.length) throw new Error(`Colunas obrigatórias ausentes: ${missing.join(', ')}`);
+                    staged.push({name:file.name, signature, rows});
+                    known.add(signature);
+                } catch(error) { console.error('Erro na importação:',file.name,error); errors.push(`${file.name}: ${error.message}`); }
+            }
+            if (staged.length) {
+                // Preserva as fontes originais se a renderização falhar, permitindo análise do erro.
+                const nextFiles = [...importedFiles,...staged];
+                const merged = mergeImportedRows(nextFiles);
+                try {
+                    selectedCompetence = document.getElementById('competenceSelect').value.trim() || 'Consolidada';
+                    processDataset(merged.rows, `${nextFiles.length} planilha(s) consolidada(s)`);
+                    importedFiles = nextFiles; duplicateImportRows = merged.duplicates;
+                    currentSourceName = 'Justificativas_Consolidadas_CAERN';
+                    renderImportedSources();
+                    showToast(`${staged.length} planilha(s) adicionada(s); ${merged.rows.length} registros únicos.`, 'success');
+                } catch(error) { console.error('Falha ao processar base consolidada:',error); showToast('Arquivos lidos, mas houve falha no processamento. Consulte o console.', 'error'); }
+            }
+            if (errors.length) { console.warn('Arquivos ignorados:',errors); showToast(`${errors.length} arquivo(s) ignorado(s): ${errors.slice(0,2).join(' | ')}`, 'warning'); }
         }
 
         function loadDemoData() {
             currentSourceName = "Demonstracao_Ahgora_NUPNN_CAERN";
+            importedFiles = [{name:'Demonstração NUPNN',signature:'demo',rows:DEMO_DATA}];
+            duplicateImportRows = 0;
             processDataset(DEMO_DATA, "Base de Demonstração NUPNN (37 registros)");
+            renderImportedSources();
         }
 
         // =========================================================================
@@ -1233,23 +1274,20 @@
         }
 
         function changeCompetence() {
-            selectedCompetence = document.getElementById('competenceSelect').value;
-            processDataset(fullImportedDataset, currentDatasetLabel, true);
+            selectedCompetence = document.getElementById('competenceSelect').value.trim() || 'Consolidada';
+            document.getElementById('competenceSelect').value = selectedCompetence;
+            if (fullImportedDataset.length) {
+                processDataset(fullImportedDataset, currentDatasetLabel, true);
+                renderImportedSources();
+            }
         }
 
         function processDataset(rows, sourceLabel, preserveCompetence = false) {
             fullImportedDataset = rows;
             currentDatasetLabel = sourceLabel;
-            const available = [...new Set(rows.map(r => getCompetence(r['Data da justificativa'])).filter(Boolean))].sort().reverse();
-            if (!preserveCompetence) selectedCompetence = ''; // padrão: todas as competências
-            if (selectedCompetence && !available.includes(selectedCompetence)) selectedCompetence = '';
-            const competenceSelect = document.getElementById('competenceSelect');
-            competenceSelect.replaceChildren();
-            const allOption = new Option('Todas as competências', '');
-            competenceSelect.add(allOption);
-            available.forEach(value => competenceSelect.add(new Option(`${value.slice(5)}/${value.slice(0, 4)}`, value)));
-            competenceSelect.value = selectedCompetence;
-            const scopedRows = selectedCompetence ? rows.filter(r => getCompetence(r['Data da justificativa']) === selectedCompetence) : rows;
+            // Competência é UM identificador para o lote, não o mês da data da ocorrência.
+            selectedCompetence = document.getElementById('competenceSelect').value.trim() || 'Consolidada';
+            const scopedRows = rows;
             rawDataset = scopedRows;
 
             // Primeira passagem: normalização linha a linha
@@ -1460,10 +1498,8 @@
 
                 // Apenas os registros textualmente identificados como esquecimento
                 // integram esta triagem; não há inferência de motivo para os demais ajustes.
-                if (selectedCompetence && item.isEsquecimento && empStat.totalEsquecimentos > 4) {
-                    flags.push(`Possível excesso de esquecimentos identificados (${empStat.totalEsquecimentos}/mês; Norma art. 7º, §3º)`);
-                    if (sev !== 'CRITICO') sev = 'ATENCAO';
-                }
+                // Não sinalizar excesso mensal a partir de competência que cruza meses.
+                // O ranking consolidado é informativo; descumprimento exige apuração mensal individualizada.
 
                 const isMotivo12x36 = item.motivo.toLowerCase().includes('12x36') || item.informacao.toLowerCase().includes('12x36');
                 const isLocRevezamento = item.grupoRegra.toLowerCase().includes('revezamento') || item.localizacaoOriginal.toLowerCase().includes('12x36');
@@ -1569,10 +1605,7 @@
 
         function hasRecurrentForgotten(item) {
             if (!item.isEsquecimento) return false;
-            const month = normMonth(item);
-            if (!month) return false;
-            return processedDataset.filter(d => d.matricula === item.matricula && d.isEsquecimento &&
-                normMonth(d) === month).length >= 5;
+            return processedDataset.filter(d => d.matricula === item.matricula && d.isEsquecimento).length >= 5;
         }
         function focusPunchIssues() {
             document.getElementById('globalRisk').value = 'forgotten';
@@ -1705,7 +1738,7 @@
             const esc12Count = filteredDataset.filter(d => d.motivo.toLowerCase().includes('12x36')).length;
 
             const visibleKeys = new Set(filteredDataset.map(d => d.matricula));
-            const acimaLimite4 = selectedCompetence ? Object.values(employeeStatsMap).filter(e => visibleKeys.has(e.matricula) && e.totalEsquecimentos >= 5).length : 0;
+            const acimaLimite4 = Object.values(employeeStatsMap).filter(e => visibleKeys.has(e.matricula) && e.totalEsquecimentos >= 5).length;
             const atrasosCriticos = filteredDataset.filter(d => d.flagsAuditoria.some(f => f.startsWith('Aprovação em '))).length;
 
             const cards = [
@@ -1731,7 +1764,7 @@
                     icon: 'fa-shield-virus',
                     color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60',
                     title: 'Triagem Normativa • Controle de Jornada',
-                    text: `<strong>${acimaLimite4}</strong> empregado(s) com mais de 4 possíveis esquecimentos na competência e <strong>${atrasosCriticos}</strong> aprovação(ões) acima de 24h, sujeitas a conferência normativa.`
+                    text: `<strong>${acimaLimite4}</strong> empregado(s) com 5+ possíveis esquecimentos no período consolidado (não equivale a excesso mensal) e <strong>${atrasosCriticos}</strong> aprovação(ões) acima de 24h, sujeitas a conferência normativa.`
                 },
                 {
                     icon: 'fa-hourglass-half',
@@ -2178,8 +2211,8 @@
             tbody.innerHTML = list.map((emp, idx) => {
                 const avgDelay = (emp.somaDiasPrazo / (emp.totalSolicitacoes || 1)).toFixed(1);
                 let riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">Sem esquecimentos identificados</span>`;
-                if (selectedCompetence && emp.totalEsquecimentos > 4) {
-                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Conferir ${emp.totalEsquecimentos} esquecimentos</span>`;
+                if (emp.totalEsquecimentos > 4) {
+                    riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">${emp.totalEsquecimentos} no período consolidado (não mensal)</span>`;
                 } else if (emp.totalEsquecimentos > 0) {
                     riskBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">${emp.totalEsquecimentos} possível(is) esquecimento(s)</span>`;
                 }
@@ -2241,14 +2274,14 @@
         // Relatório de gestão: indícios rastreáveis por competência e empregado.
         // Nunca classificar automaticamente como infração nem aplicar sanção.
         function normMonth(item) {
-            return item.dataJustificativaIso ? item.dataJustificativaIso.slice(0, 7) : '';
+            return selectedCompetence || 'Consolidada';
         }
 
         function getConformityFindings(rows, referenceRows = rows) {
             const findings = [];
             const monthly = new Map();
-            // A contagem de esquecimentos é por empregado e competência do evento,
-            // nunca a soma de toda a planilha nem de qualquer inclusão de batida.
+            // Uma competência pode abranger vários meses; total é exploratório.
+            // Não usar o total consolidado para afirmar excesso do limite normativo mensal.
             referenceRows.forEach(item => {
                 const month = normMonth(item);
                 if (!item.isEsquecimento || !item.matricula || !month) return;
@@ -2305,9 +2338,9 @@
                 const item = items.find(x => selectedIds.has(x.id));
                 if (!item) continue;
                 add(item, 'ESQUECIMENTO', 'Norma art. 7º, §§3º e 4º; Manual p. 6',
-                    'Possível excesso mensal de esquecimentos',
-                    `${items.length} solicitações com texto indicativo de esquecimento em ${normMonth(item)}; limite de validações: 4/mês`,
-                    'Prioritária', 'Conferir motivo oficial, quantidade de validações efetivas e eventual comunicação à chefia', items.length);
+                    'Volume de esquecimentos na competência consolidada',
+                    `${items.length} registros com texto indicativo de esquecimento na competência ${normMonth(item)} (possivelmente vários meses); não é possível concluir excesso mensal`,
+                    'Informativa', 'Conferir motivo oficial e distribuir por mês apenas na verificação normativa, sem dividir o ranking consolidado', items.length);
             }
             const rank = {'Prioritária':0, 'Atenção':1, 'Informativa':2};
             return findings.sort((a,b)=>(rank[a.prioridade]-rank[b.prioridade]) || a.unidade.localeCompare(b.unidade,'pt-BR') || a.funcionario.localeCompare(b.funcionario,'pt-BR'));
@@ -2505,7 +2538,7 @@
             const inclusions = records.filter(d => d.isInclusao);
             const forgotten = inclusions.filter(d => d.isEsquecimento);
             const other = inclusions.length - forgotten.length;
-            const recurrent = new Set(forgotten.filter(hasRecurrentForgotten).map(d => d.matricula)).size;
+            const recurrent = new Set(forgotten.filter(hasRecurrentForgotten).map(d => d.matricula || d.funcionario)).size;
             document.getElementById('punchTotal').textContent = inclusions.length.toLocaleString('pt-BR');
             document.getElementById('punchForgotten').textContent = forgotten.length.toLocaleString('pt-BR');
             document.getElementById('punchOther').textContent = other.toLocaleString('pt-BR');
@@ -2523,6 +2556,52 @@
             const top = [...emap.values()].sort((a,b)=>b.total-a.total).slice(0,8);
             add('chartPunchEmployees','bar',top.map(e=>e.name),top.map(e=>e.total),'#0d9488',true);
         }
+        function forgottenRankingRows(records) {
+            const employees = new Map();
+            records.forEach(d => {
+                const key = d.matricula || `NOME:${d.funcionario}:${d.deptNome}`;
+                if (!employees.has(key)) employees.set(key, {matricula:d.matricula, funcionario:d.funcionario,unidade:d.deptNome,inclusoes:0,esquecimentos:0,identificados:0});
+                const e = employees.get(key);
+                if (d.isInclusao) { e.inclusoes++; e.esquecimentos++; }
+                if (d.isEsquecimento) e.identificados++;
+            });
+            return [...employees.values()].sort((a,b)=>b.esquecimentos-a.esquecimentos || b.inclusoes-a.inclusoes || a.funcionario.localeCompare(b.funcionario,'pt-BR'));
+        }
+        function renderForgottenRanking(records) {
+            const ranking = forgottenRankingRows(records);
+            const groups = [0,1,2,3,4,5];
+            document.getElementById('forgottenDistribution').innerHTML = groups.map(n => {
+                const quantity = ranking.filter(e => n===5 ? e.esquecimentos >= 5 : e.esquecimentos === n).length;
+                return `<div class="rounded-lg p-3 text-center ${n===5?'bg-amber-50 dark:bg-amber-950/40':'bg-slate-50 dark:bg-slate-800'}"><p class="text-[11px] text-slate-500">${n===5?'5 ou mais':n} </p><p class="font-extrabold text-xl">${quantity}</p><p class="text-[10px] text-slate-500">empregados</p></div>`;
+            }).join('');
+            document.getElementById('forgottenRankBody').innerHTML = ranking.length ? ranking.map((e,i)=>`<tr class="border-t border-slate-200 dark:border-slate-700"><td class="p-3">${i+1}</td><td class="p-3 font-semibold">${escapeHtml(e.funcionario)}</td><td class="p-3">${escapeHtml(e.matricula)}</td><td class="p-3">${escapeHtml(e.unidade)}</td><td class="p-3">${e.inclusoes}</td><td class="p-3 font-bold ${e.identificados>=5?'text-amber-700 dark:text-amber-300':''}">${e.identificados}</td><td class="p-3"><button type="button" class="text-sky-700 dark:text-sky-300 underline" onclick="openRankEmployee(${i})">Analisar</button></td></tr>`).join('') : '<tr><td colspan="7" class="p-6 text-slate-500">Sem registros para o filtro.</td></tr>';
+        }
+        function openRankEmployee(index) {
+            const record = forgottenRankingRows(filteredDataset)[index];
+            if (!record) return;
+            // Mantém os filtros globais para a ficha e localiza o empregado pelo recorte.
+            const employees = getFilteredEmployeesList();
+            const idx = employees.findIndex(e => e.matricula === record.matricula && e.funcionario === record.funcionario);
+            switchTab('tabEmployees');
+            if (idx >= 0) openEmployeeAnalysis(idx);
+        }
+        async function exportForgottenRanking() {
+            if (typeof ExcelJS === 'undefined') { showToast('Biblioteca Excel indisponível.', 'error'); return; }
+            const rows = forgottenRankingRows(filteredDataset);
+            if (!rows.length) { showToast('Não há empregados no recorte.', 'warning'); return; }
+            const book = new ExcelJS.Workbook();
+            const sheet = book.addWorksheet('Ranking Esquecimentos', {views:[{state:'frozen',ySplit:1}]});
+            sheet.columns = [{header:'Posição',key:'posicao',width:12},{header:'Competência',key:'competencia',width:24},{header:'Matrícula',key:'matricula',width:16},{header:'Empregado',key:'funcionario',width:40},{header:'Unidade',key:'unidade',width:48},{header:'Inclusões de batida',key:'inclusoes',width:25},{header:'Esquecimentos com texto indicativo',key:'identificados',width:34}];
+            rows.forEach((r,i)=>sheet.addRow({posicao:i+1,competencia:selectedCompetence,...r}));
+            sheet.autoFilter = 'A1:G1';
+            sheet.getRow(1).eachCell(cell=>{cell.font={bold:true,color:{argb:'FFFFFFFF'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF004B93'}};cell.alignment={vertical:'middle',wrapText:true};});
+            sheet.getRow(1).height=30;
+            for(let i=2;i<=sheet.rowCount;i++) { if(i%2===0) sheet.getRow(i).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEFF6FC'}}; }
+            const blob = new Blob([await book.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            const stamp = new Date().toLocaleDateString('pt-BR').replaceAll('/','.');
+            saveBlob(blob,`justificativas_Ranking_Esquecimentos_${safeExportFilename(selectedCompetence)}_${stamp}.xlsx`);
+        }
+
         function renderDashboardAdvanced() {
             const records = filteredDataset;
             const total = records.length;
@@ -2537,6 +2616,7 @@
             document.getElementById('extraForgotten').textContent = records.filter(d => d.isEsquecimento).length;
             document.getElementById('extraManagers').textContent = new Set(records.map(d => d.gestor)).size;
             renderPunchDashboard(records);
+            renderForgottenRanking(records);
 
             const managers = summarizeManagers(records);
             const tbody = document.getElementById('managerDashboardBody');
@@ -2578,7 +2658,7 @@
                 setupStyledSheet('Dashboard',[
                     {header:'Indicador',key:'indicador',width:38},{header:'Valor',key:'valor',width:25}
                 ],[
-                    {indicador:'Competência',valor:selectedCompetence||'Todas (exploratório)'},
+                    {indicador:'Competência consolidada',valor:selectedCompetence},
                     {indicador:'Registros filtrados',valor:data.length},
                     {indicador:'Empregados distintos',valor:new Set(data.map(d=>d.matricula)).size},
                     {indicador:'Gestores distintos',valor:managers.length},
@@ -2593,7 +2673,7 @@
                     {header:'Gestor',key:'gestor',width:44},{header:'Total',key:'total',width:15},{header:'Pendentes',key:'pendentes',width:16},{header:'Aprovadas',key:'aprovadas',width:16},{header:'Acima de 24h',key:'late',width:19},{header:'Tempo médio decisão (h)',key:'avg',width:26},{header:'Sinalizadas',key:'alertas',width:17}
                 ],managers.map(e=>({gestor:e.gestor,total:e.total,pendentes:e.pendentes,aprovadas:e.aprovadas,late:e.late,avg:e.decisions?Number((e.sumHours/e.decisions).toFixed(2)):'N/D',alertas:e.alertas})));
                 buildBaseTratadaSheet(setupStyledSheet, styles, data, 'Registros_Filtrados');
-                await downloadWorkbook(workbook, `${currentSourceName}_Dashboard_${selectedCompetence||'Todas'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+                await downloadWorkbook(workbook, `${currentSourceName}_Dashboard_${safeExportFilename(selectedCompetence)}_${new Date().toISOString().slice(0,10)}.xlsx`);
                 showToast('Dashboard exportado com sucesso!', 'success');
             } catch (error) { console.error(error); showToast('Não foi possível exportar o Dashboard.', 'error'); }
         }
@@ -2954,7 +3034,7 @@
         function updateExportSummary() {
             const rows = getExportRows();
             const count = new Set(rows.map(d => String(d.deptNome || 'Não informada'))).size;
-            document.getElementById('exportSelectionSummary').textContent = `${count} unidade(s) · ${rows.length.toLocaleString('pt-BR')} registro(s) · competência: ${selectedCompetence ? selectedCompetence.slice(5) + '/' + selectedCompetence.slice(0, 4) : 'todas'}`;
+            document.getElementById('exportSelectionSummary').textContent = `${count} unidade(s) · ${rows.length.toLocaleString('pt-BR')} registro(s) · competência: ${selectedCompetence}`;
             document.getElementById('exportConfirmButton').disabled = !rows.length;
             document.getElementById('exportConfirmButton').classList.toggle('opacity-50', !rows.length);
             document.getElementById('exportConfirmButton').innerHTML = document.querySelector('input[name="exportScope"]:checked')?.value === 'zip' ? '<i class="fa-solid fa-file-zipper mr-2"></i>Gerar ZIP' : '<i class="fa-solid fa-file-excel mr-2"></i>Gerar Excel';
@@ -3053,7 +3133,7 @@
                 const reprovadas = processedDataset.filter(d => d.status.toLowerCase().includes('reprovad')).length;
                 const alertsCount = processedDataset.filter(d => d.flagsAuditoria.length > 0).length;
                 const avgLead = Number((processedDataset.reduce((a, b) => a + b.diasDiferenca, 0) / (total || 1)).toFixed(2));
-                const empAcimaLimite4 = selectedCompetence ? [...new Set(processedDataset.filter(d => d.isEsquecimento).map(d => d.matricula))].filter(mat => processedDataset.filter(d => d.matricula === mat && d.isEsquecimento).length >= 5).length : 0;
+                const empAcimaLimite4 = [...new Set(processedDataset.filter(d => d.isEsquecimento).map(d => d.matricula))].filter(mat => processedDataset.filter(d => d.matricula === mat && d.isEsquecimento).length >= 5).length;
 
                 const addSectionBanner = (title) => {
                     const r = wsResumo.addRow({ indicador: title, valor: '', obs: '' });
@@ -3084,7 +3164,7 @@
                 addKpiRow('Solicitações Pendentes', pendentes, `${((pendentes / total) * 100).toFixed(1)}%`, FILL_AMBER, FONT_AMBER);
                 addKpiRow('Solicitações Reprovadas', reprovadas, `${((reprovadas / total) * 100).toFixed(1)}%`);
                 addKpiRow('Média de Dias entre Ocorrência e Solicitação', avgLead, 'Dias corridos médios');
-                addKpiRow('Possíveis esquecimentos >4 no mês', empAcimaLimite4, selectedCompetence ? 'Triagem textual, conferir motivo' : 'Selecione uma competência', empAcimaLimite4 > 0 ? FILL_AMBER : FILL_GREEN, empAcimaLimite4 > 0 ? FONT_AMBER : FONT_GREEN);
+                addKpiRow('Empregados com 5+ esquecimentos na competência', empAcimaLimite4, 'Indicador consolidado; NÃO significa excesso mensal', empAcimaLimite4 > 0 ? FILL_AMBER : FILL_GREEN, empAcimaLimite4 > 0 ? FONT_AMBER : FONT_GREEN);
                 addKpiRow('Registros com Pontos de Atenção (Auditoria)', alertsCount, `${((alertsCount / total) * 100).toFixed(1)}%`, FILL_RED, FONT_RED);
 
                 const appendDistBlock = (bannerTitle, extractor) => {

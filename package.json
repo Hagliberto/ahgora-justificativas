@@ -1,6 +1,6 @@
 {
   "name": "ahgora-justificativas",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "description": "Auditoria local de justificativas Ahgora CAERN / NUPNN",
   "scripts": {

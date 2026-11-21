@@ -1,4 +1,4 @@
-# Relatório de Inconformidades para Gestores — versão 2.6.0
+# Relatório de Inconformidades para Gestores — versão 2.7.0
 
 ## Fontes primárias
 
@@ -7,9 +7,9 @@
 
 ## Semântica e limites
 
-Cada linha do relatório é **um indício para conferência**, não uma irregularidade comprovada. Múltiplos indícios podem nascer de um mesmo registro. Os textos de evidência são derivados da importação, não de prova externa. O mesmo empregado pode ter entradas para competências diferentes.
+Cada linha do relatório é **um indício para conferência**, não uma irregularidade comprovada. Múltiplos indícios podem nascer de um mesmo registro. Os textos de evidência são derivados da importação, não de prova externa. A análise atual tem uma competência única consolidada, mesmo que existam meses diferentes nas datas dos registros.
 
-- **ESQUECIMENTO**: apenas inclusões cujo texto contenha indício de esquecimento; agrupa matrícula + competência e cria **uma ocorrência consolidada por mês** quando a contagem supera quatro. O limite normativo se refere às **validações** de ponto por esquecimento; confirma-se na origem, inclusive o motivo oficial. Não são somadas genericamente todas as inclusões.
+- **ESQUECIMENTO**: apenas inclusões cujo texto contenha indício de esquecimento; agrupa matrícula + competência consolidada e cria **um aviso informativo de volume** quando a contagem supera quatro; esse total não prova excesso mensal. O limite normativo se refere às **validações** de ponto por esquecimento; confirma-se na origem, inclusive o motivo oficial. Não são somadas genericamente todas as inclusões.
 - **PRAZO_SOL**: solicitação posterior ao fato exige verificação do art. 12, que traz hipóteses de previsibilidade/imprevisibilidade e exceções; não basta estar posterior para configurar infração.
 - **APROVACAO**: acima de 24 horas corridas é indicador **informativo**, pois a Norma art. 12 indica 24h e o Manual p. 4, dois dias úteis. A regra prevalecente depende da validação institucional; não existe condenação automática do gestor.
 - **FUNDAMENTACAO**: textos genéricos são evidência insuficiente e demandam apuração; não se presume falsidade.

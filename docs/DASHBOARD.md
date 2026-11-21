@@ -27,4 +27,4 @@ O dashboard utiliza **volume absoluto** e não taxas por quadro de empregados, p
 
 
 ## Fluxo hierárquico 2.4.0
-Na appbar, abra Unidades e clique na unidade; a lista de empregados aparece filtrada. Clique no empregado para ver ficha analítica mensal, perfil e comparações. A evolução histórica consulta todas as competências do **arquivo atual**, independentemente da competência visual. Não agrega importações diferentes. As médias da unidade usam o recorte de filtros selecionado.
+Na appbar, abra Unidades e clique na unidade; a lista de empregados aparece filtrada. Clique no empregado para ver ficha analítica mensal, perfil e comparações. A evolução histórica consulta todas as competências do **arquivo atual**, independentemente da competência visual. Agrega os arquivos enviados à sessão atual. Não conserva dados entre recargas. As médias da unidade usam o recorte de filtros selecionado.

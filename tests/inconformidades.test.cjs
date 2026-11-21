@@ -12,7 +12,7 @@ function parseBrDate(input) {
   const m = String(input).match(/^(\d\d)\/(\d\d)\/(\d{4})(?:\s+(\d\d):(\d\d))?/);
   return m ? new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)) : null;
 }
-const context = vm.createContext({parseBrDate, Date, console});
+const context = vm.createContext({parseBrDate, Date, console, selectedCompetence:'Consolidada'});
 vm.runInContext(source,context);
 function row(id, month='2026-11', matricula='000123', extra={}) {
  return {id, matricula, funcionario:'EMPREGADO TESTE', deptNome:'Unidade A',deptCodigo:'10',filial:'01',
@@ -26,16 +26,16 @@ test('rota, aba, filtros e exportação normativos estão integrados',()=>{
  for (const token of ["tabConformidade: '/inconformidades'", "tabConformidade: '/inconformidades'",'id="conformityTableBody"','id="confUnit"','id="confRule"','id="confSeverity"','id="confSearch"','function exportConformityReport()',"workbook.addWorksheet('Inconformidades')"]) assert.ok(html.includes(token),token);
  assert.match(html,/addConformitySheet\(workbook, processedDataset\)/);
 });
-test('limite mensal não junta competências nem outras inclusões',()=>{
+test('competência única reúne meses sem confundir inclusões comuns',()=>{
  const data = [1,2,3,4].map(i=>row(i));
  data.push(row(5,'2026-12'));
  data.push(row(6,'2026-11','000123',{isEsquecimento:false,informacao:'Falha biométrica'}));
- assert.equal(findings(data).filter(f=>f.regraId==='ESQUECIMENTO').length,0);
- data.push(row(7));
  const incidents=findings(data).filter(f=>f.regraId==='ESQUECIMENTO');
  assert.equal(incidents.length,1);
  assert.equal(incidents[0].quantidade,5);
- assert.equal(incidents[0].competencia,'2026-11');
+ assert.equal(incidents[0].competencia,'Consolidada');
+ assert.equal(incidents[0].prioridade,'Informativa');
+ assert.match(incidents[0].evidencia,/não é possível concluir excesso mensal/);
 });
 test('matrículas distintas não são misturadas e um filtro não oculta o total da competência',()=>{
  const data=[...Array.from({length:5},(_,i)=>row(i+1)),...Array.from({length:4},(_,i)=>row(i+6,'2026-11','000999'))];

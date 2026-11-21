@@ -19,8 +19,8 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 **Critério de aceite:** nenhuma mudança não autorizada nos resultados do motor; divergências documentadas em issue e corrigidas antes da publicação.
 
 ## Checklist 2.1.0
-- [ ] Base de duas competências: a mais recente aparece por padrão; alternar mês recarrega KPIs, tabelas, alertas e Excel.
-- [ ] “Todas” mostra dados exploratórios sem afirmar excesso mensal de esquecimentos.
+- [ ] Importar duas planilhas com datas em meses distintos e confirmar uma única competência consolidada.
+- [ ] Ranking consolidado não afirma excesso mensal de esquecimentos.
 - [ ] Cinco ajustes com motivo textual explícito de esquecimento sinalizam conferência; cinco inclusões sem tal texto NÃO disparam a regra de quatro.
 - [ ] Aprovação após 24h sinaliza alerta **sem decisão de infração**; registrar divergência entre Norma e Manual.
 - [ ] Datas impossíveis e matrículas ausentes não geram agrupamento fraudulento.
@@ -52,9 +52,19 @@ Usar **exclusivamente dados fictícios** durante testes automatizados e demonstr
 - [ ] Versão 2.6.0 indicada em appbar, configurações e documentação.
 - [ ] Aba `#/inconformidades` acessível após importação e pelo histórico do navegador.
 - [ ] Filtros de unidade, regra, prioridade, pesquisa, gestor e competência funcionais.
-- [ ] Quatro esquecimentos no mês não geram alerta de excesso; cinco geram um único caso no mês.
+- [ ] Cinco inclusões em diferentes meses geram ranking consolidado com cinco, sem afirmar excesso mensal.
 - [ ] Não somar ajustes comuns como esquecimentos nem somar meses diferentes.
 - [ ] Aprovação acima de 24h indicada como conferência informativa, diante da divergência Norma/Manual.
 - [ ] Exportação específica contém os indícios filtrados e campo para análise humana.
 - [ ] Excel analítico completa ou por múltiplas unidades tem 8 abas, incluindo Inconformidades.
 - [ ] Testar unidade → empregado → ficha e links dos registros originais.
+
+## Checklist v2.7.0 — múltiplas planilhas e ranking consolidado
+
+- [ ] Selecionar duas ou mais planilhas em um único upload; conferir quantidade de arquivos e registros.
+- [ ] Adicionar outra planilha após a primeira, mantendo os dados anteriores.
+- [ ] Importar linhas iguais presentes em arquivos diferentes e confirmar deduplicação exata.
+- [ ] Importar meses diferentes de um mesmo empregado e confirmar a soma na mesma competência do ranking.
+- [ ] Filtrar unidade no Dashboard e conferir ranking e Excel correspondente.
+- [ ] Confirmar que cinco inclusões em meses distintos não geram conclusão automática de infração mensal.
+- [ ] Usar Limpar base e confirmar novo início sem dados da sessão anterior.

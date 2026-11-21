@@ -4,10 +4,10 @@
 
 | ID | Regra em produção | Base/ressalva |
 |---|---|---|
-| R01 | Competência pelo mês/ano da **data da justificativa (ocorrência)**; padrão é o mês mais recente do arquivo | Quando escolhida a opção “Todas”, totais não representam uma competência única |
+| R01 | Uma competência única engloba as linhas de todos os arquivos e pode atravessar meses | A competência consolidada é nomeada na appbar |
 | R02 | Totaliza todas as inclusões como volume informativo | Não confundir com esquecimento; o art. 7º §3º é específico |
 | R03 | Identifica possíveis esquecimentos por expressões como “esqueci”, “esquecimento”, “esqueceu” | Triagem heurística textual; requer conferência do motivo no Ahgora |
-| R04 | Mais de quatro possíveis esquecimentos identificados no mês sinaliza conferência | Norma NN.DD.P.A.06.0008.05 art. 7º §3º–4º; não sinaliza em “Todas” |
+| R04 | Volume consolidado de 5 ou mais ajustes pode ser destacado para conferência, mas não constitui excesso mensal | Norma NN.DD.P.A.06.0008.05 art. 7º §3º–4º; análise normativa mensal requer verificação específica |
 | R05 | Solicitação posterior à ocorrência sinaliza para análise contextual | Norma art. 12 contempla exceções; não é violação automática |
 | R06 | Aprovação com intervalo superior a 24h após solicitação sinaliza conferência | Norma art. 12 e Manual p. 4 divergem; não há verificação de 2 dias úteis automática |
 | R07 | Texto genérico/curto gera atenção | Heurística gerencial não prevista explicitamente na Norma |

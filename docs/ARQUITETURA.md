@@ -15,7 +15,7 @@ Arquivo Ahgora (.xlsx/.xls/.csv)
 ```
 
 ## Componentes lógicos
-- Entrada: `handleFileSelect`, `processUploadedFile`, `EXPECTED_COLUMNS`.
+- Entrada: `handleFileSelect`, `processUploadedFiles`, `mergeImportedRows`, `EXPECTED_COLUMNS`.
 - Tratamento: `parseBrDate`, `processDataset`, `getInclusionClassification`.
 - Estado: `rawDataset`, `processedDataset`, `filteredDataset`, `employeeStatsMap`.
 - UI: `switchTab`, `applyFilters`, `render*`, `openDetailModal`.
