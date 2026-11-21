@@ -1,14 +1,15 @@
 # Ahgora Justificativas — Auditoria e Análise (CAERN / NUPNN)
 
-Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.1.0.** Esta versão adiciona competência mensal e triagem normativa sem migrar a interface para um framework.
+Aplicação web estática para importar planilhas de justificativas do Ahgora, normalizar registros, oferecer análise gerencial e gerar relatórios Excel. **Versão do aplicativo: 2.2.0.** Dashboard gerencial com filtros globais, análise integrada e exportação dedicada, preservando a competência e a triagem normativa.
 
 ## Como executar
 
 1. Baixe/descompacte o projeto e abra `index.html` em um navegador atualizado conectado à internet para carregar as bibliotecas externas.
 2. Importe um `.xlsx`, `.xls` ou `.csv` do Ahgora (primeira aba) ou use a demonstração em **Configurações**.
 3. Selecione a **competência MM/AAAA** (a mais recente é selecionada por padrão). A opção “Todas” é exploratória e desativa a checagem mensal do limite de esquecimentos.
-4. Explore as abas **Visão Geral**, **Base Tratada**, **Empregados**, **Unidades** e **Alertas**.
-5. Exporte os registros filtrados, o ranking ou o relatório analítico de **7 abas** em `.xlsx`.
+4. No **Dashboard & Insights**, selecione filtros globais de período, empregado, gestor, filial, regime e auditoria. Os filtros complementares da aba **Base Tratada** também afetam os gráficos, KPIs e demais abas.
+5. Explore **Base Tratada**, **Empregados**, **Unidades** e **Alertas**. Use **Limpar globais** para limpar apenas filtros globais ou **Limpar filtros** na base tratada para limpar os filtros complementares.
+6. Exporte o **Dashboard XLSX** (resumo, gestores, registros filtrados), os registros filtrados, o ranking ou o relatório analítico completo em `.xlsx`. O botão de exportação analítica completa não segue necessariamente o recorte global: use o botão dedicado do Dashboard para exportar a seleção.
 
 Alternativamente, para servir localmente: `python -m http.server 8000` e acesse `http://localhost:8000`.
 
@@ -65,6 +66,15 @@ A versão original estava na `main` com a árvore limpa; esta entrega **não alt
 ## Limites
 
 O sistema **sinaliza** registros para conferência e não decide automaticamente a validade jurídica ou administrativa de uma justificativa. Os parâmetros atuais de 4 inclusões, 5/7 dias e escala 12x36 vêm do código recebido; precisam de confirmação formal na norma aplicável e no período de apuração. Consulte [regras](docs/REGRAS_DE_NEGOCIO.md) e [homologação](docs/HOMOLOGACAO.md).
+
+## Mudanças da versão 2.2.0
+
+- Filtros globais de datas de ocorrência, matrícula/empregado, gestor, filial, grupo de regra e tipo de sinalização; cruzamento com filtros já existentes.
+- Indicadores de aprovação, tempo de decisão, decisões com mais de 24h, reprovações, esquecimentos textualmente identificados e gestores.
+- Quatro novos gráficos (status, gestores, empregados, dias da semana), quatro novos insights e painel com volume, pendências, decisões e alertas por gestor.
+- Exportação do recorte do Dashboard para XLSX em três abas; reorganização de análises por empregado/unidade/alerta para respeitar filtros ativos.
+- **Atenção:** estatísticas individuais da coluna de esquecimentos preservam a competência inteira; filtros não reclassificam o limite mensal. Contagens por gestor são volumes absolutos, sem normalização pela lotação da equipe.
+- Nenhuma classificação automática implica sanção; sinais de prazo exigem conferência frente à Norma e Manual.
 
 ## Mudanças da versão 2.1.0
 

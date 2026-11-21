@@ -1,5 +1,13 @@
 # Histórico de alterações
 
+## 2.2.0 — 20/11/2026
+- Dashboard com filtros globais cruzados e indicadores de gestão.
+- Novos gráficos e insights descritivos por status, gestor, empregado e dia da semana.
+- Painel de pendências e decisão por gestor; exportação filtrada em XLSX.
+- Sincronização dos recortes das abas de empregados, unidades e auditoria.
+- Preservados os alertas preventivos e a lógica mensal de esquecimentos.
+
+
 ## 2.1.0 — 20/11/2026
 - Filtro por competência baseado na data da ocorrência, com reapuração mensal.
 - Triagem de possíveis esquecimentos sem confundir todas as inclusões com motivo normativo.
