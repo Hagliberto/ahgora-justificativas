@@ -1,4 +1,4 @@
-# Mapa de código e pontos de extensão — v2.7.1
+# Mapa de código e pontos de extensão — v2.7.2
 
 **Arquivo**: `index.html`. Em vez de confiar em números de linha, busque pelo **nome da função** (os deslocamentos mudam a cada release).
 

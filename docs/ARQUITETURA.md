@@ -1,4 +1,4 @@
-# Arquitetura implementada — v2.7.1
+# Arquitetura implementada — v2.7.2
 
 ## Visão geral
 Aplicação web estática (SPA) com **um `index.html` monolítico** contendo UI, CSS e JavaScript. Não utiliza servidor de aplicação nem base de dados. Bibliotecas de terceiros são baixadas por CDN em tempo de execução (necessária conexão inicial). Interface WIDE e hash routes; arquivos importados e registros vivem na memória da guia do navegador.

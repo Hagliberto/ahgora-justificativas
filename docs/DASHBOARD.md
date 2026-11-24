@@ -1,4 +1,4 @@
-# Dashboard e ranking de esquecimentos — v2.7.1
+# Dashboard e ranking de esquecimentos — v2.7.2
 
 ## Escopo e filtros
 - A competência **inicia `Consolidada`** e abrange todos os registros importados na sessão, ainda que tenham datas de vários meses; não é automaticamente um seletor mensal.

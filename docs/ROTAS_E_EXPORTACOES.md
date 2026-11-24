@@ -1,4 +1,4 @@
-# Rotas e exportações — v2.7.1
+# Rotas e exportações — v2.7.2
 
 ## Rotas
 

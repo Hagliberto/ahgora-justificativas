@@ -1,4 +1,4 @@
-# Homologação e regressão — v2.7.1
+# Homologação e regressão — v2.7.2
 
 Este roteiro separa **testes automatizados estáticos/isolados** de **homologação real no navegador**. `npm test` não substitui testes da geração binária e da interface.
 
@@ -30,3 +30,8 @@ Construir pelo menos 2 departamentos (A e B) com empregados fictícios; inserir 
 
 ## Critério de entrega
 Relatório com: versão, arquivos alterados, testes executados e resultados, evidências de navegador e Excel/ZIP (quando realizadas), pendências e aprovação do responsável. Não declarar 'homologado' sem execução comprovada da etapa correspondente.
+
+## Regressão v2.7.2 — exportações filtradas
+- Oito testes novos com dependências simuladas: download padrão, retorno de buffer, base vazia e falha de download, para cada uma das duas funções. Antes da correção, seis falharam; após a correção, os oito passaram.
+- Suíte completa: 50 testes aprovados; scripts inline aprovados em `node --check` (Node 22).
+- Pendente: conferência em navegador real e abertura dos arquivos gerados no Excel. Tailwind CDN mantido; migração visual fora do escopo desta correção.

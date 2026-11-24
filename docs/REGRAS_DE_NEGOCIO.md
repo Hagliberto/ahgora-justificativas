@@ -1,4 +1,4 @@
-# Regras de negócio implementadas — v2.7.1
+# Regras de negócio implementadas — v2.7.2
 
 **Natureza:** auditoria preventiva, baseada em declarações extraídas do Ahgora. Indícios demandam conferência e nunca geram conclusão disciplinar automática.
 

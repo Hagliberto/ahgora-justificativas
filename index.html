@@ -188,7 +188,7 @@
                 <div class="p-4 rounded-xl bg-caern-light/60 dark:bg-sky-950/40 border border-caern-secondary/25 space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-caern-primary dark:text-sky-300">Ficha Técnica</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.7.1 • NUPNN</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-caern-primary text-white">Versão 2.7.2 • NUPNN</span>
                     </div>
                     <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 pt-1">
                         <p><strong>Autoria:</strong> Hagliberto Alves de Oliveira — Gestor do Núcleo de Pessoal Natal Norte (NUPNN / CAERN)</p>
@@ -245,7 +245,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5">
-                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.7.1</span>
+                        <span class="font-extrabold tracking-wider text-lg sm:text-xl">CAERN</span><span class="text-[10px] text-sky-100/80" title="Versão da aplicação">v2.7.2</span>
                         <span class="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-sky-400/20 text-sky-200 border border-sky-300/30 rounded-full">
                             NUPNN • Auditoria de Ponto
                         </span>
@@ -2926,7 +2926,7 @@
         }
 
         // Exportar APENAS os registros filtrados da Aba "Base Tratada & Filtros"
-        async function exportFilteredRecordsExcel() {
+        async function exportFilteredRecordsExcel(options = {}) {
             if (!filteredDataset || filteredDataset.length === 0) {
                 showToast('Não há registros filtrados para exportar.', 'warning');
                 return;
@@ -2950,7 +2950,7 @@
         }
 
         // Exportar APENAS o ranking filtrado da Aba "Análise por Empregado"
-        async function exportFilteredEmployeesExcel() {
+        async function exportFilteredEmployeesExcel(options = {}) {
             const empList = getFilteredEmployeesList();
             if (!empList || empList.length === 0) {
                 showToast('Não há empregados no filtro atual para exportar.', 'warning');

@@ -1,4 +1,4 @@
-# Contratos de dados — v2.7.1
+# Contratos de dados — v2.7.2
 
 ## Fontes e leitura
 - Extensões aceitas: `.xlsx`, `.xls`, `.csv`. `processUploadedFiles` usa `file.arrayBuffer()` e SheetJS, lê **a primeira planilha** de cada arquivo e normaliza espaços nos nomes das colunas.

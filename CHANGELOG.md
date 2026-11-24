@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.7.2] - 2026-11-23
+- Corrigido `ReferenceError: options is not defined` nas duas exportações filtradas, com parâmetro opcional padrão e suporte a `returnBuffer`.
+- Adicionados testes de regressão executáveis para download, buffer, ausência de dados e falha simulada.
+- Tailwind CDN mantido para preservar a interface; migração de CSS fica separada.
+
 ## Documentação complementar — 21/11/2026 (código mantido em v2.7.1)
 - Revisados README, AGENTS e documentos técnicos para refletir o código da v2.7.1.
 - Adicionados índice técnico, mapa de funções, contratos de dados e contrato de isolamento de XLSX/ZIP por departamento.

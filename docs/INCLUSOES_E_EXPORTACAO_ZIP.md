@@ -1,4 +1,4 @@
-# Dashboard de inclusões e exportação ZIP — v2.7.1
+# Dashboard de inclusões e exportação ZIP — v2.7.2
 
 ## Filtros globais
 

@@ -1,4 +1,4 @@
-# Exportações e isolamento por departamento — contrato crítico v2.7.1
+# Exportações e isolamento por departamento — contrato crítico v2.7.2
 
 ## Modal Exportar análise
 1. **Completa**: um XLSX com a base da sessão.

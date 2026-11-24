@@ -1,4 +1,4 @@
-# Índice técnico — v2.7.1
+# Índice técnico — v2.7.2
 
 **Leitura por ordem**: [AGENTS](../AGENTS.md) → [README](../README.md) → este índice.
 

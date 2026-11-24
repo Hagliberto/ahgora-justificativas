@@ -1,6 +1,6 @@
 # Ahgora Justificativas — CAERN / NUPNN
 
-**Versão do projeto: 2.7.1** · aplicação web de auditoria **preventiva** de justificativas do Ahgora, com processamento local no navegador e exportação Excel formatada.
+**Versão do projeto: 2.7.2** · aplicação web de auditoria **preventiva** de justificativas do Ahgora, com processamento local no navegador e exportação Excel formatada.
 
 ## Início rápido
 1. Abra `index.html` em navegador com acesso às bibliotecas CDN (ou hospede o diretório em servidor estático, inclusive Cloudflare Pages).
@@ -39,7 +39,7 @@ npm test
 Os testes `node:test` abrangem regras e regressões, incluindo `tests/isolamento-exportacao.test.cjs`. **Não equivalem a homologação em navegador ou no SharePoint**. Para um ciclo completo, siga `docs/HOMOLOGACAO.md`.
 
 ## Guia para mantenedores e outras IAs
-**Antes de alterar código, leia [`AGENTS.md`](AGENTS.md).** Consulte [`docs/INDICE_TECNICO.md`](docs/INDICE_TECNICO.md) para arquitetura, mapa de funções, contratos de dados, regras de negócio e exportações. A documentação foi sincronizada com a **v2.7.1** e diferencia comportamento atual de melhorias propostas.
+**Antes de alterar código, leia [`AGENTS.md`](AGENTS.md).** Consulte [`docs/INDICE_TECNICO.md`](docs/INDICE_TECNICO.md) para arquitetura, mapa de funções, contratos de dados, regras de negócio e exportações. A documentação foi sincronizada com a **v2.7.2** e diferencia comportamento atual de melhorias propostas.
 
 ## Segurança e governança
 Não usar dados pessoais reais em fixtures/commits. Não presumir que heurísticas equivalem a infrações. Não publicar projeto ou dados sem autorização. Ver [`SECURITY.md`](SECURITY.md) e [`docs/CONCILIACAO_NORMATIVA.md`](docs/CONCILIACAO_NORMATIVA.md).

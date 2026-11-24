@@ -1,4 +1,4 @@
-# Roadmap — propostas futuras, NÃO implementadas na v2.7.1
+# Roadmap — propostas futuras, NÃO implementadas na v2.7.2
 
 ## P0: confiabilidade e segurança
 - [ ] Testes E2E de navegador com SheetJS/ExcelJS/JSZip reais, incluindo importação de XLSX/XLS/CSV e abertura de cada XLSX do ZIP.

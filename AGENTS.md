@@ -1,6 +1,6 @@
 # AGENTS.md — contrato de manutenção para agentes de IA
 
-> **Leia este arquivo ANTES de editar.** Fonte analisada: `index.html` / `package.json` da **v2.7.1**. A documentação descreve o comportamento observado no código, não uma arquitetura futura desejada. Consulte `docs/INDICE_TECNICO.md` para navegação.
+> **Leia este arquivo ANTES de editar.** Fonte analisada: `index.html` / `package.json` da **v2.7.2**. A documentação descreve o comportamento observado no código, não uma arquitetura futura desejada. Consulte `docs/INDICE_TECNICO.md` para navegação.
 
 ## 0. Objetivo e inegociáveis
 - Aplicação web estática, local no navegador, de triagem gerencial de justificativas exportadas do Ahgora; **não é um sistema disciplinar**, homologador de faltas nem um validador automático do ACT.
